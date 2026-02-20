@@ -1,0 +1,20 @@
+{
+  "name": "@candoo/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@candoo/domain": "workspace:*",
+    "@supabase/supabase-js": "^2.97.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0"
+  }
+}

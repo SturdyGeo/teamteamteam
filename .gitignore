@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+coverage/
+.DS_Store
+
+# Supabase
+supabase/.temp/
+supabase/.env
+supabase/functions/api/app.bundle.js

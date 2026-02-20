@@ -1,0 +1,22 @@
+{
+  "workspaces": {
+    ".": {
+      "entry": [],
+      "project": ["*.{js,ts}"],
+      "ignoreBinaries": ["supabase"]
+    },
+    "packages/domain": {
+      "project": ["src/**/*.ts"]
+    },
+    "packages/api-client": {
+      "project": ["src/**/*.ts"]
+    },
+    "apps/api": {
+      "entry": ["src/index.ts", "src/app.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "apps/cli": {
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
+}

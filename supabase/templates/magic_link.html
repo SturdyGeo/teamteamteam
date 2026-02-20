@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Candoo login code</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px; color: #1a1a1a;">
+  <h2 style="margin-bottom: 8px;">Your login code</h2>
+  <p style="color: #555; margin-top: 0;">Enter this code in your terminal to sign in to Candoo:</p>
+  <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 24px; background: #f4f4f5; border-radius: 8px; margin: 24px 0;">
+    {{ .Token }}
+  </div>
+  <p style="color: #555; font-size: 14px;">This code expires in 1 hour.</p>
+  <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 32px 0;" />
+  <p style="color: #888; font-size: 13px;">
+    Alternatively, you can <a href="{{ .ConfirmationURL }}" style="color: #2563eb;">click here to sign in</a> via your browser.
+  </p>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "candoo",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "knip": "knip",
+    "clean": "rm -rf packages/*/dist apps/*/dist *.tsbuildinfo packages/*/*.tsbuildinfo apps/*/*.tsbuildinfo",
+    "build:edge": "bun build apps/api/src/app.ts --bundle --outfile supabase/functions/api/app.bundle.js --format esm --target browser --external @supabase/supabase-js",
+    "db:push": "supabase db push",
+    "db:reset": "supabase db reset --linked",
+    "db:diff": "supabase db diff",
+    "db:status": "supabase migration list"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.0.0",
+    "knip": "^5.84.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18"
+  }
+}

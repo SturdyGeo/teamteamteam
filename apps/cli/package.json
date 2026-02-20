@@ -1,0 +1,22 @@
+{
+  "name": "@candoo/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "candoo": "./dist/index.js"
+  },
+  "dependencies": {
+    "@candoo/api-client": "workspace:*",
+    "@candoo/domain": "workspace:*",
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0",
+    "ink": "^5",
+    "react": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^18",
+    "ink-testing-library": "^4"
+  }
+}
