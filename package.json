@@ -12,6 +12,8 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config tests/integration/vitest.config.ts",
     "knip": "knip",
+    "install:cli": "bash ./scripts/install-cli.sh",
+    "uninstall:cli": "bash ./scripts/uninstall-cli.sh",
     "build:cli": "bun build apps/cli/src/index.ts --compile --outfile dist/candoo",
     "release": "bun run build && bun run build:cli",
     "clean": "rm -rf dist packages/*/dist apps/*/dist *.tsbuildinfo packages/*/*.tsbuildinfo apps/*/*.tsbuildinfo",

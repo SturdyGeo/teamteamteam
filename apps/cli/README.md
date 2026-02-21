@@ -10,11 +10,31 @@ The CLI is part of the Candoo monorepo. After building (`bun run build`), run co
 doppler run -- bun run --filter @candoo/cli start -- <command>
 ```
 
-Or use the standalone binary (see root README for `bun run build:cli`):
+For a one-command install to your shell path:
+
+```sh
+bun run install:cli
+```
+
+By default this installs `candoo` to `~/.local/bin/candoo`. Override with `CANDOO_INSTALL_DIR`:
+
+```sh
+CANDOO_INSTALL_DIR=/usr/local/bin bun run install:cli
+```
+
+Remove it with:
+
+```sh
+bun run uninstall:cli
+```
+
+Or use the standalone binary directly (see root README for `bun run build:cli`):
 
 ```sh
 ./dist/candoo <command>
 ```
+
+By default, the CLI uses a built-in backend target so end users can run commands without Doppler or extra env setup.
 
 ## Configuration
 
@@ -32,6 +52,28 @@ Config is stored at `~/.config/candoo/`:
 | `--json` | Output raw JSON instead of formatted text |
 | `--org <name>` | Override the default org (name or UUID) |
 | `--project <prefix>` | Override the default project (prefix or UUID) |
+| `--custom-backend` | Use custom backend values from flags/env instead of the built-in default |
+| `--api-url <url>` | Custom API URL (requires `--custom-backend`) |
+| `--supabase-url <url>` | Custom Supabase URL (requires `--custom-backend`) |
+| `--supabase-anon-key <key>` | Custom Supabase anon key (requires `--custom-backend`) |
+
+### Custom Backend
+
+Override backend values directly on the command line:
+
+```sh
+candoo --custom-backend \
+  --api-url https://<project-ref>.supabase.co/functions/v1/api \
+  --supabase-url https://<project-ref>.supabase.co \
+  --supabase-anon-key <anon-key> \
+  whoami
+```
+
+Or pass `--custom-backend` and rely on env vars:
+
+```sh
+SUPABASE_URL=... SUPABASE_ANON_KEY=... CANDOO_API_URL=... candoo --custom-backend whoami
+```
 
 ## Commands
 

@@ -6,6 +6,7 @@ import { registerProjectCommands } from "./commands/project.js";
 import { registerTicketCommands } from "./commands/ticket.js";
 import { registerTagCommands } from "./commands/tag.js";
 import { registerBoardCommand } from "./commands/board.js";
+import { configureClient } from "./client.js";
 
 const program = new Command("candoo")
   .version("0.1.0")
@@ -14,6 +15,13 @@ const program = new Command("candoo")
   .option("--json", "Output as JSON")
   .option("--org <name>", "Override default org (name or UUID)")
   .option("--project <prefix>", "Override default project (prefix or UUID)")
+  .option("--custom-backend", "Use a custom backend from flags/env instead of the built-in backend")
+  .option("--api-url <url>", "Custom API URL (requires --custom-backend)")
+  .option("--supabase-url <url>", "Custom Supabase URL (requires --custom-backend)")
+  .option(
+    "--supabase-anon-key <key>",
+    "Custom Supabase anon key (requires --custom-backend)",
+  )
   .addHelpText(
     "after",
     `
@@ -26,6 +34,21 @@ Getting started:
   $ candoo ticket create "My first ticket"
   $ candoo board`,
   );
+
+program.hook("preAction", (_command, actionCommand) => {
+  const opts = actionCommand.optsWithGlobals<{
+    customBackend?: boolean;
+    apiUrl?: string;
+    supabaseUrl?: string;
+    supabaseAnonKey?: string;
+  }>();
+  configureClient({
+    customBackend: opts.customBackend,
+    apiUrl: opts.apiUrl,
+    supabaseUrl: opts.supabaseUrl,
+    supabaseAnonKey: opts.supabaseAnonKey,
+  });
+});
 
 registerAuthCommands(program);
 registerOrgCommands(program);

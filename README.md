@@ -8,6 +8,7 @@ Designed to evolve into a full web application without rewriting core logic.
 
 - **CLI commands** for managing orgs, projects, tickets, tags, and workflows
 - **TUI board** (Ink-based kanban board rendered in the terminal)
+- **Built-in backend defaults** in the CLI for zero-config consumer usage
 - **Multi-user / multi-org** with Supabase magic link authentication
 - **Row Level Security** for org-level data isolation
 - **Command-based mutations** with full activity logging
@@ -19,7 +20,7 @@ Designed to evolve into a full web application without rewriting core logic.
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (runtime and package manager)
-- [Doppler](https://www.doppler.com/) (secrets management)
+- [Doppler](https://www.doppler.com/) (secrets management for local development and CI checks)
 - [Supabase](https://supabase.com/) project (or local dev via `supabase init`)
 
 ## Setup
@@ -37,7 +38,7 @@ Designed to evolve into a full web application without rewriting core logic.
    bun install
    ```
 
-3. **Configure secrets**
+3. **Configure secrets (developer workflow)**
 
    Copy the environment template and configure Doppler with your Supabase credentials:
 
@@ -45,7 +46,7 @@ Designed to evolve into a full web application without rewriting core logic.
    cp .env.example .env
    ```
 
-   Required environment variables (managed via Doppler):
+   Development environment variables (managed via Doppler):
 
    | Variable           | Description                  |
    |--------------------|------------------------------|
@@ -71,7 +72,8 @@ Designed to evolve into a full web application without rewriting core logic.
 
 ## Usage
 
-> **Note:** All commands require the Doppler prefix: `doppler run -- <command>`
+`candoo` now includes a built-in default backend target for consumer usage.
+You only need Doppler when running local development scripts in this repository.
 
 ### Global Flags
 
@@ -80,6 +82,28 @@ Designed to evolve into a full web application without rewriting core logic.
 | `--json` | Output raw JSON (works with every command) |
 | `--org <name>` | Override the default org (name or UUID) |
 | `--project <prefix>` | Override the default project (prefix or UUID) |
+| `--custom-backend` | Use custom backend values from flags or env vars instead of built-in defaults |
+| `--api-url <url>` | Custom API URL (requires `--custom-backend`) |
+| `--supabase-url <url>` | Custom Supabase URL (requires `--custom-backend`) |
+| `--supabase-anon-key <key>` | Custom Supabase anon key (requires `--custom-backend`) |
+
+### Custom Backend Override
+
+If you want to point the CLI at your own Supabase project and API:
+
+```sh
+candoo --custom-backend \
+  --api-url https://<project-ref>.supabase.co/functions/v1/api \
+  --supabase-url https://<project-ref>.supabase.co \
+  --supabase-anon-key <anon-key> \
+  whoami
+```
+
+You can also pass only `--custom-backend` and provide values through env vars:
+
+```sh
+SUPABASE_URL=... SUPABASE_ANON_KEY=... CANDOO_API_URL=... candoo --custom-backend whoami
+```
 
 ### Authentication
 
@@ -314,7 +338,27 @@ Integration tests cover:
 
 ## Binary Distribution
 
-Build a standalone macOS binary (no Bun runtime required to run):
+Install the CLI in one command:
+
+```sh
+bun run install:cli
+```
+
+This builds the standalone binary and installs `candoo` to `~/.local/bin/candoo` by default.
+
+Use a custom install location with `CANDOO_INSTALL_DIR`:
+
+```sh
+CANDOO_INSTALL_DIR=/usr/local/bin bun run install:cli
+```
+
+Uninstall:
+
+```sh
+bun run uninstall:cli
+```
+
+You can also build the standalone macOS binary without installing it:
 
 ```sh
 doppler run -- bun run build:cli
