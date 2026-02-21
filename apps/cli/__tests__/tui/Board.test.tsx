@@ -18,6 +18,13 @@ const columns: WorkflowColumn[] = [
     position: 1,
     created_at: "2025-01-01T00:00:00Z",
   },
+  {
+    id: "col-3",
+    project_id: "proj-1",
+    name: "Done",
+    position: 2,
+    created_at: "2025-01-01T00:00:00Z",
+  },
 ];
 
 const tickets: Ticket[] = [
@@ -35,45 +42,80 @@ const tickets: Ticket[] = [
     updated_at: "2025-01-01T00:00:00Z",
     closed_at: null,
   },
+  {
+    id: "t-2",
+    project_id: "proj-1",
+    number: 2,
+    title: "Second ticket",
+    description: "",
+    status_column_id: "col-1",
+    assignee_id: null,
+    reporter_id: "user-1",
+    tags: [],
+    created_at: "2025-01-01T00:00:00Z",
+    updated_at: "2025-01-01T00:00:00Z",
+    closed_at: null,
+  },
+  {
+    id: "t-3",
+    project_id: "proj-1",
+    number: 3,
+    title: "Third ticket",
+    description: "",
+    status_column_id: "col-2",
+    assignee_id: "user-1",
+    reporter_id: "user-1",
+    tags: [],
+    created_at: "2025-01-01T00:00:00Z",
+    updated_at: "2025-01-01T00:00:00Z",
+    closed_at: null,
+  },
 ];
+
+function buildTicketsByColumn(): Map<string, Ticket[]> {
+  const map = new Map<string, Ticket[]>();
+  map.set(
+    "col-1",
+    tickets.filter((t) => t.status_column_id === "col-1"),
+  );
+  map.set(
+    "col-2",
+    tickets.filter((t) => t.status_column_id === "col-2"),
+  );
+  map.set("col-3", []);
+  return map;
+}
+
+const memberMap = new Map<string, string>([["user-1", "Alice"]]);
 
 describe("Board", () => {
   it("renders columns", () => {
-    const ticketsByColumn = new Map<string, Ticket[]>();
-    ticketsByColumn.set("col-1", tickets);
-    ticketsByColumn.set("col-2", []);
-
-    const memberMap = new Map<string, string>();
-    memberMap.set("user-1", "Alice");
-
     const { lastFrame } = render(
       <Board
         columns={columns}
-        ticketsByColumn={ticketsByColumn}
+        ticketsByColumn={buildTicketsByColumn()}
         memberMap={memberMap}
         prefix="DEMO"
+        selectedColumnIndex={0}
+        selectedTicketIndex={0}
       />,
     );
 
     const frame = lastFrame()!;
     expect(frame).toContain("To Do");
     expect(frame).toContain("In Progress");
+    expect(frame).toContain("Done");
   });
 
   it("renders tickets in their columns", () => {
-    const ticketsByColumn = new Map<string, Ticket[]>();
-    ticketsByColumn.set("col-1", tickets);
-    ticketsByColumn.set("col-2", []);
-
-    const memberMap = new Map<string, string>();
-    memberMap.set("user-1", "Alice");
-
     const { lastFrame } = render(
       <Board
         columns={columns}
-        ticketsByColumn={ticketsByColumn}
+        ticketsByColumn={buildTicketsByColumn()}
         memberMap={memberMap}
         prefix="DEMO"
+        selectedColumnIndex={0}
+        selectedTicketIndex={0}
       />,
     );
 
@@ -84,20 +126,60 @@ describe("Board", () => {
   });
 
   it("shows placeholder for empty columns", () => {
-    const ticketsByColumn = new Map<string, Ticket[]>();
-    ticketsByColumn.set("col-1", []);
-    ticketsByColumn.set("col-2", []);
+    const emptyMap = new Map<string, Ticket[]>();
+    emptyMap.set("col-1", []);
+    emptyMap.set("col-2", []);
+    emptyMap.set("col-3", []);
 
     const { lastFrame } = render(
       <Board
         columns={columns}
-        ticketsByColumn={ticketsByColumn}
+        ticketsByColumn={emptyMap}
         memberMap={new Map()}
         prefix="DEMO"
+        selectedColumnIndex={0}
+        selectedTicketIndex={0}
       />,
     );
 
     const frame = lastFrame()!;
     expect(frame).toContain("No tickets");
+  });
+
+  it("highlights active column header", () => {
+    const { lastFrame } = render(
+      <Board
+        columns={columns}
+        ticketsByColumn={buildTicketsByColumn()}
+        memberMap={memberMap}
+        prefix="DEMO"
+        selectedColumnIndex={1}
+        selectedTicketIndex={0}
+      />,
+    );
+
+    // The active column (In Progress) should be rendered —
+    // we can't directly test color in plain text, but we confirm it renders
+    const frame = lastFrame()!;
+    expect(frame).toContain("In Progress");
+    expect(frame).toContain("DEMO-3");
+  });
+
+  it("shows selected ticket with border in active column", () => {
+    const { lastFrame } = render(
+      <Board
+        columns={columns}
+        ticketsByColumn={buildTicketsByColumn()}
+        memberMap={memberMap}
+        prefix="DEMO"
+        selectedColumnIndex={0}
+        selectedTicketIndex={0}
+      />,
+    );
+
+    const frame = lastFrame()!;
+    // The selected ticket (DEMO-1) should have a round border
+    expect(frame).toContain("╭");
+    expect(frame).toContain("DEMO-1");
   });
 });

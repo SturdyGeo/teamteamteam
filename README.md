@@ -94,6 +94,7 @@ candoo org list                # List your organizations
 candoo org create <name>       # Create a new organization
 candoo org use <name>          # Set default org for local context
 candoo org delete <name>       # Delete an org and all its data (--yes to skip prompt)
+candoo org invite <email>      # Invite a user by email (--role admin|member)
 ```
 
 If you have only one org, it is auto-selected without needing `org use`.
@@ -168,7 +169,7 @@ candoo board          # Launch the interactive kanban board
 | `o`   | Reopen ticket               |
 | `/`   | Open filter bar             |
 | `r`   | Refresh board               |
-| `Esc` | Clear filters               |
+| `Esc` | Close detail pane / clear filters |
 | `?`   | Show help                   |
 
 ## API

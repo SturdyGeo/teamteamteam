@@ -46,4 +46,37 @@ describe("TicketCard", () => {
     // Should contain the truncation character
     expect(frame).toContain("\u2026");
   });
+
+  it("renders with border when isSelected is true", () => {
+    const { lastFrame } = render(
+      <TicketCard
+        ticketKey="DEMO-4"
+        title="Selected ticket"
+        assignee="Bob"
+        columnWidth={30}
+        isSelected={true}
+      />,
+    );
+    const frame = lastFrame()!;
+    expect(frame).toContain("DEMO-4");
+    expect(frame).toContain("Selected ticket");
+    // Round border uses characters like ╭ ╮ ╰ ╯
+    expect(frame).toContain("╭");
+    expect(frame).toContain("╯");
+  });
+
+  it("renders without border when isSelected is false", () => {
+    const { lastFrame } = render(
+      <TicketCard
+        ticketKey="DEMO-5"
+        title="Not selected"
+        assignee={null}
+        columnWidth={30}
+        isSelected={false}
+      />,
+    );
+    const frame = lastFrame()!;
+    expect(frame).toContain("DEMO-5");
+    expect(frame).not.toContain("╭");
+  });
 });

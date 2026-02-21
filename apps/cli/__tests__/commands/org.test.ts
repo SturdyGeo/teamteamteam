@@ -14,6 +14,7 @@ vi.mock("../../src/config.js", () => ({
 
 vi.mock("../../src/resolve.js", () => ({
   resolveOrg: vi.fn(),
+  resolveOrgId: vi.fn(),
 }));
 
 vi.mock("../../src/output.js", async (importOriginal) => {
@@ -26,12 +27,13 @@ vi.mock("../../src/output.js", async (importOriginal) => {
 
 import { getClient } from "../../src/client.js";
 import { saveConfig } from "../../src/config.js";
-import { resolveOrg } from "../../src/resolve.js";
+import { resolveOrg, resolveOrgId } from "../../src/resolve.js";
 import { confirmAction } from "../../src/output.js";
 
 const mockGetClient = vi.mocked(getClient);
 const mockSaveConfig = vi.mocked(saveConfig);
 const mockResolveOrg = vi.mocked(resolveOrg);
+const mockResolveOrgId = vi.mocked(resolveOrgId);
 const mockConfirmAction = vi.mocked(confirmAction);
 
 function buildProgram(): Command {
@@ -184,6 +186,53 @@ describe("org commands", () => {
 
       expect(mockClient.deleteOrg).not.toHaveBeenCalled();
       expect(logSpy.mock.calls[0][0]).toContain("Aborted");
+    });
+  });
+
+  describe("org invite", () => {
+    it("invites a member with default role", async () => {
+      const membership = { id: "mem-1", org_id: "org-1", user_id: "u-1", role: "member", created_at: "2024-01-01T00:00:00Z" };
+      const mockClient = {
+        inviteMember: vi.fn().mockResolvedValue(membership),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+      mockResolveOrgId.mockResolvedValue("org-1");
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "candoo", "org", "invite", "alice@example.com"]);
+
+      expect(mockResolveOrgId).toHaveBeenCalledWith(mockClient, undefined);
+      expect(mockClient.inviteMember).toHaveBeenCalledWith("org-1", { email: "alice@example.com", role: "member" });
+      expect(logSpy.mock.calls[0][0]).toContain("alice@example.com");
+    });
+
+    it("invites a member with --role admin", async () => {
+      const membership = { id: "mem-2", org_id: "org-1", user_id: "u-2", role: "admin", created_at: "2024-01-01T00:00:00Z" };
+      const mockClient = {
+        inviteMember: vi.fn().mockResolvedValue(membership),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+      mockResolveOrgId.mockResolvedValue("org-1");
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "candoo", "org", "invite", "bob@example.com", "--role", "admin"]);
+
+      expect(mockClient.inviteMember).toHaveBeenCalledWith("org-1", { email: "bob@example.com", role: "admin" });
+      expect(logSpy.mock.calls[0][0]).toContain("bob@example.com");
+    });
+
+    it("outputs JSON when --json flag is used", async () => {
+      const membership = { id: "mem-1", org_id: "org-1", user_id: "u-1", role: "member", created_at: "2024-01-01T00:00:00Z" };
+      const mockClient = {
+        inviteMember: vi.fn().mockResolvedValue(membership),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+      mockResolveOrgId.mockResolvedValue("org-1");
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "candoo", "--json", "org", "invite", "alice@example.com"]);
+
+      expect(logSpy).toHaveBeenCalledWith(JSON.stringify(membership, null, 2));
     });
   });
 });

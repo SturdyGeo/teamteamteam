@@ -7,6 +7,8 @@ interface BoardProps {
   ticketsByColumn: Map<string, Ticket[]>;
   memberMap: Map<string, string>;
   prefix: string;
+  selectedColumnIndex?: number;
+  selectedTicketIndex?: number;
 }
 
 export function Board({
@@ -14,6 +16,8 @@ export function Board({
   ticketsByColumn,
   memberMap,
   prefix,
+  selectedColumnIndex = 0,
+  selectedTicketIndex = 0,
 }: BoardProps) {
   const { stdout } = useStdout();
   const termWidth = stdout?.columns ?? 80;
@@ -21,7 +25,7 @@ export function Board({
 
   return (
     <Box flexDirection="row">
-      {columns.map((col) => (
+      {columns.map((col, colIndex) => (
         <Column
           key={col.id}
           name={col.name}
@@ -29,6 +33,10 @@ export function Board({
           prefix={prefix}
           memberMap={memberMap}
           columnWidth={columnWidth}
+          isActive={colIndex === selectedColumnIndex}
+          selectedTicketIndex={
+            colIndex === selectedColumnIndex ? selectedTicketIndex : -1
+          }
         />
       ))}
     </Box>

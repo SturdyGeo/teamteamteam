@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import type { MembershipRole } from "@candoo/domain";
 import { getClient } from "../client.js";
 import { loadConfig, saveConfig } from "../config.js";
 import {
@@ -8,7 +9,7 @@ import {
   confirmAction,
   withErrorHandler,
 } from "../output.js";
-import { resolveOrg } from "../resolve.js";
+import { resolveOrg, resolveOrgId } from "../resolve.js";
 
 export function registerOrgCommands(program: Command): void {
   const org = program
@@ -128,6 +129,34 @@ Examples:
           printJson(deleted);
         } else {
           printSuccess(`Organization "${resolved.name}" deleted.`);
+        }
+      }),
+    );
+
+  org
+    .command("invite")
+    .description("Invite a user to the current organization by email")
+    .argument("<email>", "Email of the user to invite")
+    .option("--role <role>", "Role to assign (admin or member)", "member")
+    .addHelpText(
+      "after",
+      `
+Examples:
+  $ candoo org invite alice@example.com
+  $ candoo org invite bob@example.com --role admin`,
+    )
+    .action(
+      withErrorHandler(async (email: string, opts: { role: string }, cmd: Command) => {
+        const client = getClient();
+        const { json, org } = cmd.optsWithGlobals();
+        const orgId = await resolveOrgId(client, org);
+        const role = opts.role as MembershipRole;
+        const membership = await client.inviteMember(orgId, { email, role });
+
+        if (json) {
+          printJson(membership);
+        } else {
+          printSuccess(`Invited ${email} as ${role}.`);
         }
       }),
     );

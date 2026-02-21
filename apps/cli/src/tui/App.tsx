@@ -1,9 +1,14 @@
-import { Box, Text, useApp, useInput } from "ink";
-import { useState, useEffect } from "react";
-import type { WorkflowColumn, Ticket } from "@candoo/domain";
-import { sortColumns, sortTickets } from "@candoo/domain";
+import { Box, Text } from "ink";
 import type { CandooClient } from "@candoo/api-client";
 import { Board } from "./Board.js";
+import { TicketDetail } from "./TicketDetail.js";
+import { SelectList } from "./SelectList.js";
+import { TextInput } from "./TextInput.js";
+import { StatusBar } from "./StatusBar.js";
+import { FilterBar } from "./FilterBar.js";
+import { Spinner } from "./Spinner.js";
+import { HelpOverlay } from "./HelpOverlay.js";
+import { useBoardState } from "./useBoardState.js";
 
 interface AppProps {
   client: CandooClient;
@@ -13,78 +18,105 @@ interface AppProps {
 }
 
 export function App({ client, projectId, orgId, prefix }: AppProps) {
-  const { exit } = useApp();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [columns, setColumns] = useState<WorkflowColumn[]>([]);
-  const [ticketsByColumn, setTicketsByColumn] = useState<Map<string, Ticket[]>>(
-    new Map(),
-  );
-  const [memberMap, setMemberMap] = useState<Map<string, string>>(new Map());
+  const state = useBoardState({ client, projectId, orgId });
 
-  useInput((input) => {
-    if (input === "q") {
-      exit();
-    }
-  });
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [cols, tickets, members] = await Promise.all([
-          client.getColumns(projectId),
-          client.getTickets(projectId),
-          client.getMembers(orgId),
-        ]);
-
-        const sorted = sortColumns(cols);
-        setColumns(sorted);
-
-        const grouped = new Map<string, Ticket[]>();
-        for (const col of sorted) {
-          const colTickets = tickets.filter(
-            (t) => t.status_column_id === col.id,
-          );
-          grouped.set(col.id, sortTickets(colTickets));
-        }
-        setTicketsByColumn(grouped);
-
-        const mMap = new Map<string, string>();
-        for (const m of members) {
-          mMap.set(m.user.id, m.user.display_name || m.user.email);
-        }
-        setMemberMap(mMap);
-
-        setLoading(false);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load board",
-        );
-        setLoading(false);
-      }
-    }
-
-    void fetchData();
-  }, [client, projectId, orgId]);
-
-  if (loading) {
-    return <Text>Loading board\u2026</Text>;
+  if (state.loading) {
+    return <Spinner label="Loading board…" />;
   }
 
-  if (error) {
-    return <Text color="red">Error: {error}</Text>;
+  if (state.error) {
+    return <Text color="red">Error: {state.error}</Text>;
   }
+
+  if (state.columns.length === 0) {
+    return (
+      <Box flexDirection="column">
+        <Text>No columns configured for this project.</Text>
+        <Text dimColor>q: quit</Text>
+      </Box>
+    );
+  }
+
+  const { selectedTicket, selectedColumn } = state;
 
   return (
     <Box flexDirection="column">
       <Board
-        columns={columns}
-        ticketsByColumn={ticketsByColumn}
-        memberMap={memberMap}
+        columns={state.columns}
+        ticketsByColumn={state.ticketsByColumn}
+        memberMap={state.memberMap}
         prefix={prefix}
+        selectedColumnIndex={state.selectedColumnIndex}
+        selectedTicketIndex={state.selectedTicketIndex}
       />
+      <FilterBar filters={state.filters} memberMap={state.memberMap} />
+      {state.showDetail && selectedTicket && selectedColumn && (
+        <TicketDetail
+          ticket={selectedTicket}
+          columnName={selectedColumn.name}
+          assigneeName={
+            selectedTicket.assignee_id
+              ? (state.memberMap.get(selectedTicket.assignee_id) ??
+                selectedTicket.assignee_id)
+              : null
+          }
+          prefix={prefix}
+        />
+      )}
+      {(state.actionMode.type === "move" || state.actionMode.type === "reopen") && (
+        <SelectList
+          title={state.actionMode.type === "move" ? "Move to" : "Reopen in"}
+          items={state.actionMode.options}
+          selectedIndex={state.actionMode.selectedIndex}
+        />
+      )}
+      {state.actionMode.type === "assign" && (
+        <SelectList
+          title="Assign to"
+          items={state.actionMode.options.map((o) => ({
+            label: o.label,
+            value: o.value ?? "null",
+          }))}
+          selectedIndex={state.actionMode.selectedIndex}
+        />
+      )}
+      {state.actionMode.type === "create" && (
+        <TextInput label="New Ticket" value={state.actionMode.title} />
+      )}
+      {(state.actionMode.type === "filter-menu" ||
+        state.actionMode.type === "filter-assignee" ||
+        state.actionMode.type === "filter-tag") && (
+        <SelectList
+          title={
+            state.actionMode.type === "filter-menu"
+              ? "Filter by"
+              : state.actionMode.type === "filter-assignee"
+                ? "Filter by Assignee"
+                : "Filter by Tag"
+          }
+          items={state.actionMode.options}
+          selectedIndex={state.actionMode.selectedIndex}
+        />
+      )}
+      {state.actionMode.type === "filter-search" && (
+        <TextInput
+          label="Search"
+          value={state.actionMode.text}
+          hint="type to search | enter: apply | esc: cancel"
+        />
+      )}
+      {state.showHelp && <HelpOverlay />}
+      <StatusBar message={state.statusMessage} />
       <Box marginTop={1}>
-        <Text dimColor>Press q to quit</Text>
+        <Text dimColor>
+          {state.showDetail
+            ? "esc: close | arrows: navigate | q: quit"
+            : state.actionMode.type !== "none"
+              ? ""
+              : state.hasActiveFilters
+                ? "arrows: navigate | enter: details | m: move | a: assign | c: close | o: reopen | n: new | /: filter | r: refresh | esc: clear filters | ?: help | q: quit"
+                : "arrows: navigate | enter: details | m: move | a: assign | c: close | o: reopen | n: new | /: filter | r: refresh | ?: help | q: quit"}
+        </Text>
       </Box>
     </Box>
   );

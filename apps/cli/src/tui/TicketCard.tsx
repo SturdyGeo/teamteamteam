@@ -5,6 +5,7 @@ interface TicketCardProps {
   title: string;
   assignee: string | null;
   columnWidth: number;
+  isSelected?: boolean;
 }
 
 export function TicketCard({
@@ -12,6 +13,7 @@ export function TicketCard({
   title,
   assignee,
   columnWidth,
+  isSelected = false,
 }: TicketCardProps) {
   const maxTitleLen = Math.max(10, columnWidth - 4);
   const truncatedTitle =
@@ -19,13 +21,34 @@ export function TicketCard({
       ? title.slice(0, maxTitleLen - 1) + "\u2026"
       : title;
 
-  return (
-    <Box flexDirection="column" marginBottom={1}>
+  const content = (
+    <Box flexDirection="column">
       <Text>
-        <Text bold>{ticketKey}</Text>
+        <Text bold color={isSelected ? "cyan" : undefined}>
+          {ticketKey}
+        </Text>
       </Text>
       <Text>{truncatedTitle}</Text>
       <Text dimColor>{assignee ?? "unassigned"}</Text>
+    </Box>
+  );
+
+  if (isSelected) {
+    return (
+      <Box
+        borderStyle="round"
+        borderColor="cyan"
+        marginBottom={1}
+        flexDirection="column"
+      >
+        {content}
+      </Box>
+    );
+  }
+
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      {content}
     </Box>
   );
 }

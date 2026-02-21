@@ -9,6 +9,8 @@ interface ColumnProps {
   prefix: string;
   memberMap: Map<string, string>;
   columnWidth: number;
+  isActive?: boolean;
+  selectedTicketIndex?: number;
 }
 
 export function Column({
@@ -17,10 +19,14 @@ export function Column({
   prefix,
   memberMap,
   columnWidth,
+  isActive = false,
+  selectedTicketIndex = -1,
 }: ColumnProps) {
   return (
     <Box flexDirection="column" width={columnWidth}>
-      <Text bold>{name}</Text>
+      <Text bold color={isActive ? "cyan" : undefined}>
+        {name}
+      </Text>
       <Text dimColor>
         {tickets.length} ticket{tickets.length !== 1 ? "s" : ""}
       </Text>
@@ -28,7 +34,7 @@ export function Column({
       {tickets.length === 0 ? (
         <Text dimColor>No tickets</Text>
       ) : (
-        tickets.map((t) => (
+        tickets.map((t, i) => (
           <TicketCard
             key={t.id}
             ticketKey={generateTicketKey(prefix, t.number)}
@@ -39,6 +45,7 @@ export function Column({
                 : null
             }
             columnWidth={columnWidth}
+            isSelected={isActive && i === selectedTicketIndex}
           />
         ))
       )}

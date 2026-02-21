@@ -126,25 +126,25 @@ Scope: Ink app entry point. Fetch columns + tickets via API client. Render colum
 
 Deliverable: `candoo board` renders a static board from live data.
 
-### 7.2 — Navigation & Selection
+- [x] **7.2 — Navigation & Selection**
 
 Scope: Arrow key navigation: left/right between columns, up/down between tickets. Highlight selected ticket. Ticket detail pane (press Enter to expand).
 
 Deliverable: Can navigate the board and view ticket details.
 
-### 7.3 — Board Actions
+- [x] **7.3 — Board Actions**
 
-Scope: Keyboard shortcuts: `m` move (select target column), `a` assign, `c` close, `o` reopen, `n` new ticket. Each dispatches API client mutation, then refreshes board.
+Scope: Keyboard shortcuts: `m` move (select target column), `a` assign, `c` close, `o` reopen, `n` new ticket. Each dispatches API client mutation, then refreshes board. Extracted `useBoardState` hook, `SelectList`, `TextInput`, `StatusBar` components.
 
 Deliverable: All ticket mutations work from the board.
 
-### 7.4 — Filtering & Refresh
+- [x] **7.4 — Filtering & Refresh**
 
 Scope: `/` to open filter bar. Filter by assignee, tag, text. `r` to manual refresh. Display active filters. `Esc` to clear filters.
 
 Deliverable: Filters apply client-side. Board updates on refresh.
 
-### 7.5 — TUI Polish
+- [x] **7.5 — TUI Polish**
 
 Scope: Loading states, error toasts, empty states, responsive column widths, color theme (Chalk), help bar (`?` to show shortcuts).
 
