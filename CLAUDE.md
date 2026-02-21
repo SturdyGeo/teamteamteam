@@ -7,15 +7,20 @@ Terminal-first multi-user kanban platform (CLI/TUI) backed by Supabase + Postgre
 All commands require Doppler prefix: `doppler run -- <command>`
 
 ```
-bun run build        # Build
-bun run test         # Run tests
-bun run typecheck    # Type check
-bun run lint         # Lint
-bun run knip         # Dead code detection
-bun run test:watch   # Watch mode tests
-bun run test:coverage # Coverage
-bun run clean        # Clean build artifacts
+bun run build            # Build
+bun run test             # Run tests
+bun run test:integration # Run integration tests (requires Supabase local dev)
+bun run typecheck        # Type check
+bun run lint             # Lint
+bun run knip             # Dead code detection
+bun run test:watch       # Watch mode tests
+bun run test:coverage    # Coverage
+bun run build:cli        # Build standalone binary (dist/candoo)
+bun run release          # Build all + binary
+bun run clean            # Clean build artifacts
 ```
+
+Integration tests (`bun run test:integration`) require Docker + `supabase start`.
 
 **Never auto-start dev servers** (`bun run dev`).
 

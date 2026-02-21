@@ -24,7 +24,6 @@ export function enrichTicketWithTags(raw: RawTicketRow): Ticket {
     (tt: TicketTagRow) => tt.tags.name,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { ticket_tags: _ticketTags, ...rest } = raw;
   return { ...rest, tags } as Ticket;
 }

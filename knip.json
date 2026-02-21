@@ -3,7 +3,8 @@
     ".": {
       "entry": [],
       "project": ["*.{js,ts}"],
-      "ignoreBinaries": ["supabase"]
+      "ignoreBinaries": ["supabase"],
+      "ignoreDependencies": ["react-devtools-core"]
     },
     "packages/domain": {
       "project": ["src/**/*.ts"]

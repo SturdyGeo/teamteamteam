@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { createInterface } from "node:readline";
+import { ApiError } from "@candoo/api-client";
 import { getClient } from "../client.js";
 import { printSuccess, printJson, withErrorHandler } from "../output.js";
 
@@ -62,7 +63,7 @@ Examples:
         const { json } = cmd.optsWithGlobals();
         const session = await client.getSession();
         if (!session) {
-          throw new Error("Not logged in. Run 'candoo login <email>' first.");
+          throw new ApiError("AUTH_ERROR", "Not logged in. Run 'candoo login <email>' first.", 401);
         }
         if (json) {
           printJson(session.user);

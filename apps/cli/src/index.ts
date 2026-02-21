@@ -8,7 +8,7 @@ import { registerTagCommands } from "./commands/tag.js";
 import { registerBoardCommand } from "./commands/board.js";
 
 const program = new Command("candoo")
-  .version("0.0.0")
+  .version("0.1.0")
   .description("Terminal-first multi-user kanban")
   .showHelpAfterError()
   .option("--json", "Output as JSON")

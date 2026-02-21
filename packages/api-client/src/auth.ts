@@ -121,7 +121,7 @@ export function createAuthClient(config: AuthClientConfig): AuthClient {
         refresh_token: session.refresh_token,
       });
       if (error || !data.session) {
-        // Refresh failed — clear session
+        console.error("Token refresh failed — session cleared");
         await store.clear();
         return null;
       }

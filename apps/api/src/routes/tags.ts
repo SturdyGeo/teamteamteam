@@ -3,6 +3,7 @@ import { z } from "zod";
 import { addTag, removeTag, normalizeTag } from "@candoo/domain";
 import { getAuth } from "../middleware/auth.js";
 import { enrichTicketWithTags, TICKET_SELECT } from "../lib/tickets.js";
+import { persistActivityEvents } from "../lib/activity.js";
 
 const tags = new Hono();
 
@@ -113,10 +114,8 @@ tags.post("/tickets/:ticketId/tags", async (c) => {
     );
   }
 
-  // Insert activity event
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  // Persist activity events (best-effort)
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data, 201);
 });
@@ -186,10 +185,8 @@ tags.delete("/tickets/:ticketId/tags/:tag", async (c) => {
     );
   }
 
-  // Insert activity event
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  // Persist activity events (best-effort)
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
 });

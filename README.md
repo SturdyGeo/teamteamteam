@@ -51,7 +51,9 @@ Designed to evolve into a full web application without rewriting core logic.
    |--------------------|------------------------------|
    | `SUPABASE_URL`     | Your Supabase project URL    |
    | `SUPABASE_ANON_KEY`| Your Supabase anonymous key  |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (integration tests only) |
    | `CANDOO_API_URL`   | API URL (Edge Function or local, e.g. `https://<ref>.supabase.co/functions/v1/api`) |
+   | `DATABASE_URL`     | Direct Postgres URL (integration tests only, defaults to local Supabase) |
 
    See [infra/README.md](infra/README.md) for detailed Doppler setup instructions.
 
@@ -260,9 +262,12 @@ All development commands require the Doppler prefix:
 ```sh
 doppler run -- bun run build          # Build all packages
 doppler run -- bun run build:edge     # Build Edge Function bundle
+doppler run -- bun run build:cli      # Build standalone macOS binary (dist/candoo)
+doppler run -- bun run release        # Build all + binary
 doppler run -- bun run typecheck      # Type check
 doppler run -- bun run lint           # Lint
-doppler run -- bun run test           # Run tests
+doppler run -- bun run test           # Run unit tests
+doppler run -- bun run test:integration # Run integration tests (requires Supabase local dev)
 doppler run -- bun run test:watch     # Run tests in watch mode
 doppler run -- bun run test:coverage  # Run tests with coverage
 doppler run -- bun run knip           # Dead code detection
@@ -283,7 +288,51 @@ doppler run -- bun run knip
 
 ### Test Pattern
 
-Tests are located at `**/__tests__/**/*.test.ts`.
+Unit tests are located at `**/__tests__/**/*.test.ts` within each workspace package.
+
+### Integration Tests
+
+Integration tests live in `tests/integration/` and run against a real Supabase local dev instance. They verify the full stack: HTTP request -> auth middleware -> Supabase client -> Postgres (with RLS) -> response.
+
+**Prerequisites:**
+- Docker running
+- `supabase start` (runs migrations automatically)
+
+**Running:**
+
+```sh
+doppler run -- bun run test:integration
+```
+
+Integration tests cover:
+- Org/project/ticket CRUD through the real API
+- RLS org isolation (users can only see their own org's data)
+- Ticket lifecycle (create, move, assign, tag, close, reopen)
+- Activity event append-only enforcement
+- Member invitation and access control
+- Tag normalization and deduplication
+
+## Binary Distribution
+
+Build a standalone macOS binary (no Bun runtime required to run):
+
+```sh
+doppler run -- bun run build:cli
+```
+
+This produces `dist/candoo`. Run it directly:
+
+```sh
+./dist/candoo --version   # 0.1.0
+./dist/candoo --help
+./dist/candoo login alice@acme.com
+```
+
+Or use the `release` script to build everything (TypeScript + binary):
+
+```sh
+doppler run -- bun run release
+```
 
 ## Architecture
 

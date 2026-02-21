@@ -11,6 +11,7 @@ import {
 } from "@candoo/domain";
 import { getAuth } from "../middleware/auth.js";
 import { enrichTicketWithTags, TICKET_SELECT } from "../lib/tickets.js";
+import { persistActivityEvents } from "../lib/activity.js";
 
 const tickets = new Hono();
 
@@ -202,22 +203,14 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
     );
   }
 
-  // Persist activity event
-  for (const event of result.events) {
-    const { error: eventError } = await supabase
-      .from("activity_events")
-      .insert(event);
+  // Persist activity events (best-effort)
+  await persistActivityEvents(supabase, result.events);
 
-    if (eventError) {
-      console.error("Failed to insert activity event:", eventError);
-    }
-  }
-
-  // Handle tags if provided
+  // Handle tags if provided (best-effort — ticket already created)
   if (parsed.data.tags && parsed.data.tags.length > 0) {
     for (const tagName of result.data.tags) {
       // Upsert tag
-      const { data: tagRow } = await supabase
+      const { data: tagRow, error: tagError } = await supabase
         .from("tags")
         .upsert(
           { project_id: projectId, name: tagName },
@@ -226,10 +219,18 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
         .select("id")
         .single();
 
+      if (tagError) {
+        console.error(`Failed to upsert tag "${tagName}":`, tagError);
+        continue;
+      }
+
       if (tagRow) {
-        await supabase
+        const { error: joinError } = await supabase
           .from("ticket_tags")
           .insert({ ticket_id: id, tag_id: tagRow.id });
+        if (joinError) {
+          console.error(`Failed to link tag "${tagName}" to ticket:`, joinError);
+        }
       }
     }
   }
@@ -318,9 +319,7 @@ tickets.patch("/tickets/:ticketId/move", async (c) => {
     );
   }
 
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
 });
@@ -391,9 +390,7 @@ tickets.patch("/tickets/:ticketId/assign", async (c) => {
     );
   }
 
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
 });
@@ -445,9 +442,7 @@ tickets.patch("/tickets/:ticketId/close", async (c) => {
     );
   }
 
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
 });
@@ -532,9 +527,7 @@ tickets.patch("/tickets/:ticketId/reopen", async (c) => {
     );
   }
 
-  for (const event of result.events) {
-    await supabase.from("activity_events").insert(event);
-  }
+  await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
 });

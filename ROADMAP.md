@@ -38,8 +38,8 @@ Phase 2: Domain    Phase 3: Database
 | 4. API | 6 | HTTP server, query endpoints, mutation endpoints, auth, org/project CRUD | DONE |
 | 5. API Client | 3 | Typed client: auth, queries, mutations | DONE |
 | 6. CLI | 6 | Commander commands: auth, org/project, ticket CRUD, mutations, tags, polish | DONE |
-| 7. TUI | 5 | Ink board: layout, navigation, actions, filtering | |
-| 8. Polish | 5 | Integration tests, error audit, docs, binary, pre-release checklist | |
+| 7. TUI | 5 | Ink board: layout, navigation, actions, filtering | DONE |
+| 8. Polish | 5 | Integration tests, error audit, docs, binary, pre-release checklist | DONE |
 | **Total** | **40** | | |
 
 ---
@@ -116,7 +116,7 @@ Goal: Commander-based CLI with all commands. Formatted text output + `--json` fl
 
 ---
 
-## Phase 7: TUI
+## Phase 7: TUI [DONE]
 
 Goal: Ink-based kanban board rendered in terminal. Read-only board with keyboard-driven actions.
 
@@ -169,31 +169,31 @@ The API has been migrated to support Supabase Edge Functions as a deployment tar
 
 Goal: Production-ready MVP. All tests pass, errors handled, docs complete.
 
-### 8.1 — Integration Tests
+- [x] **8.1 — Integration Tests**
 
 Scope: End-to-end tests: API -> database round-trips, CLI -> API -> database flows. Test org isolation (user A can't see user B's org). Test full ticket lifecycle.
 
 Deliverable: Integration test suite passes in CI.
 
-### 8.2 — Error Handling Audit
+- [x] **8.2 — Error Handling Audit**
 
 Scope: Review every API endpoint, CLI command, and TUI action for: auth expiry, network errors, not-found, permission denied, validation errors. Consistent error types and user-facing messages.
 
 Deliverable: No unhandled promise rejections. All error paths tested.
 
-### 8.3 — Documentation
+- [x] **8.3 — Documentation**
 
 Scope: Root `README.md` (setup, usage, architecture). `apps/cli/README.md` (command reference). `apps/api/README.md` (endpoint reference). `packages/domain/README.md` (domain model overview). Update `CLAUDE.md` and `AGENTS.md` if anything changed.
 
 Deliverable: A new contributor can set up and use the project from docs alone.
 
-### 8.4 — Binary & Distribution
+- [x] **8.4 — Binary & Distribution**
 
 Scope: `bun build --compile` to produce standalone CLI binary. Test on macOS. Add `bun run release` script. Version in `package.json`.
 
 Deliverable: Single binary runs without Bun installed.
 
-### 8.5 — Pre-Release Checklist
+- [x] **8.5 — Pre-Release Checklist**
 
 Scope: Full pass of all 5 checks (`typecheck`, `lint`, `build`, `test`, `knip`). Verify no hardcoded secrets. Verify RLS works. Verify domain has no I/O imports. Tag `v0.1.0`.
 

@@ -367,6 +367,8 @@ export function useBoardState({ client, projectId, orgId }: UseBoardStateOptions
     } else if (input === "r") {
       void refreshBoard().then(() => {
         setStatusMessage({ text: "Board refreshed", type: "success" });
+      }).catch((err) => {
+        setStatusMessage({ text: err instanceof Error ? err.message : "Refresh failed", type: "error" });
       });
     } else if (input === "m") {
       if (selectedTicket && selectedColumn) {

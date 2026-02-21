@@ -5,6 +5,14 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["dist/", "node_modules/", "coverage/", "**/dist/"],
+    ignores: ["dist/", "node_modules/", "coverage/", "**/dist/", "supabase/"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { ignoreRestSiblings: true },
+      ],
+    },
   },
 );

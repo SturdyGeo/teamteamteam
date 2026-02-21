@@ -32,3 +32,38 @@ jobs:
 
       - name: Knip
         run: bun run knip
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Extract Supabase credentials
+        run: |
+          echo "SUPABASE_URL=$(supabase status --output json | jq -r '.API_URL')" >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=$(supabase status --output json | jq -r '.ANON_KEY')" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$(supabase status --output json | jq -r '.SERVICE_ROLE_KEY')" >> "$GITHUB_ENV"
+          echo "DATABASE_URL=$(supabase status --output json | jq -r '.DB_URL')" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: bun run build
+
+      - name: Integration tests
+        run: bun run test:integration
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop
