@@ -44,7 +44,10 @@ Examples:
     .command("list")
     .description("List tickets in the current project")
     .option("--status <column>", "Filter by column name (e.g. 'To Do', 'In Progress')")
-    .option("--assignee <email>", "Filter by assignee email")
+    .option(
+      "--assignee <assignee>",
+      "Filter by assignee (email, display name, or email username)",
+    )
     .option("--tag <name>", "Filter by tag")
     .option("--search <term>", "Search tickets")
     .addHelpText(
@@ -95,7 +98,10 @@ Examples:
     .description("Create a new ticket in the current project")
     .argument("<title>", "Ticket title (use quotes for multi-word titles)")
     .option("-d, --description <text>", "Longer description of the ticket")
-    .option("-a, --assignee <email>", "Assign to a team member by email")
+    .option(
+      "-a, --assignee <assignee>",
+      "Assign to a team member (email, display name, or email username)",
+    )
     .option("-t, --tag <name>", "Add a tag (repeatable for multiple tags)", collect, [])
     .addHelpText(
       "after",
@@ -232,27 +238,31 @@ Examples:
     .command("assign")
     .description("Assign a ticket to an org member")
     .argument("<key>", "Ticket key (e.g. BACK-1)")
-    .argument("<email>", "Assignee email")
+    .argument(
+      "<assignee>",
+      "Assignee identifier (email, display name, or email username)",
+    )
     .addHelpText(
       "after",
       `
 Example:
-  $ ttteam ticket assign BACK-1 alice@acme.com`,
+  $ ttteam ticket assign BACK-1 alice@acme.com
+  $ ttteam ticket assign BACK-1 alice`,
     )
     .action(
-      withErrorHandler(async (key: string, email: string, _opts: unknown, cmd: Command) => {
+      withErrorHandler(async (key: string, assignee: string, _opts: unknown, cmd: Command) => {
         const client = getClient();
         const { json, project, org } = cmd.optsWithGlobals();
         const projectId = await getDefaultProjectId(project);
         const orgId = await resolveOrgId(client, org);
         const resolved = await resolveTicket(client, projectId, key);
-        const member = await resolveMember(client, orgId, email);
+        const member = await resolveMember(client, orgId, assignee);
         const updated = await client.assignTicket(resolved.id, { assignee_id: member.user.id });
 
         if (json) {
           printJson(updated);
         } else {
-          printSuccess(`Assigned ${key.toUpperCase()} to ${email}.`);
+          printSuccess(`Assigned ${key.toUpperCase()} to ${assignee}.`);
         }
       }),
     );

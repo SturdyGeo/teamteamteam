@@ -155,7 +155,7 @@ ttteam ticket list             # List tickets (supports filter flags)
 ttteam ticket create <title>   # Create a new ticket
 ttteam ticket show <key>       # Show ticket details + activity history
 ttteam ticket move <key> <column>      # Move ticket to a workflow column
-ttteam ticket assign <key> <email>     # Assign ticket to a member by email
+ttteam ticket assign <key> <assignee>  # Assign by email, display name, or email username
 ttteam ticket close <key>              # Close a ticket
 ttteam ticket reopen <key>             # Reopen a closed ticket
 ```
@@ -169,7 +169,7 @@ ttteam ticket create "Fix login" -d "Details..." -a alice@co.com -t bug
 | Flag | Description |
 |------|-------------|
 | `-d, --description <text>` | Description |
-| `-a, --assignee <email>` | Assignee email |
+| `-a, --assignee <assignee>` | Assignee (email, display name, or email username) |
 | `-t, --tag <name>` | Tag (repeatable) |
 
 #### Filtering
@@ -177,6 +177,7 @@ ttteam ticket create "Fix login" -d "Details..." -a alice@co.com -t bug
 ```sh
 ttteam ticket list --status "In Progress"
 ttteam ticket list --assignee alice@co.com
+ttteam ticket list --assignee alice
 ttteam ticket list --tag bug
 ttteam ticket list --search "login issue"
 ```

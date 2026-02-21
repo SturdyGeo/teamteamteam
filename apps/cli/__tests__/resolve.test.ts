@@ -85,13 +85,44 @@ describe("resolve", () => {
       expect(member.user.id).toBe("u-1");
     });
 
+    it("resolves member by case-insensitive display name", async () => {
+      const client = mockClient({
+        getMembers: vi.fn().mockResolvedValue([
+          { user: { id: "u-1", email: "alice@example.com", display_name: "Alice" } },
+        ]),
+      });
+      const member = await resolveMember(client, "org-1", "alice");
+      expect(member.user.id).toBe("u-1");
+    });
+
+    it("resolves member by email username when unique", async () => {
+      const client = mockClient({
+        getMembers: vi.fn().mockResolvedValue([
+          { user: { id: "u-1", email: "knowles.kyle.james@gmail.com", display_name: null } },
+          { user: { id: "u-2", email: "bob@example.com", display_name: "Bob" } },
+        ]),
+      });
+      const member = await resolveMember(client, "org-1", "knowles.kyle.james");
+      expect(member.user.id).toBe("u-1");
+    });
+
+    it("throws a clear error when email username is ambiguous", async () => {
+      const client = mockClient({
+        getMembers: vi.fn().mockResolvedValue([
+          { user: { id: "u-1", email: "alex@acme.com", display_name: "Alex A" } },
+          { user: { id: "u-2", email: "alex@other.com", display_name: "Alex B" } },
+        ]),
+      });
+      await expect(resolveMember(client, "org-1", "alex")).rejects.toThrow(
+        'Assignee "alex" is ambiguous',
+      );
+    });
+
     it("throws when member not found", async () => {
       const client = mockClient({
         getMembers: vi.fn().mockResolvedValue([]),
       });
-      await expect(resolveMember(client, "org-1", "nobody@x.com")).rejects.toThrow(
-        'not found',
-      );
+      await expect(resolveMember(client, "org-1", "nobody@x.com")).rejects.toThrow("not found");
     });
   });
 

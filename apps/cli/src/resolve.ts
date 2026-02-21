@@ -80,16 +80,43 @@ export async function resolveColumn(
 export async function resolveMember(
   client: TeamteamteamClient,
   orgId: string,
-  email: string,
+  assignee: string,
 ): Promise<MemberWithUser> {
+  const identifier = assignee.trim().toLowerCase();
   const members = await client.getMembers(orgId);
-  const match = members.find(
-    (m) => m.user.email.toLowerCase() === email.toLowerCase(),
+
+  const byEmail = members.filter(
+    (m) => m.user.email.toLowerCase() === identifier,
   );
-  if (!match) {
-    throw new Error(`Member with email "${email}" not found in this org.`);
+  if (byEmail.length === 1) return byEmail[0];
+
+  const byDisplayName = members.filter(
+    (m) => (m.user.display_name?.trim().toLowerCase() ?? "") === identifier,
+  );
+  if (byDisplayName.length === 1) return byDisplayName[0];
+  if (byDisplayName.length > 1) {
+    const matches = byDisplayName.map(formatMemberMatch).join(", ");
+    throw new Error(`Assignee "${assignee}" is ambiguous. Matches: ${matches}`);
   }
-  return match;
+
+  const byEmailUsername = members.filter((m) => {
+    const [localPart] = m.user.email.toLowerCase().split("@");
+    return localPart === identifier;
+  });
+  if (byEmailUsername.length === 1) return byEmailUsername[0];
+  if (byEmailUsername.length > 1) {
+    const matches = byEmailUsername.map(formatMemberMatch).join(", ");
+    throw new Error(`Assignee "${assignee}" is ambiguous. Matches: ${matches}`);
+  }
+
+  if (byEmail.length > 1) {
+    const matches = byEmail.map(formatMemberMatch).join(", ");
+    throw new Error(`Assignee "${assignee}" is ambiguous. Matches: ${matches}`);
+  }
+
+  throw new Error(
+    `Member "${assignee}" not found in this org. Use full email or a unique display name/email username.`,
+  );
 }
 
 export async function resolveProjectByPrefix(
@@ -107,4 +134,12 @@ export async function resolveProjectByPrefix(
     );
   }
   return { id: match.id, prefix: match.prefix };
+}
+
+function formatMemberMatch(member: MemberWithUser): string {
+  const displayName = member.user.display_name?.trim();
+  if (displayName) {
+    return `${displayName} <${member.user.email}>`;
+  }
+  return member.user.email;
 }

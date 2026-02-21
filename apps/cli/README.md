@@ -117,7 +117,7 @@ ttteam ticket list                        # List tickets in current project
 ttteam ticket create <title>              # Create a new ticket
 ttteam ticket show <key>                  # Show ticket details + activity history
 ttteam ticket move <key> <column>         # Move ticket to a workflow column
-ttteam ticket assign <key> <email>        # Assign ticket to a member
+ttteam ticket assign <key> <assignee>     # Assign by email, display name, or email username
 ttteam ticket close <key>                 # Close a ticket
 ttteam ticket reopen <key>               # Reopen a closed ticket (to first column)
 ttteam ticket reopen <key> --column <col> # Reopen to a specific column
@@ -132,7 +132,7 @@ ttteam ticket create "Fix login" -d "Detailed description" -a alice@co.com -t bu
 | Flag | Description |
 |------|-------------|
 | `-d, --description <text>` | Ticket description |
-| `-a, --assignee <email>` | Assign to member by email |
+| `-a, --assignee <assignee>` | Assign by email, display name, or email username |
 | `-t, --tag <name>` | Add tag (repeatable) |
 
 #### Filtering
@@ -140,6 +140,7 @@ ttteam ticket create "Fix login" -d "Detailed description" -a alice@co.com -t bu
 ```sh
 ttteam ticket list --status "In Progress"
 ttteam ticket list --assignee alice@co.com
+ttteam ticket list --assignee alice
 ttteam ticket list --tag bug
 ttteam ticket list --search "login issue"
 ```
