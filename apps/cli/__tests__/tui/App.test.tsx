@@ -427,8 +427,8 @@ describe("App", () => {
     await wait();
 
     const frame = lastFrame()!;
-    expect(frame).toContain("New Ticket");
-    expect(frame).toContain("type title | enter: create | esc: cancel");
+    expect(frame).toContain("New Ticket Title");
+    expect(frame).toContain("type title | enter: next | tab: switch | esc: cancel");
   });
 
   it("typing in create mode appends characters", async () => {
@@ -451,7 +451,7 @@ describe("App", () => {
     expect(frame).toContain("Hi_");
   });
 
-  it("Enter in create mode calls createTicket", async () => {
+  it("Enter in create mode calls createTicket after title and description steps", async () => {
     const client = createMockClient();
     const { lastFrame, stdin } = render(
       <App client={client} projectId="proj-1" orgId="org-1" prefix="DEMO" />,
@@ -471,7 +471,11 @@ describe("App", () => {
     stdin.write("w");
     await wait();
 
-    // Submit
+    // Enter moves from title -> description
+    stdin.write("\r");
+    await wait();
+
+    // Submit from description mode (empty description is allowed)
     stdin.write("\r");
     await wait(100);
 
@@ -479,6 +483,46 @@ describe("App", () => {
     const frame = lastFrame()!;
     expect(frame).toContain("\u2713");
     expect(frame).toContain("Ticket created");
+  });
+
+  it("create mode sends description when provided", async () => {
+    const client = createMockClient();
+    const { stdin } = render(
+      <App client={client} projectId="proj-1" orgId="org-1" prefix="DEMO" />,
+    );
+
+    await wait();
+
+    stdin.write("n");
+    await wait();
+
+    stdin.write("N");
+    await wait();
+    stdin.write("e");
+    await wait();
+    stdin.write("w");
+    await wait();
+
+    // Move to description
+    stdin.write("\r");
+    await wait();
+
+    stdin.write("D");
+    await wait();
+    stdin.write("e");
+    await wait();
+    stdin.write("s");
+    await wait();
+    stdin.write("c");
+    await wait();
+
+    stdin.write("\r");
+    await wait(100);
+
+    expect(client.createTicket).toHaveBeenCalledWith("proj-1", {
+      title: "New",
+      description: "Desc",
+    });
   });
 
   it("action keys are no-ops on empty column", async () => {

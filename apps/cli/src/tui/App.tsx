@@ -81,7 +81,28 @@ export function App({ client, projectId, orgId, prefix }: AppProps) {
         />
       )}
       {state.actionMode.type === "create" && (
-        <TextInput label="New Ticket" value={state.actionMode.title} />
+        <Box flexDirection="column">
+          {state.actionMode.field === "description" && (
+            <Text dimColor>Title: {state.actionMode.title || "(empty)"}</Text>
+          )}
+          <TextInput
+            label={
+              state.actionMode.field === "title"
+                ? "New Ticket Title"
+                : "New Ticket Description"
+            }
+            value={
+              state.actionMode.field === "title"
+                ? state.actionMode.title
+                : state.actionMode.description
+            }
+            hint={
+              state.actionMode.field === "title"
+                ? "type title | enter: next | tab: switch | esc: cancel"
+                : "type description | enter: create | tab: switch | esc: cancel"
+            }
+          />
+        </Box>
       )}
       {(state.actionMode.type === "filter-menu" ||
         state.actionMode.type === "filter-assignee" ||

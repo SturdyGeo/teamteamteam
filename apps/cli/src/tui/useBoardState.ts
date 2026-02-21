@@ -16,7 +16,7 @@ type ActionMode =
   | { type: "move"; options: { label: string; value: string }[]; selectedIndex: number }
   | { type: "assign"; options: { label: string; value: string | null }[]; selectedIndex: number }
   | { type: "reopen"; options: { label: string; value: string }[]; selectedIndex: number }
-  | { type: "create"; title: string }
+  | { type: "create"; title: string; description: string; field: "title" | "description" }
   | { type: "filter-menu"; options: { label: string; value: string }[]; selectedIndex: number }
   | { type: "filter-assignee"; options: { label: string; value: string }[]; selectedIndex: number }
   | { type: "filter-tag"; options: { label: string; value: string }[]; selectedIndex: number }
@@ -162,21 +162,61 @@ export function useBoardState({ client, projectId, orgId }: UseBoardStateOptions
       }
 
       if (actionMode.type === "create") {
+        if (key.tab || key.upArrow || key.downArrow) {
+          setActionMode({
+            ...actionMode,
+            field: actionMode.field === "title" ? "description" : "title",
+          });
+          return;
+        }
         if (key.return) {
-          if (actionMode.title.trim()) {
+          if (actionMode.field === "title") {
+            if (actionMode.title.trim()) {
+              setActionMode({ ...actionMode, field: "description" });
+            }
+            return;
+          }
+
+          const title = actionMode.title.trim();
+          if (title) {
+            const description = actionMode.description.trim();
             void executeMutation(
-              () => client.createTicket(projectId, { title: actionMode.title.trim() }),
+              () =>
+                client.createTicket(
+                  projectId,
+                  description ? { title, description } : { title },
+                ),
               "Ticket created",
             );
           }
           return;
         }
         if (key.backspace || key.delete) {
-          setActionMode({ type: "create", title: actionMode.title.slice(0, -1) });
+          if (actionMode.field === "title") {
+            setActionMode({
+              ...actionMode,
+              title: actionMode.title.slice(0, -1),
+            });
+          } else {
+            setActionMode({
+              ...actionMode,
+              description: actionMode.description.slice(0, -1),
+            });
+          }
           return;
         }
         if (input.length === 1 && !key.ctrl && !key.meta) {
-          setActionMode({ type: "create", title: actionMode.title + input });
+          if (actionMode.field === "title") {
+            setActionMode({
+              ...actionMode,
+              title: actionMode.title + input,
+            });
+          } else {
+            setActionMode({
+              ...actionMode,
+              description: actionMode.description + input,
+            });
+          }
           return;
         }
         return;
@@ -403,7 +443,7 @@ export function useBoardState({ client, projectId, orgId }: UseBoardStateOptions
         setActionMode({ type: "reopen", options: reopenOptions, selectedIndex: 0 });
       }
     } else if (input === "n") {
-      setActionMode({ type: "create", title: "" });
+      setActionMode({ type: "create", title: "", description: "", field: "title" });
     } else if (input === "?") {
       setShowHelp(true);
     }

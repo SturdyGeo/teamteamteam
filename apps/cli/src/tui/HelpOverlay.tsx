@@ -4,7 +4,7 @@ const shortcuts: [string, string][] = [
   ["←/→", "Navigate between columns"],
   ["↑/↓", "Navigate between tickets"],
   ["Enter", "Expand ticket detail"],
-  ["n", "Create new ticket"],
+  ["n", "Create ticket (title + description)"],
   ["m", "Move ticket to column"],
   ["a", "Assign ticket"],
   ["c", "Close ticket"],

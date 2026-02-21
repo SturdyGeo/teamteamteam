@@ -202,7 +202,7 @@ ttteam board          # Launch the interactive kanban board
 | `←/→` | Navigate between columns   |
 | `↑/↓` | Navigate between tickets   |
 | `Enter`| Expand ticket detail pane  |
-| `n`   | Create new ticket           |
+| `n`   | Create ticket (title + description) |
 | `m`   | Move ticket to column       |
 | `a`   | Assign ticket               |
 | `c`   | Close ticket                |

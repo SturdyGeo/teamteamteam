@@ -14,7 +14,7 @@ describe("HelpOverlay", () => {
     expect(frame).toContain("Navigate between columns");
     expect(frame).toContain("Navigate between tickets");
     expect(frame).toContain("Expand ticket detail");
-    expect(frame).toContain("Create new ticket");
+    expect(frame).toContain("Create ticket (title + description)");
     expect(frame).toContain("Move ticket to column");
     expect(frame).toContain("Assign ticket");
     expect(frame).toContain("Close ticket");
