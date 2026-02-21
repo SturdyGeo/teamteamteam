@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { DomainError, type DomainErrorCode } from "@candoo/domain";
+import { DomainError, type DomainErrorCode } from "@teamteamteam/domain";
 
 const DOMAIN_ERROR_STATUS: Record<DomainErrorCode, ContentfulStatusCode> = {
   INVALID_INPUT: 400,

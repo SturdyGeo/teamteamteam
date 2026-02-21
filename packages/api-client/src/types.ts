@@ -3,7 +3,7 @@ import type {
   Membership,
   ActivityEvent,
   MembershipRole,
-} from "@candoo/domain";
+} from "@teamteamteam/domain";
 
 // ---------- Response types ----------
 

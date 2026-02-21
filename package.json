@@ -1,5 +1,5 @@
 {
-  "name": "candoo",
+  "name": "teamteamteam",
   "private": true,
   "type": "module",
   "workspaces": ["packages/*", "apps/*"],
@@ -14,7 +14,7 @@
     "knip": "knip",
     "install:cli": "bash ./scripts/install-cli.sh",
     "uninstall:cli": "bash ./scripts/uninstall-cli.sh",
-    "build:cli": "bun build apps/cli/src/index.ts --compile --outfile dist/candoo",
+    "build:cli": "bun build apps/cli/src/index.ts --compile --outfile dist/ttteam",
     "release": "bun run build && bun run build:cli",
     "clean": "rm -rf dist packages/*/dist apps/*/dist *.tsbuildinfo packages/*/*.tsbuildinfo apps/*/*.tsbuildinfo",
     "build:edge": "bun build apps/api/src/app.ts --bundle --outfile supabase/functions/api/app.bundle.js --format esm --target browser --external @supabase/supabase-js",

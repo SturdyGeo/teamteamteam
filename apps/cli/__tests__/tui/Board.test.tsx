@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "ink-testing-library";
-import type { WorkflowColumn, Ticket } from "@candoo/domain";
+import type { WorkflowColumn, Ticket } from "@teamteamteam/domain";
 import { Board } from "../../src/tui/Board.js";
 
 const columns: WorkflowColumn[] = [

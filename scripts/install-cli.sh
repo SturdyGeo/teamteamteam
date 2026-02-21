@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INSTALL_DIR="${CANDOO_INSTALL_DIR:-$HOME/.local/bin}"
-TARGET="$INSTALL_DIR/candoo"
+INSTALL_DIR="${TTTEAM_INSTALL_DIR:-$HOME/.local/bin}"
+TARGET="$INSTALL_DIR/ttteam"
 
 cd "$ROOT_DIR"
 
@@ -11,10 +11,10 @@ echo "Building CLI binary..."
 bun run build:cli
 
 mkdir -p "$INSTALL_DIR"
-cp "$ROOT_DIR/dist/candoo" "$TARGET"
+cp "$ROOT_DIR/dist/ttteam" "$TARGET"
 chmod +x "$TARGET"
 
-echo "Installed candoo to: $TARGET"
+echo "Installed ttteam to: $TARGET"
 
 case ":$PATH:" in
   *":$INSTALL_DIR:"*) ;;
@@ -25,4 +25,4 @@ case ":$PATH:" in
     ;;
 esac
 
-echo "Run: candoo --help"
+echo "Run: ttteam --help"

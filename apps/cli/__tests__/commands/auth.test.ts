@@ -47,7 +47,7 @@ describe("auth commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "login", "user@test.com"]);
+      await program.parseAsync(["node", "ttteam", "login", "user@test.com"]);
 
       expect(mockClient.sendMagicLink).toHaveBeenCalledWith("user@test.com");
       expect(mockClient.verifyOtp).toHaveBeenCalledWith("user@test.com", "123456");
@@ -60,7 +60,7 @@ describe("auth commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "logout"]);
+      await program.parseAsync(["node", "ttteam", "logout"]);
 
       expect(mockClient.logout).toHaveBeenCalled();
     });
@@ -76,7 +76,7 @@ describe("auth commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "whoami"]);
+      await program.parseAsync(["node", "ttteam", "whoami"]);
 
       const output = logSpy.mock.calls.map((c) => c[0]).join("\n");
       expect(output).toContain("user@test.com");
@@ -91,7 +91,7 @@ describe("auth commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "whoami"]);
+      await program.parseAsync(["node", "ttteam", "--json", "whoami"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(user, null, 2));
     });
@@ -103,7 +103,7 @@ describe("auth commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "whoami"]);
+      await program.parseAsync(["node", "ttteam", "whoami"]);
 
       // Should call process.exit(1) via handleError
       expect(process.exit).toHaveBeenCalledWith(1);

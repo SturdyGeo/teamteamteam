@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useApp, useInput } from "ink";
-import type { WorkflowColumn, Ticket, TicketFilters } from "@candoo/domain";
-import { sortColumns, sortTickets, filterTickets } from "@candoo/domain";
-import type { CandooClient, MemberWithUser } from "@candoo/api-client";
+import type { WorkflowColumn, Ticket, TicketFilters } from "@teamteamteam/domain";
+import { sortColumns, sortTickets, filterTickets } from "@teamteamteam/domain";
+import type { TeamteamteamClient, MemberWithUser } from "@teamteamteam/api-client";
 
 interface StatusMessage {
   text: string;
@@ -42,7 +42,7 @@ interface BoardState {
 }
 
 interface UseBoardStateOptions {
-  client: CandooClient;
+  client: TeamteamteamClient;
   projectId: string;
   orgId: string;
 }

@@ -8,9 +8,9 @@ import { HttpClient } from "./http.js";
 import { FileSessionStore } from "./session.js";
 import type { ClientConfig } from "./types.js";
 
-export type CandooClient = AuthClient & QueryMethods & MutationMethods;
+export type TeamteamteamClient = AuthClient & QueryMethods & MutationMethods;
 
-export function createCandooClient(config: ClientConfig): CandooClient {
+export function createTeamteamteamClient(config: ClientConfig): TeamteamteamClient {
   const sessionStore = config.sessionStore ?? new FileSessionStore();
   const auth = createAuthClient({
     supabaseUrl: config.supabaseUrl,

@@ -38,7 +38,7 @@ export class HttpClient {
     if (!this.baseUrl) {
       throw new ApiError(
         "MISSING_CONFIG",
-        "CANDOO_API_URL is not set. Set it to your Supabase Edge Functions URL.",
+        "TEAMTEAMTEAM_API_URL is not set. Set it to your Supabase Edge Functions URL.",
         0,
       );
     }

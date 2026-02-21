@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "candoo",
+      "name": "teamteamteam",
       "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/pg": "^8.16.0",
@@ -18,11 +18,11 @@
       },
     },
     "apps/api": {
-      "name": "@candoo/api",
+      "name": "@teamteamteam/api",
       "version": "0.0.0",
       "dependencies": {
-        "@candoo/domain": "workspace:*",
         "@supabase/supabase-js": "^2.97.0",
+        "@teamteamteam/domain": "workspace:*",
         "hono": "^4.12.0",
         "zod": "3.24",
       },
@@ -31,14 +31,14 @@
       },
     },
     "apps/cli": {
-      "name": "@candoo/cli",
+      "name": "@teamteamteam/cli",
       "version": "0.1.0",
       "bin": {
-        "candoo": "./dist/index.js",
+        "teamteamteam": "./dist/index.js",
       },
       "dependencies": {
-        "@candoo/api-client": "workspace:*",
-        "@candoo/domain": "workspace:*",
+        "@teamteamteam/api-client": "workspace:*",
+        "@teamteamteam/domain": "workspace:*",
         "chalk": "^5.4.0",
         "commander": "^13.0.0",
         "ink": "^5",
@@ -51,18 +51,18 @@
       },
     },
     "packages/api-client": {
-      "name": "@candoo/api-client",
+      "name": "@teamteamteam/api-client",
       "version": "0.0.0",
       "dependencies": {
-        "@candoo/domain": "workspace:*",
         "@supabase/supabase-js": "^2.97.0",
+        "@teamteamteam/domain": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^22.15.0",
       },
     },
     "packages/domain": {
-      "name": "@candoo/domain",
+      "name": "@teamteamteam/domain",
       "version": "0.0.0",
       "dependencies": {
         "zod": "^3.24",
@@ -81,14 +81,6 @@
     "@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
     "@bcoe/v8-coverage": ["@bcoe/v8-coverage@1.0.2", "", {}, "sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA=="],
-
-    "@candoo/api": ["@candoo/api@workspace:apps/api"],
-
-    "@candoo/api-client": ["@candoo/api-client@workspace:packages/api-client"],
-
-    "@candoo/cli": ["@candoo/cli@workspace:apps/cli"],
-
-    "@candoo/domain": ["@candoo/domain@workspace:packages/domain"],
 
     "@emnapi/core": ["@emnapi/core@1.8.1", "", { "dependencies": { "@emnapi/wasi-threads": "1.1.0", "tslib": "^2.4.0" } }, "sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg=="],
 
@@ -289,6 +281,14 @@
     "@supabase/storage-js": ["@supabase/storage-js@2.97.0", "", { "dependencies": { "iceberg-js": "^0.8.1", "tslib": "2.8.1" } }, "sha512-9f6NniSBfuMxOWKwEFb+RjJzkfMdJUwv9oHuFJKfe/5VJR8cd90qw68m6Hn0ImGtwG37TUO+QHtoOechxRJ1Yg=="],
 
     "@supabase/supabase-js": ["@supabase/supabase-js@2.97.0", "", { "dependencies": { "@supabase/auth-js": "2.97.0", "@supabase/functions-js": "2.97.0", "@supabase/postgrest-js": "2.97.0", "@supabase/realtime-js": "2.97.0", "@supabase/storage-js": "2.97.0" } }, "sha512-kTD91rZNO4LvRUHv4x3/4hNmsEd2ofkYhuba2VMUPRVef1RCmnHtm7rIws38Fg0yQnOSZOplQzafn0GSiy6GVg=="],
+
+    "@teamteamteam/api": ["@teamteamteam/api@workspace:apps/api"],
+
+    "@teamteamteam/api-client": ["@teamteamteam/api-client@workspace:packages/api-client"],
+
+    "@teamteamteam/cli": ["@teamteamteam/cli@workspace:apps/cli"],
+
+    "@teamteamteam/domain": ["@teamteamteam/domain@workspace:packages/domain"],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 
@@ -706,11 +706,11 @@
 
     "zod": ["zod@3.24.4", "", {}, "sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg=="],
 
-    "@candoo/domain/zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
-
     "@eslint-community/eslint-utils/eslint-visitor-keys": ["eslint-visitor-keys@3.4.3", "", {}, "sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag=="],
 
     "@supabase/realtime-js/ws": ["ws@8.19.0", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg=="],
+
+    "@teamteamteam/domain/zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
     "@types/pg/@types/node": ["@types/node@25.2.3", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-m0jEgYlYz+mDJZ2+F4v8D1AyQb+QzsNqRuI7xg1VQX/KlKS0qT9r1Mo16yo5F/MtifXFgaofIFsdFMox2SxIbQ=="],
 

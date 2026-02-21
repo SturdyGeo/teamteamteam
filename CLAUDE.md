@@ -1,4 +1,4 @@
-# Candoo
+# Teamteamteam
 
 Terminal-first multi-user kanban platform (CLI/TUI) backed by Supabase + Postgres. Designed to evolve into a web app without rewriting core logic.
 
@@ -15,7 +15,7 @@ bun run lint             # Lint
 bun run knip             # Dead code detection
 bun run test:watch       # Watch mode tests
 bun run test:coverage    # Coverage
-bun run build:cli        # Build standalone binary (dist/candoo)
+bun run build:cli        # Build standalone binary (dist/ttteam)
 bun run release          # Build all + binary
 bun run clean            # Clean build artifacts
 ```
@@ -63,7 +63,7 @@ packages/api-client/→ Shared API client used by CLI and TUI.
 
 ### Repository Structure
 ```
-candoo/
+teamteamteam/
 ├─ apps/
 │  ├─ cli/          # CLI commands + TUI
 │  └─ api/          # Optional thin server

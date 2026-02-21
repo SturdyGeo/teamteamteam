@@ -8,8 +8,8 @@ export { createQueryMethods } from "./queries.js";
 export type { QueryMethods } from "./queries.js";
 export { createMutationMethods } from "./mutations.js";
 export type { MutationMethods } from "./mutations.js";
-export { createCandooClient } from "./client.js";
-export type { CandooClient } from "./client.js";
+export { createTeamteamteamClient } from "./client.js";
+export type { TeamteamteamClient } from "./client.js";
 
 export type {
   OrgWithRole,

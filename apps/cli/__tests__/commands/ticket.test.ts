@@ -72,7 +72,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "list"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "list"]);
 
       expect(mockClient.getTickets).toHaveBeenCalledWith("proj-1", {});
       expect(logSpy).toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "ticket", "list"]);
+      await program.parseAsync(["node", "ttteam", "--json", "ticket", "list"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(tickets, null, 2));
     });
@@ -98,7 +98,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "create", "New ticket"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "create", "New ticket"]);
 
       expect(mockClient.createTicket).toHaveBeenCalledWith("proj-1", {
         title: "New ticket",
@@ -120,7 +120,7 @@ describe("ticket commands", () => {
 
       const program = buildProgram();
       await program.parseAsync([
-        "node", "candoo", "ticket", "create", "Important task",
+        "node", "ttteam", "ticket", "create", "Important task",
         "-d", "Something urgent", "-a", "alice@x.com", "-t", "bug",
       ]);
 
@@ -146,7 +146,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "show", "TEST-1"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "show", "TEST-1"]);
 
       expect(mockClient.getTicket).toHaveBeenCalledWith("t-1");
       // Should print key + title, status, etc.
@@ -163,7 +163,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "ticket", "show", "TEST-1"]);
+      await program.parseAsync(["node", "ttteam", "--json", "ticket", "show", "TEST-1"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(sampleTicket, null, 2));
     });
@@ -179,7 +179,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "move", "TEST-1", "In Progress"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "move", "TEST-1", "In Progress"]);
 
       expect(mockClient.moveTicket).toHaveBeenCalledWith("t-1", { to_column_id: "col-2" });
       expect(logSpy.mock.calls[0][0]).toContain("In Progress");
@@ -198,7 +198,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "assign", "TEST-1", "bob@x.com"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "assign", "TEST-1", "bob@x.com"]);
 
       expect(mockClient.assignTicket).toHaveBeenCalledWith("t-1", { assignee_id: "u-2" });
       expect(logSpy.mock.calls[0][0]).toContain("bob@x.com");
@@ -214,7 +214,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "close", "TEST-1"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "close", "TEST-1"]);
 
       expect(mockClient.closeTicket).toHaveBeenCalledWith("t-1");
       expect(logSpy.mock.calls[0][0]).toContain("TEST-1");
@@ -234,7 +234,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "reopen", "TEST-1"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "reopen", "TEST-1"]);
 
       expect(mockClient.reopenTicket).toHaveBeenCalledWith("t-1", { to_column_id: "col-1" });
     });
@@ -248,7 +248,7 @@ describe("ticket commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "ticket", "reopen", "TEST-1", "--column", "In Progress"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "reopen", "TEST-1", "--column", "In Progress"]);
 
       expect(mockClient.reopenTicket).toHaveBeenCalledWith("t-1", { to_column_id: "col-2" });
     });

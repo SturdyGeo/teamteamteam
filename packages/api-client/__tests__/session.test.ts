@@ -18,7 +18,7 @@ describe("FileSessionStore", () => {
   let store: FileSessionStore;
 
   beforeEach(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), "candoo-test-"));
+    tmpDir = await mkdtemp(join(tmpdir(), "teamteamteam-test-"));
     filePath = join(tmpDir, "session.json");
     store = new FileSessionStore(filePath);
   });

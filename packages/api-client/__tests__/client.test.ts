@@ -21,7 +21,7 @@ vi.mock("@supabase/supabase-js", () => ({
   }),
 }));
 
-import { createCandooClient } from "../src/client.js";
+import { createTeamteamteamClient } from "../src/client.js";
 import type { SessionStore, StoredSession } from "../src/types.js";
 
 function createMockStore(): SessionStore {
@@ -37,9 +37,9 @@ function createMockStore(): SessionStore {
   };
 }
 
-describe("createCandooClient", () => {
+describe("createTeamteamteamClient", () => {
   it("returns an object with auth, query, and mutation methods", () => {
-    const client = createCandooClient({
+    const client = createTeamteamteamClient({
       baseUrl: "https://api.example.com",
       supabaseUrl: "https://test.supabase.co",
       supabaseAnonKey: "anon-key",
@@ -69,7 +69,7 @@ describe("createCandooClient", () => {
 
   it("uses custom sessionStore when provided", () => {
     const store = createMockStore();
-    const client = createCandooClient({
+    const client = createTeamteamteamClient({
       baseUrl: "https://api.example.com",
       supabaseUrl: "https://test.supabase.co",
       supabaseAnonKey: "anon-key",
@@ -82,7 +82,7 @@ describe("createCandooClient", () => {
   });
 
   it("auth methods delegate to supabase", async () => {
-    const client = createCandooClient({
+    const client = createTeamteamteamClient({
       baseUrl: "https://api.example.com",
       supabaseUrl: "https://test.supabase.co",
       supabaseAnonKey: "anon-key",
@@ -94,7 +94,7 @@ describe("createCandooClient", () => {
   });
 
   it("getToken returns null when no session", async () => {
-    const client = createCandooClient({
+    const client = createTeamteamteamClient({
       baseUrl: "https://api.example.com",
       supabaseUrl: "https://test.supabase.co",
       supabaseAnonKey: "anon-key",
@@ -107,7 +107,7 @@ describe("createCandooClient", () => {
 
   it("logout clears session and calls signOut", async () => {
     const store = createMockStore();
-    const client = createCandooClient({
+    const client = createTeamteamteamClient({
       baseUrl: "https://api.example.com",
       supabaseUrl: "https://test.supabase.co",
       supabaseAnonKey: "anon-key",

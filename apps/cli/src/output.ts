@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { createInterface } from "node:readline";
-import { ApiError } from "@candoo/api-client";
+import { ApiError } from "@teamteamteam/api-client";
 
 export function printJson(data: unknown): void {
   console.log(JSON.stringify(data, null, 2));
@@ -67,7 +67,7 @@ export function handleError(err: unknown): never {
   if (err instanceof ApiError) {
     switch (err.statusCode) {
       case 401:
-        printError("Not authenticated. Run 'candoo login <email>' first.");
+        printError("Not authenticated. Run 'ttteam login <email>' first.");
         break;
       case 403:
         printError("Permission denied.");

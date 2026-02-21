@@ -18,9 +18,9 @@ export function registerProjectCommands(program: Command): void {
       "after",
       `
 Examples:
-  $ candoo project create "Backend API" BACK
-  $ candoo project use BACK
-  $ candoo project list`,
+  $ ttteam project create "Backend API" BACK
+  $ ttteam project use BACK
+  $ ttteam project list`,
     );
 
   project
@@ -56,8 +56,8 @@ Examples:
 The prefix is used to generate ticket keys (e.g. BACK → BACK-1, BACK-2).
 
 Examples:
-  $ candoo project create "Backend API" BACK
-  $ candoo project create "Frontend" WEB`,
+  $ ttteam project create "Backend API" BACK
+  $ ttteam project create "Frontend" WEB`,
     )
     .action(
       withErrorHandler(async (name: string, prefix: string, _opts: unknown, cmd: Command) => {
@@ -82,7 +82,7 @@ Examples:
       "after",
       `
 Example:
-  $ candoo project use BACK`,
+  $ ttteam project use BACK`,
     )
     .action(
       withErrorHandler(async (prefix: string, _opts: unknown, cmd: Command) => {
@@ -110,8 +110,8 @@ Example:
       "after",
       `
 Examples:
-  $ candoo project delete BACK
-  $ candoo project delete BACK --yes`,
+  $ ttteam project delete BACK
+  $ ttteam project delete BACK --yes`,
     )
     .action(
       withErrorHandler(async (prefix: string, opts: { yes?: boolean }, cmd: Command) => {

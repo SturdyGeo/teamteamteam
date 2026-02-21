@@ -67,7 +67,7 @@ describe("org commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "list"]);
+      await program.parseAsync(["node", "ttteam", "org", "list"]);
 
       expect(mockClient.getOrgs).toHaveBeenCalled();
       expect(logSpy).toHaveBeenCalled();
@@ -79,7 +79,7 @@ describe("org commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "org", "list"]);
+      await program.parseAsync(["node", "ttteam", "--json", "org", "list"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(orgs, null, 2));
     });
@@ -93,7 +93,7 @@ describe("org commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "create", "NewOrg"]);
+      await program.parseAsync(["node", "ttteam", "org", "create", "NewOrg"]);
 
       expect(mockClient.createOrg).toHaveBeenCalledWith({ name: "NewOrg" });
       expect(logSpy.mock.calls[0][0]).toContain("NewOrg");
@@ -105,7 +105,7 @@ describe("org commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "org", "create", "NewOrg"]);
+      await program.parseAsync(["node", "ttteam", "--json", "org", "create", "NewOrg"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(created, null, 2));
     });
@@ -122,7 +122,7 @@ describe("org commands", () => {
       } as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "use", "Acme"]);
+      await program.parseAsync(["node", "ttteam", "org", "use", "Acme"]);
 
       expect(mockSaveConfig).toHaveBeenCalledWith(
         expect.objectContaining({ orgId: "org-1" }),
@@ -144,7 +144,7 @@ describe("org commands", () => {
       } as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "delete", "Acme", "--yes"]);
+      await program.parseAsync(["node", "ttteam", "org", "delete", "Acme", "--yes"]);
 
       expect(mockClient.deleteOrg).toHaveBeenCalledWith("org-1");
       expect(logSpy.mock.calls[0][0]).toContain("Acme");
@@ -163,7 +163,7 @@ describe("org commands", () => {
       mockConfirmAction.mockResolvedValue(true);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "delete", "Acme"]);
+      await program.parseAsync(["node", "ttteam", "org", "delete", "Acme"]);
 
       expect(mockConfirmAction).toHaveBeenCalled();
       expect(mockClient.deleteOrg).toHaveBeenCalledWith("org-1");
@@ -182,7 +182,7 @@ describe("org commands", () => {
       mockConfirmAction.mockResolvedValue(false);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "delete", "Acme"]);
+      await program.parseAsync(["node", "ttteam", "org", "delete", "Acme"]);
 
       expect(mockClient.deleteOrg).not.toHaveBeenCalled();
       expect(logSpy.mock.calls[0][0]).toContain("Aborted");
@@ -199,7 +199,7 @@ describe("org commands", () => {
       mockResolveOrgId.mockResolvedValue("org-1");
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "invite", "alice@example.com"]);
+      await program.parseAsync(["node", "ttteam", "org", "invite", "alice@example.com"]);
 
       expect(mockResolveOrgId).toHaveBeenCalledWith(mockClient, undefined);
       expect(mockClient.inviteMember).toHaveBeenCalledWith("org-1", { email: "alice@example.com", role: "member" });
@@ -215,7 +215,7 @@ describe("org commands", () => {
       mockResolveOrgId.mockResolvedValue("org-1");
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "org", "invite", "bob@example.com", "--role", "admin"]);
+      await program.parseAsync(["node", "ttteam", "org", "invite", "bob@example.com", "--role", "admin"]);
 
       expect(mockClient.inviteMember).toHaveBeenCalledWith("org-1", { email: "bob@example.com", role: "admin" });
       expect(logSpy.mock.calls[0][0]).toContain("bob@example.com");
@@ -230,7 +230,7 @@ describe("org commands", () => {
       mockResolveOrgId.mockResolvedValue("org-1");
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "--json", "org", "invite", "alice@example.com"]);
+      await program.parseAsync(["node", "ttteam", "--json", "org", "invite", "alice@example.com"]);
 
       expect(logSpy).toHaveBeenCalledWith(JSON.stringify(membership, null, 2));
     });

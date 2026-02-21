@@ -1,6 +1,6 @@
-# @candoo/api
+# @teamteamteam/api
 
-HTTP API for Candoo, built with [Hono](https://hono.dev/). Runs on Bun for local development and deploys as a Supabase Edge Function.
+HTTP API for Teamteamteam, built with [Hono](https://hono.dev/). Runs on Bun for local development and deploys as a Supabase Edge Function.
 
 ## Authentication
 
@@ -116,7 +116,7 @@ The API deploys as a Supabase Edge Function. See the root [README.md](../../READ
 For local development:
 
 ```sh
-doppler run -- bun run --filter @candoo/api dev
+doppler run -- bun run --filter @teamteamteam/api dev
 ```
 
 Runs on `http://localhost:3001` by default (configurable via `PORT` env var).

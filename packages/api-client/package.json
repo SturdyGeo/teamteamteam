@@ -1,5 +1,5 @@
 {
-  "name": "@candoo/api-client",
+  "name": "@teamteamteam/api-client",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
   },
   "files": ["dist"],
   "dependencies": {
-    "@candoo/domain": "workspace:*",
+    "@teamteamteam/domain": "workspace:*",
     "@supabase/supabase-js": "^2.97.0"
   },
   "devDependencies": {

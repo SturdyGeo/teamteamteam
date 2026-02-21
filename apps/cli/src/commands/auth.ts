@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import { createInterface } from "node:readline";
-import { ApiError } from "@candoo/api-client";
+import { ApiError } from "@teamteamteam/api-client";
 import { getClient } from "../client.js";
 import { printSuccess, printJson, withErrorHandler } from "../output.js";
 
@@ -23,7 +23,7 @@ export function registerAuthCommands(program: Command): void {
       "after",
       `
 Example:
-  $ candoo login alice@acme.com`,
+  $ ttteam login alice@acme.com`,
     )
     .action(
       withErrorHandler(async (email: string) => {
@@ -54,8 +54,8 @@ Example:
       "after",
       `
 Examples:
-  $ candoo whoami
-  $ candoo whoami --json`,
+  $ ttteam whoami
+  $ ttteam whoami --json`,
     )
     .action(
       withErrorHandler(async (_opts: unknown, cmd: Command) => {
@@ -63,7 +63,7 @@ Examples:
         const { json } = cmd.optsWithGlobals();
         const session = await client.getSession();
         if (!session) {
-          throw new ApiError("AUTH_ERROR", "Not logged in. Run 'candoo login <email>' first.", 401);
+          throw new ApiError("AUTH_ERROR", "Not logged in. Run 'ttteam login <email>' first.", 401);
         }
         if (json) {
           printJson(session.user);

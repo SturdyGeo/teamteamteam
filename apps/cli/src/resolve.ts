@@ -1,11 +1,11 @@
-import type { CandooClient, OrgWithRole } from "@candoo/api-client";
-import type { Ticket, WorkflowColumn } from "@candoo/domain";
-import { parseTicketKey } from "@candoo/domain";
-import type { MemberWithUser } from "@candoo/api-client";
+import type { TeamteamteamClient, OrgWithRole } from "@teamteamteam/api-client";
+import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
+import { parseTicketKey } from "@teamteamteam/domain";
+import type { MemberWithUser } from "@teamteamteam/api-client";
 import { loadConfig } from "./config.js";
 
 export async function resolveOrg(
-  client: CandooClient,
+  client: TeamteamteamClient,
   nameOrId: string,
 ): Promise<OrgWithRole> {
   const orgs = await client.getOrgs();
@@ -22,7 +22,7 @@ export async function resolveOrg(
 }
 
 export async function resolveOrgId(
-  client: CandooClient,
+  client: TeamteamteamClient,
   flag?: string,
 ): Promise<string> {
   if (flag) {
@@ -34,16 +34,16 @@ export async function resolveOrgId(
   const orgs = await client.getOrgs();
   if (orgs.length === 1) return orgs[0].id;
   if (orgs.length === 0) {
-    throw new Error("No orgs found. Create one with 'candoo org create <name>'.");
+    throw new Error("No orgs found. Create one with 'ttteam org create <name>'.");
   }
   const names = orgs.map((o) => `  ${o.name}`).join("\n");
   throw new Error(
-    `Multiple orgs found. Use --org <name> or run 'candoo org use <name>' to set a default.\n${names}`,
+    `Multiple orgs found. Use --org <name> or run 'ttteam org use <name>' to set a default.\n${names}`,
   );
 }
 
 export async function resolveTicket(
-  client: CandooClient,
+  client: TeamteamteamClient,
   projectId: string,
   key: string,
 ): Promise<Ticket> {
@@ -60,7 +60,7 @@ export async function resolveTicket(
 }
 
 export async function resolveColumn(
-  client: CandooClient,
+  client: TeamteamteamClient,
   projectId: string,
   name: string,
 ): Promise<WorkflowColumn> {
@@ -78,7 +78,7 @@ export async function resolveColumn(
 }
 
 export async function resolveMember(
-  client: CandooClient,
+  client: TeamteamteamClient,
   orgId: string,
   email: string,
 ): Promise<MemberWithUser> {
@@ -93,7 +93,7 @@ export async function resolveMember(
 }
 
 export async function resolveProjectByPrefix(
-  client: CandooClient,
+  client: TeamteamteamClient,
   orgId: string,
   prefix: string,
 ): Promise<{ id: string; prefix: string }> {
@@ -103,7 +103,7 @@ export async function resolveProjectByPrefix(
   );
   if (!match) {
     throw new Error(
-      `Project with prefix "${prefix}" not found. Run 'candoo project list' to see available projects.`,
+      `Project with prefix "${prefix}" not found. Run 'ttteam project list' to see available projects.`,
     );
   }
   return { id: match.id, prefix: match.prefix };

@@ -8,7 +8,7 @@ import { registerTagCommands } from "./commands/tag.js";
 import { registerBoardCommand } from "./commands/board.js";
 import { configureClient } from "./client.js";
 
-const program = new Command("candoo")
+const program = new Command("ttteam")
   .version("0.1.0")
   .description("Terminal-first multi-user kanban")
   .showHelpAfterError()
@@ -26,13 +26,13 @@ const program = new Command("candoo")
     "after",
     `
 Getting started:
-  $ candoo login alice@acme.com
-  $ candoo org create "Acme Corp"
-  $ candoo org use "Acme Corp"
-  $ candoo project create "Backend API" BACK
-  $ candoo project use BACK
-  $ candoo ticket create "My first ticket"
-  $ candoo board`,
+  $ ttteam login alice@acme.com
+  $ ttteam org create "Acme Corp"
+  $ ttteam org use "Acme Corp"
+  $ ttteam project create "Backend API" BACK
+  $ ttteam project use BACK
+  $ ttteam ticket create "My first ticket"
+  $ ttteam board`,
   );
 
 program.hook("preAction", (_command, actionCommand) => {

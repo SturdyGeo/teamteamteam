@@ -99,7 +99,7 @@ Goal: Typed client in `packages/api-client` used by both CLI and TUI. Wraps all 
 
 - [x] **5.1 — Client Skeleton & Auth**: `ApiError` class, `FileSessionStore` (XDG-compliant, 0o600 perms), `HttpClient` fetch wrapper with auto-auth headers, `createAuthClient` wrapping Supabase auth (`sendMagicLink`, `verifyOtp`, `exchangeCodeForSession`, `getToken` with auto-refresh, `logout`).
 - [x] **5.2 — Query Methods**: `getOrgs()`, `getProjects()`, `getColumns()`, `getTickets()` (with query param filtering), `getTicket()`, `getTags()`, `getActivity()`, `getMembers()`. All typed with domain entities + API-specific response types (`OrgWithRole`, `MemberWithUser`, `ActivityEventWithActor`).
-- [x] **5.3 — Mutation Methods**: `createOrg()`, `createProject()`, `createTicket()`, `moveTicket()`, `assignTicket()`, `closeTicket()`, `reopenTicket()`, `addTag()`, `removeTag()` (URL-encoded), `inviteMember()`. `createCandooClient()` factory composes auth + queries + mutations.
+- [x] **5.3 — Mutation Methods**: `createOrg()`, `createProject()`, `createTicket()`, `moveTicket()`, `assignTicket()`, `closeTicket()`, `reopenTicket()`, `addTag()`, `removeTag()` (URL-encoded), `inviteMember()`. `createTeamteamteamClient()` factory composes auth + queries + mutations.
 
 ---
 
@@ -107,7 +107,7 @@ Goal: Typed client in `packages/api-client` used by both CLI and TUI. Wraps all 
 
 Goal: Commander-based CLI with all commands. Formatted text output + `--json` flag. 62 new tests (402 total).
 
-- [x] **6.1 — CLI Skeleton & Auth Commands**: Commander program, global `--json`/`--org`/`--project` flags, `client.ts` (lazy singleton), `config.ts` (XDG `~/.config/candoo/config.json`), `output.ts` (table, JSON, error handler), `login`/`logout`/`whoami`.
+- [x] **6.1 — CLI Skeleton & Auth Commands**: Commander program, global `--json`/`--org`/`--project` flags, `client.ts` (lazy singleton), `config.ts` (XDG `~/.config/teamteamteam/config.json`), `output.ts` (table, JSON, error handler), `login`/`logout`/`whoami`.
 - [x] **6.2 — Org & Project Commands**: `org list`, `org create`, `project list`, `project create`, `project use` (saves default to config). `resolve.ts` with `resolveProjectByPrefix`.
 - [x] **6.3 — Ticket CRUD Commands**: `ticket list` (table with key, title, tags), `ticket create` (with `-d`/`-a`/`-t` flags), `ticket show` (detail view with columns, activity). `resolveTicket`, `resolveColumn`, `resolveMember` resolvers.
 - [x] **6.4 — Ticket Mutation Commands**: `ticket move`, `ticket assign`, `ticket close`, `ticket reopen` (with `--column` flag, defaults to first column).
@@ -124,7 +124,7 @@ Goal: Ink-based kanban board rendered in terminal. Read-only board with keyboard
 
 Scope: Ink app entry point. Fetch columns + tickets via API client. Render columns side-by-side. Tickets show key, title, assignee.
 
-Deliverable: `candoo board` renders a static board from live data.
+Deliverable: `ttteam board` renders a static board from live data.
 
 - [x] **7.2 — Navigation & Selection**
 
@@ -160,7 +160,7 @@ The API has been migrated to support Supabase Edge Functions as a deployment tar
 - [x] `createApp(basePath?)` factory in `apps/api/src/app.ts`
 - [x] `build:edge` script in root `package.json`
 - [x] Edge Function entry point + Deno import map
-- [x] Lazy `CANDOO_API_URL` validation (auth commands work without it)
+- [x] Lazy `TEAMTEAMTEAM_API_URL` validation (auth commands work without it)
 - [x] `supabase/config.toml` `[functions.api]` config
 
 ---

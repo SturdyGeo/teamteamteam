@@ -6,7 +6,7 @@ import type { SessionStore, StoredSession } from "./types.js";
 function getConfigDir(): string {
   const xdg = process.env["XDG_CONFIG_HOME"];
   const base = xdg || join(homedir(), ".config");
-  return join(base, "candoo");
+  return join(base, "teamteamteam");
 }
 
 export class FileSessionStore implements SessionStore {

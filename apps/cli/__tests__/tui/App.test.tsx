@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "ink-testing-library";
-import type { CandooClient } from "@candoo/api-client";
-import type { WorkflowColumn, Ticket } from "@candoo/domain";
-import type { MemberWithUser } from "@candoo/api-client";
+import type { TeamteamteamClient } from "@teamteamteam/api-client";
+import type { WorkflowColumn, Ticket } from "@teamteamteam/domain";
+import type { MemberWithUser } from "@teamteamteam/api-client";
 import { App } from "../../src/tui/App.js";
 
 const columns: WorkflowColumn[] = [
@@ -85,7 +85,7 @@ const members: MemberWithUser[] = [
   },
 ];
 
-function createMockClient(overrides: Partial<CandooClient> = {}): CandooClient {
+function createMockClient(overrides: Partial<TeamteamteamClient> = {}): TeamteamteamClient {
   return {
     getColumns: vi.fn().mockResolvedValue(columns),
     getTickets: vi.fn().mockResolvedValue(tickets),
@@ -96,7 +96,7 @@ function createMockClient(overrides: Partial<CandooClient> = {}): CandooClient {
     reopenTicket: vi.fn().mockResolvedValue(tickets[0]),
     createTicket: vi.fn().mockResolvedValue(tickets[0]),
     ...overrides,
-  } as unknown as CandooClient;
+  } as unknown as TeamteamteamClient;
 }
 
 const wait = (ms = 50) => new Promise((r) => setTimeout(r, ms));

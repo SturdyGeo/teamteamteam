@@ -1,4 +1,4 @@
-import type { Ticket } from "@candoo/domain";
+import type { Ticket } from "@teamteamteam/domain";
 
 interface TicketTagRow {
   tags: { name: string };

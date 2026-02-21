@@ -66,7 +66,7 @@ describe("project commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "list"]);
+      await program.parseAsync(["node", "ttteam", "project", "list"]);
 
       expect(mockClient.getProjects).toHaveBeenCalledWith("org-1");
       expect(logSpy).toHaveBeenCalled();
@@ -83,7 +83,7 @@ describe("project commands", () => {
       mockGetClient.mockReturnValue(mockClient as never);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "create", "New Project", "np"]);
+      await program.parseAsync(["node", "ttteam", "project", "create", "New Project", "np"]);
 
       expect(mockClient.createProject).toHaveBeenCalledWith("org-1", {
         name: "New Project",
@@ -100,7 +100,7 @@ describe("project commands", () => {
       mockResolveProjectByPrefix.mockResolvedValue({ id: "p-1", prefix: "MP" });
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "use", "MP"]);
+      await program.parseAsync(["node", "ttteam", "project", "use", "MP"]);
 
       expect(mockSaveConfig).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -124,7 +124,7 @@ describe("project commands", () => {
       mockResolveProjectByPrefix.mockResolvedValue({ id: "p-1", prefix: "MP" });
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "delete", "MP", "--yes"]);
+      await program.parseAsync(["node", "ttteam", "project", "delete", "MP", "--yes"]);
 
       expect(mockClient.deleteProject).toHaveBeenCalledWith("org-1", "p-1");
       expect(logSpy.mock.calls[0][0]).toContain("MP");
@@ -141,7 +141,7 @@ describe("project commands", () => {
       mockConfirmAction.mockResolvedValue(true);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "delete", "MP"]);
+      await program.parseAsync(["node", "ttteam", "project", "delete", "MP"]);
 
       expect(mockConfirmAction).toHaveBeenCalled();
       expect(mockClient.deleteProject).toHaveBeenCalledWith("org-1", "p-1");
@@ -156,7 +156,7 @@ describe("project commands", () => {
       mockConfirmAction.mockResolvedValue(false);
 
       const program = buildProgram();
-      await program.parseAsync(["node", "candoo", "project", "delete", "MP"]);
+      await program.parseAsync(["node", "ttteam", "project", "delete", "MP"]);
 
       expect(mockClient.deleteProject).not.toHaveBeenCalled();
       expect(logSpy.mock.calls[0][0]).toContain("Aborted");

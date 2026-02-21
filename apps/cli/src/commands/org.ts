@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import type { MembershipRole } from "@candoo/domain";
+import type { MembershipRole } from "@teamteamteam/domain";
 import { getClient } from "../client.js";
 import { loadConfig, saveConfig } from "../config.js";
 import {
@@ -19,9 +19,9 @@ export function registerOrgCommands(program: Command): void {
       "after",
       `
 Examples:
-  $ candoo org create "Acme Corp"
-  $ candoo org use "Acme Corp"
-  $ candoo org list`,
+  $ ttteam org create "Acme Corp"
+  $ ttteam org use "Acme Corp"
+  $ ttteam org list`,
     );
 
   org
@@ -53,8 +53,8 @@ Examples:
       "after",
       `
 Examples:
-  $ candoo org create "Acme Corp"
-  $ candoo org create MyStartup`,
+  $ ttteam org create "Acme Corp"
+  $ ttteam org create MyStartup`,
     )
     .action(
       withErrorHandler(async (name: string, _opts: unknown, cmd: Command) => {
@@ -78,7 +78,7 @@ Examples:
       "after",
       `
 Example:
-  $ candoo org use "Acme Corp"`,
+  $ ttteam org use "Acme Corp"`,
     )
     .action(
       withErrorHandler(async (name: string) => {
@@ -99,8 +99,8 @@ Example:
       "after",
       `
 Examples:
-  $ candoo org delete "Acme Corp"
-  $ candoo org delete "Acme Corp" --yes`,
+  $ ttteam org delete "Acme Corp"
+  $ ttteam org delete "Acme Corp" --yes`,
     )
     .action(
       withErrorHandler(async (name: string, opts: { yes?: boolean }, cmd: Command) => {
@@ -142,8 +142,8 @@ Examples:
       "after",
       `
 Examples:
-  $ candoo org invite alice@example.com
-  $ candoo org invite bob@example.com --role admin`,
+  $ ttteam org invite alice@example.com
+  $ ttteam org invite bob@example.com --role admin`,
     )
     .action(
       withErrorHandler(async (email: string, opts: { role: string }, cmd: Command) => {

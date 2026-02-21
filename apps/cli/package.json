@@ -1,14 +1,14 @@
 {
-  "name": "@candoo/cli",
+  "name": "@teamteamteam/cli",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "candoo": "./dist/index.js"
+    "ttteam": "./dist/index.js"
   },
   "dependencies": {
-    "@candoo/api-client": "workspace:*",
-    "@candoo/domain": "workspace:*",
+    "@teamteamteam/api-client": "workspace:*",
+    "@teamteamteam/domain": "workspace:*",
     "chalk": "^5.4.0",
     "commander": "^13.0.0",
     "ink": "^5",

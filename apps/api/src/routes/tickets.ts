@@ -8,7 +8,7 @@ import {
   reopenTicket,
   filterTickets,
   sortTickets,
-} from "@candoo/domain";
+} from "@teamteamteam/domain";
 import { getAuth } from "../middleware/auth.js";
 import { enrichTicketWithTags, TICKET_SELECT } from "../lib/tickets.js";
 import { persistActivityEvents } from "../lib/activity.js";

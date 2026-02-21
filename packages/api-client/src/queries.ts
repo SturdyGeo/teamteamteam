@@ -1,4 +1,4 @@
-import type { Project, WorkflowColumn, Ticket, Tag } from "@candoo/domain";
+import type { Project, WorkflowColumn, Ticket, Tag } from "@teamteamteam/domain";
 import type { HttpClient } from "./http.js";
 import type {
   OrgWithRole,

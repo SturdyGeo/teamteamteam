@@ -1,5 +1,5 @@
 import { Box, useStdout } from "ink";
-import type { WorkflowColumn, Ticket } from "@candoo/domain";
+import type { WorkflowColumn, Ticket } from "@teamteamteam/domain";
 import { Column } from "./Column.js";
 
 interface BoardProps {

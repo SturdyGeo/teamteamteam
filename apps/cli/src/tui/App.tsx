@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import type { CandooClient } from "@candoo/api-client";
+import type { TeamteamteamClient } from "@teamteamteam/api-client";
 import { Board } from "./Board.js";
 import { TicketDetail } from "./TicketDetail.js";
 import { SelectList } from "./SelectList.js";
@@ -11,7 +11,7 @@ import { HelpOverlay } from "./HelpOverlay.js";
 import { useBoardState } from "./useBoardState.js";
 
 interface AppProps {
-  client: CandooClient;
+  client: TeamteamteamClient;
   projectId: string;
   orgId: string;
   prefix: string;

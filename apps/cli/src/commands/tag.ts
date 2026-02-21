@@ -18,8 +18,8 @@ export function registerTagCommands(program: Command): void {
       "after",
       `
 Examples:
-  $ candoo tags
-  $ candoo tags --json`,
+  $ ttteam tags
+  $ ttteam tags --json`,
     )
     .action(
       withErrorHandler(async (_opts: unknown, cmd: Command) => {
@@ -50,9 +50,9 @@ export function registerTicketTagCommands(ticket: Command): void {
 Tags are auto-normalized to lowercase and trimmed.
 
 Examples:
-  $ candoo ticket tag add BACK-1 bug
-  $ candoo ticket tag add BACK-1 "tech-debt"
-  $ candoo ticket tag remove BACK-1 bug`,
+  $ ttteam ticket tag add BACK-1 bug
+  $ ttteam ticket tag add BACK-1 "tech-debt"
+  $ ttteam ticket tag remove BACK-1 bug`,
     );
 
   tag
@@ -64,8 +64,8 @@ Examples:
       "after",
       `
 Examples:
-  $ candoo ticket tag add BACK-1 bug
-  $ candoo ticket tag add BACK-1 "tech-debt"`,
+  $ ttteam ticket tag add BACK-1 bug
+  $ ttteam ticket tag add BACK-1 "tech-debt"`,
     )
     .action(
       withErrorHandler(async (key: string, tagName: string, _opts: unknown, cmd: Command) => {
@@ -92,7 +92,7 @@ Examples:
       "after",
       `
 Example:
-  $ candoo ticket tag remove BACK-1 bug`,
+  $ ttteam ticket tag remove BACK-1 bug`,
     )
     .action(
       withErrorHandler(async (key: string, tagName: string, _opts: unknown, cmd: Command) => {

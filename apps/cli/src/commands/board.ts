@@ -15,11 +15,11 @@ export function registerBoardCommand(program: Command): void {
       "after",
       `
 Keyboard shortcuts: arrow keys to navigate, enter to select,
-q to quit. Use 'candoo board' after setting a default project.
+q to quit. Use 'ttteam board' after setting a default project.
 
 Examples:
-  $ candoo board
-  $ candoo board --project BACK`,
+  $ ttteam board
+  $ ttteam board --project BACK`,
     )
     .action(
       withErrorHandler(async (_opts: unknown, cmd: Command) => {

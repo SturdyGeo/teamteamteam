@@ -1,6 +1,6 @@
 import { Box, Text } from "ink";
-import type { Ticket } from "@candoo/domain";
-import { generateTicketKey } from "@candoo/domain";
+import type { Ticket } from "@teamteamteam/domain";
+import { generateTicketKey } from "@teamteamteam/domain";
 
 interface TicketDetailProps {
   ticket: Ticket;

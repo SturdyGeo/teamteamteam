@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "ink-testing-library";
-import type { Ticket } from "@candoo/domain";
+import type { Ticket } from "@teamteamteam/domain";
 import { Column } from "../../src/tui/Column.js";
 
 const baseTicket: Ticket = {

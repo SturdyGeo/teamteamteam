@@ -47,7 +47,7 @@ describe("config", () => {
       mockFs.readFile.mockResolvedValue("{}");
       await loadConfig();
       expect(mockFs.readFile).toHaveBeenCalledWith(
-        "/custom/config/candoo/config.json",
+        "/custom/config/teamteamteam/config.json",
         "utf-8",
       );
     });
@@ -58,9 +58,9 @@ describe("config", () => {
       mockFs.mkdir.mockResolvedValue(undefined);
       mockFs.writeFile.mockResolvedValue();
       await saveConfig({ orgId: "org-1" });
-      const expectedPath = join("/home/testuser", ".config", "candoo", "config.json");
+      const expectedPath = join("/home/testuser", ".config", "teamteamteam", "config.json");
       expect(mockFs.mkdir).toHaveBeenCalledWith(
-        join("/home/testuser", ".config", "candoo"),
+        join("/home/testuser", ".config", "teamteamteam"),
         { recursive: true },
       );
       expect(mockFs.writeFile).toHaveBeenCalledWith(

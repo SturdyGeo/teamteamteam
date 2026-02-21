@@ -11,7 +11,7 @@ interface CliConfig {
 function getConfigPath(): string {
   const xdg = process.env["XDG_CONFIG_HOME"];
   const base = xdg || join(homedir(), ".config");
-  return join(base, "candoo", "config.json");
+  return join(base, "teamteamteam", "config.json");
 }
 
 export async function loadConfig(): Promise<CliConfig> {
@@ -35,7 +35,7 @@ export async function getDefaultOrgId(flag?: string): Promise<string> {
   const config = await loadConfig();
   if (config.orgId) return config.orgId;
   throw new Error(
-    "No org specified. Use --org <name> or run 'candoo org use <name>' to set a default.",
+    "No org specified. Use --org <name> or run 'ttteam org use <name>' to set a default.",
   );
 }
 
@@ -44,6 +44,6 @@ export async function getDefaultProjectId(flag?: string): Promise<string> {
   const config = await loadConfig();
   if (config.projectId) return config.projectId;
   throw new Error(
-    "No project specified. Use --project <prefix> or run 'candoo project use <prefix>' to set a default.",
+    "No project specified. Use --project <prefix> or run 'ttteam project use <prefix>' to set a default.",
   );
 }

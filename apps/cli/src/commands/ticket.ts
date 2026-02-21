@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import type { Command } from "commander";
-import { generateTicketKey } from "@candoo/domain";
+import { generateTicketKey } from "@teamteamteam/domain";
 import { getClient } from "../client.js";
 import { getDefaultProjectId, loadConfig } from "../config.js";
 import {
@@ -27,15 +27,15 @@ export function registerTicketCommands(program: Command): void {
       "after",
       `
 Ticket keys have the format PREFIX-NUMBER (e.g. BACK-1, PROJ-42).
-The prefix comes from your project. Run 'candoo project list' to see prefixes.
+The prefix comes from your project. Run 'ttteam project list' to see prefixes.
 
 Examples:
-  $ candoo ticket create "Fix login bug"
-  $ candoo ticket list --status "In Progress"
-  $ candoo ticket show BACK-1
-  $ candoo ticket move BACK-1 "In Progress"
-  $ candoo ticket assign BACK-1 alice@acme.com
-  $ candoo ticket close BACK-1`,
+  $ ttteam ticket create "Fix login bug"
+  $ ttteam ticket list --status "In Progress"
+  $ ttteam ticket show BACK-1
+  $ ttteam ticket move BACK-1 "In Progress"
+  $ ttteam ticket assign BACK-1 alice@acme.com
+  $ ttteam ticket close BACK-1`,
     );
 
   registerTicketTagCommands(ticket);
@@ -51,9 +51,9 @@ Examples:
       "after",
       `
 Examples:
-  $ candoo ticket list
-  $ candoo ticket list --status "In Progress"
-  $ candoo ticket list --tag bug --search login`,
+  $ ttteam ticket list
+  $ ttteam ticket list --status "In Progress"
+  $ ttteam ticket list --tag bug --search login`,
     )
     .action(
       withErrorHandler(async (opts: Record<string, string | undefined>, cmd: Command) => {
@@ -101,9 +101,9 @@ Examples:
       "after",
       `
 Examples:
-  $ candoo ticket create "Fix login bug"
-  $ candoo ticket create "New feature" -a alice@acme.com
-  $ candoo ticket create "Refactor auth" -t backend -t tech-debt`,
+  $ ttteam ticket create "Fix login bug"
+  $ ttteam ticket create "New feature" -a alice@acme.com
+  $ ttteam ticket create "Refactor auth" -t backend -t tech-debt`,
     )
     .action(
       withErrorHandler(async (title: string, opts: Record<string, unknown>, cmd: Command) => {
@@ -145,7 +145,7 @@ Examples:
       "after",
       `
 Example:
-  $ candoo ticket show BACK-1`,
+  $ ttteam ticket show BACK-1`,
     )
     .action(
       withErrorHandler(async (key: string, _opts: unknown, cmd: Command) => {
@@ -208,8 +208,8 @@ Example:
       "after",
       `
 Examples:
-  $ candoo ticket move BACK-1 "In Progress"
-  $ candoo ticket move PROJ-42 Done`,
+  $ ttteam ticket move BACK-1 "In Progress"
+  $ ttteam ticket move PROJ-42 Done`,
     )
     .action(
       withErrorHandler(async (key: string, columnName: string, _opts: unknown, cmd: Command) => {
@@ -237,7 +237,7 @@ Examples:
       "after",
       `
 Example:
-  $ candoo ticket assign BACK-1 alice@acme.com`,
+  $ ttteam ticket assign BACK-1 alice@acme.com`,
     )
     .action(
       withErrorHandler(async (key: string, email: string, _opts: unknown, cmd: Command) => {
@@ -265,7 +265,7 @@ Example:
       "after",
       `
 Example:
-  $ candoo ticket close BACK-1`,
+  $ ttteam ticket close BACK-1`,
     )
     .action(
       withErrorHandler(async (key: string, _opts: unknown, cmd: Command) => {
@@ -292,8 +292,8 @@ Example:
       "after",
       `
 Examples:
-  $ candoo ticket reopen BACK-1
-  $ candoo ticket reopen BACK-1 --column "In Progress"`,
+  $ ttteam ticket reopen BACK-1
+  $ ttteam ticket reopen BACK-1 --column "In Progress"`,
     )
     .action(
       withErrorHandler(async (key: string, opts: Record<string, string | undefined>, cmd: Command) => {

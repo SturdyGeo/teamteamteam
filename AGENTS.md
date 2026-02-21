@@ -1,4 +1,4 @@
-agents.md — Candoo
+agents.md — Teamteamteam
 Propose all plans before editing!
 I use doppler for secret management. If a command is not working, you might need doppler run -- in front of it
 Before finishing run the following and fix errors until it's all good
@@ -15,7 +15,7 @@ doppler run -- bun run knip
 
 Project Overview
 
-Candoo is a terminal-first, multi-user kanban platform built for software teams. It provides a CLI and TUI experience backed by Supabase authentication and Postgres persistence.
+Teamteamteam is a terminal-first, multi-user kanban platform built for software teams. It provides a CLI and TUI experience backed by Supabase authentication and Postgres persistence.
 
 The system is designed to evolve into a full web application without rewriting core logic.
 
@@ -329,7 +329,7 @@ Without rewriting domain logic.
 Domain rules must not depend on CLI implementation details.
 
 11. Repository Structure
-candoo/
+teamteamteam/
 ├─ apps/
 │  ├─ cli/
 │  │  ├─ commands/

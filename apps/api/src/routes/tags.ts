@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { addTag, removeTag, normalizeTag } from "@candoo/domain";
+import { addTag, removeTag, normalizeTag } from "@teamteamteam/domain";
 import { getAuth } from "../middleware/auth.js";
 import { enrichTicketWithTags, TICKET_SELECT } from "../lib/tickets.js";
 import { persistActivityEvents } from "../lib/activity.js";

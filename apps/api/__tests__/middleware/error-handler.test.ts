@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Hono } from "hono";
-import { DomainError, DOMAIN_ERROR_CODES } from "@candoo/domain";
+import { DomainError, DOMAIN_ERROR_CODES } from "@teamteamteam/domain";
 import { errorHandler } from "../../src/middleware/error-handler.js";
 
 function createTestApp(error: Error): Hono {

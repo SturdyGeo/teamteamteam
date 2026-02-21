@@ -1,4 +1,4 @@
-import type { Org, Project, Ticket, Membership } from "@candoo/domain";
+import type { Org, Project, Ticket, Membership } from "@teamteamteam/domain";
 import type { HttpClient } from "./http.js";
 import type {
   CreateOrgInput,

@@ -1,25 +1,25 @@
-# @candoo/cli
+# @teamteamteam/cli
 
-Command-line interface and TUI for Candoo. Built with Commander (CLI) and Ink (TUI).
+Command-line interface and TUI for Teamteamteam. Built with Commander (CLI) and Ink (TUI).
 
 ## Installation
 
-The CLI is part of the Candoo monorepo. After building (`bun run build`), run commands via:
+The CLI is part of the Teamteamteam monorepo. After building (`bun run build`), run commands via:
 
 ```sh
-doppler run -- bun run --filter @candoo/cli start -- <command>
+doppler run -- bun run --filter @teamteamteam/cli start -- <command>
 ```
 
-For a one-command install to your shell path:
+For a one-line install that adds the `ttteam` terminal command:
 
 ```sh
 bun run install:cli
 ```
 
-By default this installs `candoo` to `~/.local/bin/candoo`. Override with `CANDOO_INSTALL_DIR`:
+By default this installs `ttteam` to `~/.local/bin/ttteam`. Override with `TTTEAM_INSTALL_DIR`:
 
 ```sh
-CANDOO_INSTALL_DIR=/usr/local/bin bun run install:cli
+TTTEAM_INSTALL_DIR=/usr/local/bin bun run install:cli
 ```
 
 Remove it with:
@@ -31,14 +31,14 @@ bun run uninstall:cli
 Or use the standalone binary directly (see root README for `bun run build:cli`):
 
 ```sh
-./dist/candoo <command>
+./dist/ttteam <command>
 ```
 
 By default, the CLI uses a built-in backend target so end users can run commands without Doppler or extra env setup.
 
 ## Configuration
 
-Config is stored at `~/.config/candoo/`:
+Config is stored at `~/.config/teamteamteam/`:
 
 | File | Purpose |
 |------|---------|
@@ -62,7 +62,7 @@ Config is stored at `~/.config/candoo/`:
 Override backend values directly on the command line:
 
 ```sh
-candoo --custom-backend \
+ttteam --custom-backend \
   --api-url https://<project-ref>.supabase.co/functions/v1/api \
   --supabase-url https://<project-ref>.supabase.co \
   --supabase-anon-key <anon-key> \
@@ -72,7 +72,7 @@ candoo --custom-backend \
 Or pass `--custom-backend` and rely on env vars:
 
 ```sh
-SUPABASE_URL=... SUPABASE_ANON_KEY=... CANDOO_API_URL=... candoo --custom-backend whoami
+SUPABASE_URL=... SUPABASE_ANON_KEY=... TEAMTEAMTEAM_API_URL=... ttteam --custom-backend whoami
 ```
 
 ## Commands
@@ -80,22 +80,22 @@ SUPABASE_URL=... SUPABASE_ANON_KEY=... CANDOO_API_URL=... candoo --custom-backen
 ### Authentication
 
 ```sh
-candoo login <email>     # Send magic link, then enter OTP code
-candoo logout            # Clear stored session
-candoo whoami            # Show current user (email and ID)
-candoo whoami --json     # Show current user as JSON
+ttteam login <email>     # Send magic link, then enter OTP code
+ttteam logout            # Clear stored session
+ttteam whoami            # Show current user (email and ID)
+ttteam whoami --json     # Show current user as JSON
 ```
 
 ### Organizations
 
 ```sh
-candoo org list                      # List your organizations
-candoo org create <name>             # Create a new organization
-candoo org use <name>                # Set default org for local context
-candoo org delete <name>             # Delete an org (prompts for confirmation)
-candoo org delete <name> --yes       # Delete without confirmation
-candoo org invite <email>            # Invite a user (default: member role)
-candoo org invite <email> --role admin  # Invite as admin
+ttteam org list                      # List your organizations
+ttteam org create <name>             # Create a new organization
+ttteam org use <name>                # Set default org for local context
+ttteam org delete <name>             # Delete an org (prompts for confirmation)
+ttteam org delete <name> --yes       # Delete without confirmation
+ttteam org invite <email>            # Invite a user (default: member role)
+ttteam org invite <email> --role admin  # Invite as admin
 ```
 
 If you belong to only one org, it is auto-selected.
@@ -103,30 +103,30 @@ If you belong to only one org, it is auto-selected.
 ### Projects
 
 ```sh
-candoo project list                       # List projects in current org
-candoo project create <name> <prefix>     # Create project (prefix: e.g. PROJ)
-candoo project use <prefix>               # Set default project for local context
-candoo project delete <prefix>            # Delete project (prompts for confirmation)
-candoo project delete <prefix> --yes      # Delete without confirmation
+ttteam project list                       # List projects in current org
+ttteam project create <name> <prefix>     # Create project (prefix: e.g. PROJ)
+ttteam project use <prefix>               # Set default project for local context
+ttteam project delete <prefix>            # Delete project (prompts for confirmation)
+ttteam project delete <prefix> --yes      # Delete without confirmation
 ```
 
 ### Tickets
 
 ```sh
-candoo ticket list                        # List tickets in current project
-candoo ticket create <title>              # Create a new ticket
-candoo ticket show <key>                  # Show ticket details + activity history
-candoo ticket move <key> <column>         # Move ticket to a workflow column
-candoo ticket assign <key> <email>        # Assign ticket to a member
-candoo ticket close <key>                 # Close a ticket
-candoo ticket reopen <key>               # Reopen a closed ticket (to first column)
-candoo ticket reopen <key> --column <col> # Reopen to a specific column
+ttteam ticket list                        # List tickets in current project
+ttteam ticket create <title>              # Create a new ticket
+ttteam ticket show <key>                  # Show ticket details + activity history
+ttteam ticket move <key> <column>         # Move ticket to a workflow column
+ttteam ticket assign <key> <email>        # Assign ticket to a member
+ttteam ticket close <key>                 # Close a ticket
+ttteam ticket reopen <key>               # Reopen a closed ticket (to first column)
+ttteam ticket reopen <key> --column <col> # Reopen to a specific column
 ```
 
 #### Create Options
 
 ```sh
-candoo ticket create "Fix login" -d "Detailed description" -a alice@co.com -t bug -t urgent
+ttteam ticket create "Fix login" -d "Detailed description" -a alice@co.com -t bug -t urgent
 ```
 
 | Flag | Description |
@@ -138,24 +138,24 @@ candoo ticket create "Fix login" -d "Detailed description" -a alice@co.com -t bu
 #### Filtering
 
 ```sh
-candoo ticket list --status "In Progress"
-candoo ticket list --assignee alice@co.com
-candoo ticket list --tag bug
-candoo ticket list --search "login issue"
+ttteam ticket list --status "In Progress"
+ttteam ticket list --assignee alice@co.com
+ttteam ticket list --tag bug
+ttteam ticket list --search "login issue"
 ```
 
 ### Tags
 
 ```sh
-candoo ticket tag add <key> <tag>         # Add a tag to a ticket
-candoo ticket tag remove <key> <tag>      # Remove a tag from a ticket
-candoo tags                               # List all tags in current project
+ttteam ticket tag add <key> <tag>         # Add a tag to a ticket
+ttteam ticket tag remove <key> <tag>      # Remove a tag from a ticket
+ttteam tags                               # List all tags in current project
 ```
 
 ### TUI Board
 
 ```sh
-candoo board                              # Launch interactive kanban board
+ttteam board                              # Launch interactive kanban board
 ```
 
 #### Keyboard Shortcuts
@@ -180,15 +180,15 @@ candoo board                              # Launch interactive kanban board
 
 ```sh
 # Full workflow
-candoo login alice@acme.com
-candoo org create "Acme Corp"
-candoo org use "Acme Corp"
-candoo project create "Backend API" BACK
-candoo project use BACK
-candoo ticket create "Set up database" -t infra
-candoo ticket create "Fix login bug" -d "Users get 500 on /login" -t bug
-candoo ticket list --tag bug
-candoo ticket move BACK-2 "In Progress"
-candoo ticket assign BACK-2 bob@acme.com
-candoo board
+ttteam login alice@acme.com
+ttteam org create "Acme Corp"
+ttteam org use "Acme Corp"
+ttteam project create "Backend API" BACK
+ttteam project use BACK
+ttteam ticket create "Set up database" -t infra
+ttteam ticket create "Fix login bug" -d "Users get 500 on /login" -t bug
+ttteam ticket list --tag bug
+ttteam ticket move BACK-2 "In Progress"
+ttteam ticket assign BACK-2 bob@acme.com
+ttteam board
 ```

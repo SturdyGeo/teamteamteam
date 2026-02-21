@@ -53,7 +53,7 @@ describe("tag commands", () => {
         .option("--project <id>")
         .exitOverride();
       registerTagCommands(program);
-      await program.parseAsync(["node", "candoo", "tags"]);
+      await program.parseAsync(["node", "ttteam", "tags"]);
 
       expect(mockClient.getTags).toHaveBeenCalledWith("proj-1");
       expect(logSpy).toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe("tag commands", () => {
         .exitOverride();
       const ticket = program.command("ticket");
       registerTicketTagCommands(ticket);
-      await program.parseAsync(["node", "candoo", "ticket", "tag", "add", "TEST-1", "feature"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "tag", "add", "TEST-1", "feature"]);
 
       expect(mockClient.addTag).toHaveBeenCalledWith("t-1", { tag: "feature" });
       expect(logSpy.mock.calls[0][0]).toContain("feature");
@@ -95,7 +95,7 @@ describe("tag commands", () => {
         .exitOverride();
       const ticket = program.command("ticket");
       registerTicketTagCommands(ticket);
-      await program.parseAsync(["node", "candoo", "ticket", "tag", "remove", "TEST-1", "bug"]);
+      await program.parseAsync(["node", "ttteam", "ticket", "tag", "remove", "TEST-1", "bug"]);
 
       expect(mockClient.removeTag).toHaveBeenCalledWith("t-1", "bug");
       expect(logSpy.mock.calls[0][0]).toContain("bug");

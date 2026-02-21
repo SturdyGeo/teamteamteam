@@ -7,7 +7,7 @@ import {
   handleError,
   withErrorHandler,
 } from "../src/output.js";
-import { ApiError } from "@candoo/api-client";
+import { ApiError } from "@teamteamteam/api-client";
 
 describe("output", () => {
   let logSpy: ReturnType<typeof vi.spyOn>;

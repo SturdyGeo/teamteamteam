@@ -1,4 +1,4 @@
-# Candoo
+# Teamteamteam
 
 Terminal-first multi-user kanban platform for software teams. Provides a CLI and TUI (terminal UI) experience backed by Supabase authentication and Postgres persistence.
 
@@ -23,13 +23,27 @@ Designed to evolve into a full web application without rewriting core logic.
 - [Doppler](https://www.doppler.com/) (secrets management for local development and CI checks)
 - [Supabase](https://supabase.com/) project (or local dev via `supabase init`)
 
+## One-Line CLI Install
+
+Install the terminal command in one line:
+
+```sh
+bun run install:cli
+```
+
+Then run:
+
+```sh
+ttteam --help
+```
+
 ## Setup
 
 1. **Clone the repository**
 
    ```sh
    git clone <repo-url>
-   cd candoo
+   cd teamteamteam
    ```
 
 2. **Install dependencies**
@@ -53,7 +67,7 @@ Designed to evolve into a full web application without rewriting core logic.
    | `SUPABASE_URL`     | Your Supabase project URL    |
    | `SUPABASE_ANON_KEY`| Your Supabase anonymous key  |
    | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (integration tests only) |
-   | `CANDOO_API_URL`   | API URL (Edge Function or local, e.g. `https://<ref>.supabase.co/functions/v1/api`) |
+   | `TEAMTEAMTEAM_API_URL`   | API URL (Edge Function or local, e.g. `https://<ref>.supabase.co/functions/v1/api`) |
    | `DATABASE_URL`     | Direct Postgres URL (integration tests only, defaults to local Supabase) |
 
    See [infra/README.md](infra/README.md) for detailed Doppler setup instructions.
@@ -72,7 +86,7 @@ Designed to evolve into a full web application without rewriting core logic.
 
 ## Usage
 
-`candoo` now includes a built-in default backend target for consumer usage.
+`ttteam` now includes a built-in default backend target for consumer usage.
 You only need Doppler when running local development scripts in this repository.
 
 ### Global Flags
@@ -92,7 +106,7 @@ You only need Doppler when running local development scripts in this repository.
 If you want to point the CLI at your own Supabase project and API:
 
 ```sh
-candoo --custom-backend \
+ttteam --custom-backend \
   --api-url https://<project-ref>.supabase.co/functions/v1/api \
   --supabase-url https://<project-ref>.supabase.co \
   --supabase-anon-key <anon-key> \
@@ -102,25 +116,25 @@ candoo --custom-backend \
 You can also pass only `--custom-backend` and provide values through env vars:
 
 ```sh
-SUPABASE_URL=... SUPABASE_ANON_KEY=... CANDOO_API_URL=... candoo --custom-backend whoami
+SUPABASE_URL=... SUPABASE_ANON_KEY=... TEAMTEAMTEAM_API_URL=... ttteam --custom-backend whoami
 ```
 
 ### Authentication
 
 ```sh
-candoo login <email>       # Send login code, then enter OTP
-candoo logout              # Clear stored session
-candoo whoami              # Display current user info
+ttteam login <email>       # Send login code, then enter OTP
+ttteam logout              # Clear stored session
+ttteam whoami              # Display current user info
 ```
 
 ### Organizations
 
 ```sh
-candoo org list                # List your organizations
-candoo org create <name>       # Create a new organization
-candoo org use <name>          # Set default org for local context
-candoo org delete <name>       # Delete an org and all its data (--yes to skip prompt)
-candoo org invite <email>      # Invite a user by email (--role admin|member)
+ttteam org list                # List your organizations
+ttteam org create <name>       # Create a new organization
+ttteam org use <name>          # Set default org for local context
+ttteam org delete <name>       # Delete an org and all its data (--yes to skip prompt)
+ttteam org invite <email>      # Invite a user by email (--role admin|member)
 ```
 
 If you have only one org, it is auto-selected without needing `org use`.
@@ -128,28 +142,28 @@ If you have only one org, it is auto-selected without needing `org use`.
 ### Projects
 
 ```sh
-candoo project list                    # List projects in current org
-candoo project create <name> <prefix>  # Create a new project (prefix e.g. PROJ)
-candoo project use <prefix>            # Set default project for local context
-candoo project delete <prefix>         # Delete a project and all its data (--yes to skip prompt)
+ttteam project list                    # List projects in current org
+ttteam project create <name> <prefix>  # Create a new project (prefix e.g. PROJ)
+ttteam project use <prefix>            # Set default project for local context
+ttteam project delete <prefix>         # Delete a project and all its data (--yes to skip prompt)
 ```
 
 ### Tickets
 
 ```sh
-candoo ticket list             # List tickets (supports filter flags)
-candoo ticket create <title>   # Create a new ticket
-candoo ticket show <key>       # Show ticket details + activity history
-candoo ticket move <key> <column>      # Move ticket to a workflow column
-candoo ticket assign <key> <email>     # Assign ticket to a member by email
-candoo ticket close <key>              # Close a ticket
-candoo ticket reopen <key>             # Reopen a closed ticket
+ttteam ticket list             # List tickets (supports filter flags)
+ttteam ticket create <title>   # Create a new ticket
+ttteam ticket show <key>       # Show ticket details + activity history
+ttteam ticket move <key> <column>      # Move ticket to a workflow column
+ttteam ticket assign <key> <email>     # Assign ticket to a member by email
+ttteam ticket close <key>              # Close a ticket
+ttteam ticket reopen <key>             # Reopen a closed ticket
 ```
 
 #### Create Options
 
 ```sh
-candoo ticket create "Fix login" -d "Details..." -a alice@co.com -t bug
+ttteam ticket create "Fix login" -d "Details..." -a alice@co.com -t bug
 ```
 
 | Flag | Description |
@@ -161,24 +175,24 @@ candoo ticket create "Fix login" -d "Details..." -a alice@co.com -t bug
 #### Filtering
 
 ```sh
-candoo ticket list --status "In Progress"
-candoo ticket list --assignee alice@co.com
-candoo ticket list --tag bug
-candoo ticket list --search "login issue"
+ttteam ticket list --status "In Progress"
+ttteam ticket list --assignee alice@co.com
+ttteam ticket list --tag bug
+ttteam ticket list --search "login issue"
 ```
 
 ### Tags
 
 ```sh
-candoo ticket tag add <key> <tag>      # Add a tag to a ticket
-candoo ticket tag remove <key> <tag>   # Remove a tag from a ticket
-candoo tags                            # List all tags in current project
+ttteam ticket tag add <key> <tag>      # Add a tag to a ticket
+ttteam ticket tag remove <key> <tag>   # Remove a tag from a ticket
+ttteam tags                            # List all tags in current project
 ```
 
 ### TUI Board
 
 ```sh
-candoo board          # Launch the interactive kanban board
+ttteam board          # Launch the interactive kanban board
 ```
 
 **Keyboard shortcuts:**
@@ -217,7 +231,7 @@ doppler run -- supabase functions deploy api
 curl https://<project-ref>.supabase.co/functions/v1/api/health
 ```
 
-Set `CANDOO_API_URL` in Doppler to your deployed Edge Function URL (e.g. `https://<project-ref>.supabase.co/functions/v1/api`).
+Set `TEAMTEAMTEAM_API_URL` in Doppler to your deployed Edge Function URL (e.g. `https://<project-ref>.supabase.co/functions/v1/api`).
 
 **Local Edge Function serving** (optional, requires Docker):
 
@@ -231,7 +245,7 @@ curl http://localhost:54321/functions/v1/api/health
 The primary local dev workflow uses Bun directly (no Docker required):
 
 ```sh
-doppler run -- bun run --filter @candoo/api dev
+doppler run -- bun run --filter @teamteamteam/api dev
 ```
 
 The Bun server runs on `http://localhost:3001` by default (configurable via `PORT` env var).
@@ -286,7 +300,7 @@ All development commands require the Doppler prefix:
 ```sh
 doppler run -- bun run build          # Build all packages
 doppler run -- bun run build:edge     # Build Edge Function bundle
-doppler run -- bun run build:cli      # Build standalone macOS binary (dist/candoo)
+doppler run -- bun run build:cli      # Build standalone macOS binary (dist/ttteam)
 doppler run -- bun run release        # Build all + binary
 doppler run -- bun run typecheck      # Type check
 doppler run -- bun run lint           # Lint
@@ -344,12 +358,12 @@ Install the CLI in one command:
 bun run install:cli
 ```
 
-This builds the standalone binary and installs `candoo` to `~/.local/bin/candoo` by default.
+This builds the standalone binary and installs `ttteam` to `~/.local/bin/ttteam` by default.
 
-Use a custom install location with `CANDOO_INSTALL_DIR`:
+Use a custom install location with `TTTEAM_INSTALL_DIR`:
 
 ```sh
-CANDOO_INSTALL_DIR=/usr/local/bin bun run install:cli
+TTTEAM_INSTALL_DIR=/usr/local/bin bun run install:cli
 ```
 
 Uninstall:
@@ -364,12 +378,12 @@ You can also build the standalone macOS binary without installing it:
 doppler run -- bun run build:cli
 ```
 
-This produces `dist/candoo`. Run it directly:
+This produces `dist/ttteam`. Run it directly:
 
 ```sh
-./dist/candoo --version   # 0.1.0
-./dist/candoo --help
-./dist/candoo login alice@acme.com
+./dist/ttteam --version   # 0.1.0
+./dist/ttteam --help
+./dist/ttteam login alice@acme.com
 ```
 
 Or use the `release` script to build everything (TypeScript + binary):
@@ -395,13 +409,13 @@ apps/cli/            → Client layer. Commander CLI commands + TUI (Ink).
 
 packages/api-client/ → Shared typed API client used by both CLI and TUI.
                        Auth (magic link, token refresh), queries, mutations.
-                       Session stored at ~/.config/candoo/session.json.
+                       Session stored at ~/.config/teamteamteam/session.json.
 ```
 
 ### Repository Structure
 
 ```
-candoo/
+teamteamteam/
 ├─ apps/
 │  ├─ cli/              # CLI commands + TUI
 │  └─ api/              # HTTP API (Hono — runs on Bun or Supabase Edge Functions)

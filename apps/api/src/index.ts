@@ -7,4 +7,4 @@ Bun.serve({
   port,
 });
 
-console.log(`Candoo API listening on http://localhost:${port}`);
+console.log(`Teamteamteam API listening on http://localhost:${port}`);

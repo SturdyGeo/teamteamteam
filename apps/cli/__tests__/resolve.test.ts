@@ -7,7 +7,7 @@ import {
   resolveOrg,
   resolveOrgId,
 } from "../src/resolve.js";
-import type { CandooClient } from "@candoo/api-client";
+import type { TeamteamteamClient } from "@teamteamteam/api-client";
 
 vi.mock("../src/config.js", () => ({
   loadConfig: vi.fn().mockResolvedValue({}),
@@ -17,8 +17,8 @@ import { loadConfig } from "../src/config.js";
 
 const mockLoadConfig = vi.mocked(loadConfig);
 
-function mockClient(overrides: Partial<CandooClient> = {}): CandooClient {
-  return overrides as CandooClient;
+function mockClient(overrides: Partial<TeamteamteamClient> = {}): TeamteamteamClient {
+  return overrides as TeamteamteamClient;
 }
 
 describe("resolve", () => {
@@ -185,7 +185,7 @@ describe("resolve", () => {
         getOrgs: vi.fn().mockResolvedValue([]),
       });
       await expect(resolveOrgId(client)).rejects.toThrow(
-        "candoo org create",
+        "ttteam org create",
       );
     });
 
@@ -198,7 +198,7 @@ describe("resolve", () => {
         ]),
       });
       await expect(resolveOrgId(client)).rejects.toThrow(
-        "candoo org use",
+        "ttteam org use",
       );
     });
   });

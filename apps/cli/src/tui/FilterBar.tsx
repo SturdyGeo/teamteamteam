@@ -1,5 +1,5 @@
 import { Text } from "ink";
-import type { TicketFilters } from "@candoo/domain";
+import type { TicketFilters } from "@teamteamteam/domain";
 
 interface FilterBarProps {
   filters: TicketFilters;

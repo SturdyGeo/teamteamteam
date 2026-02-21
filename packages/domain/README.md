@@ -1,6 +1,6 @@
-# @candoo/domain
+# @teamteamteam/domain
 
-Pure business logic for Candoo. This package is the **single source of truth** for all domain rules, entities, commands, and invariants.
+Pure business logic for Teamteamteam. This package is the **single source of truth** for all domain rules, entities, commands, and invariants.
 
 **No I/O allowed.** This package must never import HTTP clients, database drivers, Supabase, Ink, Commander, `fs`, or environment variables.
 

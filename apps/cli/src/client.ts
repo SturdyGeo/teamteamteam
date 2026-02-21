@@ -1,5 +1,5 @@
-import { createCandooClient } from "@candoo/api-client";
-import type { CandooClient } from "@candoo/api-client";
+import { createTeamteamteamClient } from "@teamteamteam/api-client";
+import type { TeamteamteamClient } from "@teamteamteam/api-client";
 
 interface CliClientConfigOverrides {
   customBackend?: boolean;
@@ -15,7 +15,7 @@ export const CLI_DEFAULT_BACKEND = {
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2d2hheXNwcWJ6bXR1d3hkbG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MTM2MTgsImV4cCI6MjA4NzA4OTYxOH0.EpzScwBeyjrhrMiPRRYYMCdbgJiBf40JLcntE928AFg",
 } as const;
 
-let instance: CandooClient | null = null;
+let instance: TeamteamteamClient | null = null;
 let configOverrides: CliClientConfigOverrides = {};
 
 export function configureClient(overrides: CliClientConfigOverrides): void {
@@ -36,7 +36,7 @@ function ensureValue(
   return value;
 }
 
-export function getClient(): CandooClient {
+export function getClient(): TeamteamteamClient {
   if (instance) return instance;
 
   const {
@@ -53,7 +53,7 @@ export function getClient(): CandooClient {
   }
 
   const baseUrl = customBackend
-    ? ensureValue(overrideApiUrl ?? process.env["CANDOO_API_URL"], "--api-url", "CANDOO_API_URL")
+    ? ensureValue(overrideApiUrl ?? process.env["TEAMTEAMTEAM_API_URL"], "--api-url", "TEAMTEAMTEAM_API_URL")
     : CLI_DEFAULT_BACKEND.apiUrl;
   const supabaseUrl = customBackend
     ? ensureValue(
@@ -76,6 +76,6 @@ export function getClient(): CandooClient {
     );
   }
 
-  instance = createCandooClient({ baseUrl, supabaseUrl, supabaseAnonKey });
+  instance = createTeamteamteamClient({ baseUrl, supabaseUrl, supabaseAnonKey });
   return instance;
 }
