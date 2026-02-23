@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
@@ -246,15 +247,20 @@ function ProjectRouteComponent(): React.JSX.Element {
   const createTicketMutation = useCreateTicketMutation(project.id);
   const moveTicketMutation = useMoveTicketMutation(project.id);
 
-  const currentColumns = sortColumns(liveColumnsQuery.data ?? columns);
-  const currentTickets = sortTickets(liveTicketsQuery.data ?? tickets);
+  const currentColumns = useMemo(
+    () => sortColumns(liveColumnsQuery.data ?? columns),
+    [columns, liveColumnsQuery.data],
+  );
+  const currentTickets = useMemo(
+    () => sortTickets(liveTicketsQuery.data ?? tickets),
+    [liveTicketsQuery.data, tickets],
+  );
   const boardError = liveColumnsQuery.error ?? liveTicketsQuery.error;
   const boardErrorMessage = boardError ? toErrorMessage(boardError) : null;
   const isBoardLoading = liveColumnsQuery.isPending || liveTicketsQuery.isPending;
 
   async function handleTicketMove(ticketId: string, toColumnId: string): Promise<void> {
     await moveTicketMutation.mutateAsync({ ticketId, toColumnId });
-    await liveTicketsQuery.refetch();
   }
 
   async function handleTicketCreate(
