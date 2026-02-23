@@ -272,8 +272,8 @@ Phase 4 data layer is implemented:
 - Ticket detail save requires the latest Edge Function deployment and DB migrations (`build:edge`, `functions deploy api`, `supabase db push`)
 - Ticket edit modal supports Enter-to-save (title input) with color-coded Save vs Close/Reopen actions
 - Escape now closes active web modals (ticket modal and create org/project dialogs)
-- Primary action buttons use a consistent amber style across login/create/save/add web flows
-- Global web theme tokens now use a black + amber palette inspired by the IT Crowd aesthetic
+- Primary action buttons use a consistent bright amber style across login/create/save/add web flows
+- Global web theme tokens now use a black-first neutral palette with restrained amber accents inspired by the IT Crowd aesthetic
 - Web shell/auth backgrounds use a flat black surface (gradients removed)
 
 Phase 5 board experience is implemented:

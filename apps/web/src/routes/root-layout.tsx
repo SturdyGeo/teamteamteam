@@ -521,7 +521,7 @@ export function RootLayout(): React.JSX.Element {
                   variant="ghost"
                   size="icon"
                   onClick={() => setOpenMenu((current) => (current === "profile" ? null : "profile"))}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,hsl(var(--primary))_0%,hsl(var(--secondary))_100%)] text-xs font-semibold text-primary-foreground"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-xs font-semibold text-foreground hover:bg-accent"
                 >
                   {profileInitials(userEmail)}
                 </Button>
