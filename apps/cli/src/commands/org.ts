@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import type { MembershipRole } from "@teamteamteam/domain";
+import { MembershipRoleSchema, type MembershipRole } from "@teamteamteam/domain";
 import { getClient } from "../client.js";
 import { loadConfig, saveConfig } from "../config.js";
 import {
@@ -137,20 +137,21 @@ Examples:
     .command("invite")
     .description("Invite a user to the current organization by email")
     .argument("<email>", "Email of the user to invite")
-    .option("--role <role>", "Role to assign (admin or member)", "member")
+    .option("--role <role>", "Role to assign (admin, member, or limited)", "member")
     .addHelpText(
       "after",
       `
 Examples:
   $ ttteam org invite alice@example.com
-  $ ttteam org invite bob@example.com --role admin`,
+  $ ttteam org invite bob@example.com --role admin
+  $ ttteam org invite sam@example.com --role limited`,
     )
     .action(
       withErrorHandler(async (email: string, opts: { role: string }, cmd: Command) => {
         const client = getClient();
         const { json, org } = cmd.optsWithGlobals();
         const orgId = await resolveOrgId(client, org);
-        const role = opts.role as MembershipRole;
+        const role = MembershipRoleSchema.parse(opts.role) as MembershipRole;
         const membership = await client.inviteMember(orgId, { email, role });
 
         if (json) {

@@ -149,12 +149,13 @@ ttteam org list                # List your organizations
 ttteam org create <name>       # Create a new organization
 ttteam org use <name>          # Set default org for local context
 ttteam org delete <name>       # Delete an org and all its data (--yes to skip prompt)
-ttteam org invite <email>      # Invite a user by email (--role admin|member)
+ttteam org invite <email>      # Invite a user by email (--role admin|member|limited)
 ```
 
 If you have only one org, it is auto-selected without needing `org use`.
 
 `org invite` now supports brand-new email addresses by triggering OTP auto-provisioning; if the account does not finalize immediately, retry after the user signs in once.
+The `limited` role can only view tickets assigned to them.
 
 ### Projects
 

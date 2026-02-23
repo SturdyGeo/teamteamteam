@@ -98,6 +98,25 @@ describe("POST /orgs/:orgId/members", () => {
     expect((await res.json()).error.code).toBe("INVALID_INPUT");
   });
 
+  it("accepts role=limited", async () => {
+    const limitedMembership = {
+      ...membership,
+      id: "mem-limited",
+      role: "limited",
+    };
+    const app = setup([
+      { data: { id: "user-2" }, error: null },
+      { data: limitedMembership, error: null },
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members`,
+      post({ email: "limited@example.com", role: "limited" }),
+    );
+    expect(res.status).toBe(201);
+    expect((await res.json()).role).toBe("limited");
+  });
+
   it("provisions user via OTP and creates membership when email is new", async () => {
     const app = setup([
       { data: null, error: null },               // initial user lookup

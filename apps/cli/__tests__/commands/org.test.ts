@@ -221,6 +221,21 @@ describe("org commands", () => {
       expect(logSpy.mock.calls[0][0]).toContain("bob@example.com");
     });
 
+    it("invites a member with --role limited", async () => {
+      const membership = { id: "mem-3", org_id: "org-1", user_id: "u-3", role: "limited", created_at: "2024-01-01T00:00:00Z" };
+      const mockClient = {
+        inviteMember: vi.fn().mockResolvedValue(membership),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+      mockResolveOrgId.mockResolvedValue("org-1");
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "ttteam", "org", "invite", "sam@example.com", "--role", "limited"]);
+
+      expect(mockClient.inviteMember).toHaveBeenCalledWith("org-1", { email: "sam@example.com", role: "limited" });
+      expect(logSpy.mock.calls[0][0]).toContain("sam@example.com");
+    });
+
     it("outputs JSON when --json flag is used", async () => {
       const membership = { id: "mem-1", org_id: "org-1", user_id: "u-1", role: "member", created_at: "2024-01-01T00:00:00Z" };
       const mockClient = {

@@ -44,7 +44,7 @@ members.get("/orgs/:orgId/members", async (c) => {
 
 const InviteMemberBody = z.object({
   email: z.string().email(),
-  role: z.enum(["admin", "member"]).optional().default("member"),
+  role: z.enum(["admin", "member", "limited"]).optional().default("member"),
 });
 
 members.post("/orgs/:orgId/members", async (c) => {

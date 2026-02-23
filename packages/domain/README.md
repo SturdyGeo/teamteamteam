@@ -10,7 +10,7 @@ Pure business logic for Teamteamteam. This package is the **single source of tru
 |--------|-------------|
 | `Org` | Organization (id, name) |
 | `User` | User (id, email, display_name) |
-| `Membership` | Org membership with role (owner, admin, member) |
+| `Membership` | Org membership with role (owner, admin, member, limited) |
 | `Project` | Project within an org (id, org_id, name, prefix) |
 | `WorkflowColumn` | Kanban column (id, project_id, name, position) |
 | `Ticket` | Kanban ticket (id, project_id, number, title, description, status_column_id, assignee_id, reporter_id, tags, timestamps) |

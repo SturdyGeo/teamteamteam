@@ -13,7 +13,7 @@ const validMembership = {
 };
 
 describe("MembershipRoleSchema", () => {
-  it.each(["owner", "admin", "member"])("accepts role %s", (role) => {
+  it.each(["owner", "admin", "member", "limited"])("accepts role %s", (role) => {
     expect(MembershipRoleSchema.parse(role)).toBe(role);
   });
 

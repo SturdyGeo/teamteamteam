@@ -23,7 +23,7 @@ interface OrgPageProps {
   members: MemberWithUser[];
 }
 
-type InviteRole = "member" | "admin";
+type InviteRole = "member" | "admin" | "limited";
 
 function toMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -135,6 +135,7 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
                 >
                   <option value="member">Member</option>
                   <option value="admin">Admin</option>
+                  <option value="limited">Limited (assigned only)</option>
                 </Select>
               </div>
               <Button

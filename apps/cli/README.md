@@ -103,6 +103,7 @@ ttteam org delete <name>             # Delete an org (prompts for confirmation)
 ttteam org delete <name> --yes       # Delete without confirmation
 ttteam org invite <email>            # Invite a user (default: member role)
 ttteam org invite <email> --role admin  # Invite as admin
+ttteam org invite <email> --role limited  # Invite as limited (can only view assigned tickets)
 ```
 
 If you belong to only one org, it is auto-selected.

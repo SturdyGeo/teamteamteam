@@ -56,7 +56,7 @@ Common error codes:
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | `GET` | `/orgs/:orgId/members` | Yes | List org members |
-| `POST` | `/orgs/:orgId/members` | Yes | Invite member by email (auto-provisions via OTP if new) |
+| `POST` | `/orgs/:orgId/members` | Yes | Invite member by email (roles: admin/member/limited; auto-provisions via OTP if new) |
 
 ### Projects
 

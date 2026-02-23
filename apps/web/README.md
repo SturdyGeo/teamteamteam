@@ -20,7 +20,7 @@ Current implementation includes:
 - Unauthenticated `/` and `/login` use a dark mono no-nav auth shell
 - OTP login modal mirrors the brand's executive-terminal visual style
 - App-shell org/project context selectors persisted to localStorage
-- Org detail page includes an invite-member form (email + member/admin role) with OTP auto-provisioning for new emails
+- Org detail page includes an invite-member form (email + member/admin/limited role) with OTP auto-provisioning for new emails
 - Org and project list cards are fully clickable (no separate "Open" buttons)
 - Route-level error boundaries + not-found handling
 - Error and not-found surfaces now use the same dark mono visual theme as app pages
