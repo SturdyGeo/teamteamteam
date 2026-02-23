@@ -30,7 +30,7 @@ Current implementation includes:
 - Dev-only query/mutation error telemetry events
 - Server-ordered board columns with richer ticket card metadata
 - Shared loading/empty/error state cards across the board surface
-- Rounded capsule top navigation (org/project selectors + profile actions)
+- Rounded compact top navigation with text/caret org-project selectors and profile actions
 - Boss logo in nav is non-draggable and stays click-only for spin/home action
 - Dark mono executive-terminal visual language across org/project board surfaces
 - Boss logo fast twirl + snap-stop animation on click for authenticated sessions

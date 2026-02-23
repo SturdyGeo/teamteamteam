@@ -375,10 +375,10 @@ export function RootLayout(): React.JSX.Element {
 
   return (
     <div className="min-h-screen bg-app-shell">
-      <header className="sticky top-3 z-30 px-4 pt-1">
+      <header className="sticky top-2 z-30 px-3 pt-1">
         <div
           ref={menuContainerRef}
-          className="mx-auto flex max-w-6xl items-center gap-3 rounded-full border border-border/70 bg-card/95 px-3 py-2 text-foreground shadow-[0_28px_65px_-40px_hsl(var(--background))] backdrop-blur"
+          className="mx-auto flex max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-card/95 px-2.5 py-1.5 text-foreground shadow-[0_28px_65px_-40px_hsl(var(--background))] backdrop-blur"
         >
           <Link
             to="/"
@@ -389,7 +389,7 @@ export function RootLayout(): React.JSX.Element {
               src={bossLogo}
               alt="Boss logo"
               draggable={false}
-              className={`h-9 w-9 object-cover ${isLogoSpinning ? "animate-boss-logo-jump-spin" : ""}`}
+              className={`h-7 w-7 object-cover ${isLogoSpinning ? "animate-boss-logo-jump-spin" : ""}`}
               onAnimationEnd={() => setIsLogoSpinning(false)}
             />
           </Link>
@@ -419,7 +419,7 @@ export function RootLayout(): React.JSX.Element {
                     variant="ghost"
                     size="sm"
                     onClick={() => setOpenMenu((current) => (current === "org" ? null : "org"))}
-                    className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-background px-3 font-mono text-xs text-foreground transition hover:bg-accent"
+                    className="inline-flex h-auto items-center gap-1 border-0 bg-transparent px-1 py-0 font-mono text-xs text-foreground transition hover:bg-transparent hover:text-foreground"
                   >
                     <span className="truncate max-w-40">{activeOrg?.name ?? "Select org"}</span>
                     <span>▾</span>
@@ -470,7 +470,7 @@ export function RootLayout(): React.JSX.Element {
                     onClick={() =>
                       setOpenMenu((current) => (current === "project" ? null : "project"))
                     }
-                    className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-background px-3 font-mono text-xs text-foreground transition hover:bg-accent disabled:opacity-45"
+                    className="inline-flex h-auto items-center gap-1 border-0 bg-transparent px-1 py-0 font-mono text-xs text-foreground transition hover:bg-transparent hover:text-foreground disabled:opacity-45"
                   >
                     <span className="truncate max-w-44">
                       {activeProject ? `${activeProject.prefix} · ${activeProject.name}` : "Select project"}
