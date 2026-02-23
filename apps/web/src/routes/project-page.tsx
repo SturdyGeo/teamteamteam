@@ -764,6 +764,7 @@ export function ProjectPage({
                     value={newCardTitle}
                     onChange={(event) => setNewCardTitle(event.target.value)}
                     placeholder="What needs to be done?"
+                    autoFocus
                     className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
                   />
                 </section>
