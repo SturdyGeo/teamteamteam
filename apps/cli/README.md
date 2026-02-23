@@ -7,7 +7,14 @@ Command-line interface and TUI for Teamteamteam. Built with Commander (CLI) and 
 The CLI is part of the Teamteamteam monorepo. After building (`bun run build`), run commands via:
 
 ```sh
-doppler run -- bun run --filter @teamteamteam/cli start -- <command>
+doppler run -- bun run apps/cli/src/index.ts -- <command>
+```
+
+Examples:
+
+```sh
+doppler run -- bun run apps/cli/src/index.ts --help
+doppler run -- bun run apps/cli/src/index.ts whoami
 ```
 
 For a one-line install that adds the `ttteam` terminal command:

@@ -38,6 +38,17 @@ Then run:
 ttteam --help
 ```
 
+## Run CLI Locally (Without Install)
+
+From the repo root, run the CLI entrypoint directly:
+
+```sh
+doppler run -- bun run apps/cli/src/index.ts --help
+doppler run -- bun run apps/cli/src/index.ts whoami
+```
+
+This is the correct local dev invocation. `bun run ttteam` will fail unless you add a script named `ttteam` to `package.json`.
+
 ## Setup
 
 1. **Clone the repository**
