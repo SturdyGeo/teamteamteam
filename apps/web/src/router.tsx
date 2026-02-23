@@ -9,6 +9,7 @@ import { sortColumns, sortTickets } from "@teamteamteam/domain";
 import { useOrgMembersQuery, useOrgProjectsQuery } from "@/features/orgs/hooks";
 import { orgMembersQueryOptions, orgProjectsQueryOptions, orgsQueryOptions } from "@/features/orgs/queries";
 import {
+  useCreateTicketMutation,
   useProjectColumnsQuery,
   useMoveTicketMutation,
   useProjectTicketsQuery,
@@ -242,6 +243,7 @@ function ProjectRouteComponent(): React.JSX.Element {
   const { project, columns, tickets, members } = projectRoute.useLoaderData();
   const liveColumnsQuery = useProjectColumnsQuery(project.id);
   const liveTicketsQuery = useProjectTicketsQuery(project.id);
+  const createTicketMutation = useCreateTicketMutation(project.id);
   const moveTicketMutation = useMoveTicketMutation(project.id);
 
   const currentColumns = sortColumns(liveColumnsQuery.data ?? columns);
@@ -255,6 +257,26 @@ function ProjectRouteComponent(): React.JSX.Element {
     await liveTicketsQuery.refetch();
   }
 
+  async function handleTicketCreate(
+    toColumnId: string,
+    title: string,
+    tags: string[],
+  ): Promise<void> {
+    const created = await createTicketMutation.mutateAsync({
+      title,
+      tags,
+    });
+
+    if (created.status_column_id !== toColumnId) {
+      await moveTicketMutation.mutateAsync({
+        ticketId: created.id,
+        toColumnId,
+      });
+    }
+
+    await liveTicketsQuery.refetch();
+  }
+
   return (
     <ProjectPage
       projectName={project.name}
@@ -265,7 +287,9 @@ function ProjectRouteComponent(): React.JSX.Element {
       isBoardLoading={isBoardLoading}
       boardErrorMessage={boardErrorMessage}
       isMovePending={moveTicketMutation.isPending}
+      isCreatePending={createTicketMutation.isPending}
       onTicketMove={handleTicketMove}
+      onTicketCreate={handleTicketCreate}
     />
   );
 }

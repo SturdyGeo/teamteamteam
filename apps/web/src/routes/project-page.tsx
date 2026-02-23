@@ -15,7 +15,9 @@ interface ProjectPageProps {
   isBoardLoading: boolean;
   boardErrorMessage: string | null;
   isMovePending: boolean;
+  isCreatePending: boolean;
   onTicketMove: (ticketId: string, toColumnId: string) => Promise<void>;
+  onTicketCreate: (toColumnId: string, title: string, tags: string[]) => Promise<void>;
 }
 
 type TicketWithPriority = Ticket & { priority?: string };
@@ -51,11 +53,17 @@ export function ProjectPage({
   isBoardLoading,
   boardErrorMessage,
   isMovePending,
+  isCreatePending,
   onTicketMove,
+  onTicketCreate,
 }: ProjectPageProps): React.JSX.Element {
   const [boardTickets, setBoardTickets] = useState<Ticket[]>(tickets);
   const [draggingTicketId, setDraggingTicketId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [composerColumnId, setComposerColumnId] = useState<string | null>(null);
+  const [newCardTitle, setNewCardTitle] = useState("");
+  const [newCardTags, setNewCardTags] = useState("");
 
   useEffect(() => {
     setBoardTickets(tickets);
@@ -67,6 +75,27 @@ export function ProjectPage({
   );
 
   const totalTickets = boardTickets.length;
+
+  function parseTags(value: string): string[] {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+
+  function openComposer(columnId: string): void {
+    setCreateError(null);
+    if (composerColumnId === columnId) {
+      setComposerColumnId(null);
+      setNewCardTitle("");
+      setNewCardTags("");
+      return;
+    }
+
+    setComposerColumnId(columnId);
+    setNewCardTitle("");
+    setNewCardTags("");
+  }
 
   async function handleDrop(targetColumnId: string): Promise<void> {
     if (!draggingTicketId) {
@@ -103,6 +132,29 @@ export function ProjectPage({
     }
   }
 
+  async function handleCreateCard(
+    event: React.FormEvent<HTMLFormElement>,
+    columnId: string,
+  ): Promise<void> {
+    event.preventDefault();
+    setCreateError(null);
+
+    const title = newCardTitle.trim();
+    if (!title) {
+      setCreateError("Card title is required.");
+      return;
+    }
+
+    try {
+      await onTicketCreate(columnId, title, parseTags(newCardTags));
+      setComposerColumnId(null);
+      setNewCardTitle("");
+      setNewCardTags("");
+    } catch (error) {
+      setCreateError(toMessage(error));
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-[2rem] border border-zinc-700 bg-zinc-900/95 p-4 shadow-[0_20px_50px_-35px_rgba(0,0,0,1)] backdrop-blur">
@@ -117,6 +169,11 @@ export function ProjectPage({
           {isMovePending ? (
             <Badge className="rounded-full border border-emerald-700 bg-emerald-900/70 px-3 text-emerald-200 hover:bg-emerald-900/70">
               Saving move...
+            </Badge>
+          ) : null}
+          {isCreatePending ? (
+            <Badge className="rounded-full border border-sky-700 bg-sky-900/70 px-3 text-sky-200 hover:bg-sky-900/70">
+              Adding card...
             </Badge>
           ) : null}
         </div>
@@ -135,6 +192,15 @@ export function ProjectPage({
         <StateCard
           title="Move failed"
           description={moveError}
+          tone="destructive"
+          className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+        />
+      ) : null}
+
+      {createError ? (
+        <StateCard
+          title="Create card failed"
+          description={createError}
           tone="destructive"
           className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
         />
@@ -175,12 +241,58 @@ export function ProjectPage({
               >
                 <header className="mb-3 flex items-center justify-between px-1">
                   <h2 className="text-sm font-semibold text-zinc-100">{column.name}</h2>
-                  <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
-                    {columnTickets.length}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
+                      {columnTickets.length}
+                    </Badge>
+                    <button
+                      type="button"
+                      onClick={() => openComposer(column.id)}
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 text-sm leading-none text-zinc-200 transition hover:bg-zinc-800"
+                      aria-label={`Add card in ${column.name}`}
+                    >
+                      +
+                    </button>
+                  </div>
                 </header>
 
                 <div className="space-y-3">
+                  {composerColumnId === column.id ? (
+                    <form
+                      onSubmit={(event) => void handleCreateCard(event, column.id)}
+                      className="space-y-2 rounded-2xl border border-zinc-700 bg-zinc-950/80 p-2.5"
+                    >
+                      <input
+                        value={newCardTitle}
+                        onChange={(event) => setNewCardTitle(event.target.value)}
+                        placeholder="Card title"
+                        className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                      />
+                      <input
+                        value={newCardTags}
+                        onChange={(event) => setNewCardTags(event.target.value)}
+                        placeholder="tags (comma separated)"
+                        className="h-8 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 text-xs text-zinc-300 outline-none focus:border-zinc-500"
+                      />
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          className="rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                          onClick={() => openComposer(column.id)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isCreatePending}
+                          className="rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                        >
+                          {isCreatePending ? "Adding..." : "Add card"}
+                        </button>
+                      </div>
+                    </form>
+                  ) : null}
+
                   {columnTickets.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/70 p-4 text-center text-xs text-zinc-500">
                       Drop a ticket here

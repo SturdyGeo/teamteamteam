@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { TicketQueryParams } from "@teamteamteam/api-client/web";
+import type {
+  CreateTicketInput,
+  TicketQueryParams,
+} from "@teamteamteam/api-client/web";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import {
@@ -28,6 +31,29 @@ export function useProjectTicketsQuery(
 interface MoveTicketVariables {
   ticketId: string;
   toColumnId: string;
+}
+
+export function useCreateTicketMutation(projectId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: CreateTicketInput) => {
+      if (!projectId) {
+        throw new Error("Project is required.");
+      }
+
+      return apiClient.createTicket(projectId, input);
+    },
+    onSuccess: async () => {
+      if (!projectId) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.tickets(projectId),
+      });
+    },
+  });
 }
 
 export function useMoveTicketMutation(projectId: string | null) {

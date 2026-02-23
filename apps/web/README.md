@@ -32,6 +32,7 @@ Current implementation includes:
 - Custom nav dropdown menus for org/project switching + create actions
 - Create organization/project dialogs from top-nav controls
 - Board-first kanban layout with drag-and-drop ticket movement between columns
+- Per-column `+` actions with inline composer to add cards directly from the board
 
 ## Scripts
 
