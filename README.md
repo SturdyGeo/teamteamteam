@@ -261,9 +261,18 @@ Phase 4 data layer is implemented:
 Phase 5 board experience is implemented:
 
 - Server-ordered workflow columns and richer ticket cards
-- URL-backed ticket detail panel with metadata/actions surface
-- Domain-based filtering/sorting behavior for project board views
-- Standardized loading/empty/error states for board and ticket detail
+- Board-first project experience focused on kanban flow
+- Domain-based sorting behavior for project board views
+- Standardized loading/empty/error states for board interactions
+
+Web board UX refresh is implemented:
+
+- Compact rounded top navigation capsule with org/project selectors and profile menu
+- Custom org/project dropdown menus with inline "add" actions
+- Create org/project dialogs launched directly from nav controls
+- Board-first project view with horizontal kanban columns
+- Drag-and-drop ticket moves across columns (backed by API mutation + refetch)
+- Updated visual theme with softer rounded surfaces and a richer color palette
 
 Run a production build:
 

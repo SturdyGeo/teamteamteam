@@ -21,19 +21,3 @@ export function projectTicketsQueryOptions(
     staleTime: 15_000,
   });
 }
-
-export function projectTicketQueryOptions(ticketId: string) {
-  return queryOptions({
-    queryKey: queryKeys.projects.ticket(ticketId),
-    queryFn: () => apiClient.getTicket(ticketId),
-    staleTime: 15_000,
-  });
-}
-
-export function projectTagsQueryOptions(projectId: string) {
-  return queryOptions({
-    queryKey: queryKeys.projects.tags(projectId),
-    queryFn: () => apiClient.getTags(projectId),
-    staleTime: 60_000,
-  });
-}

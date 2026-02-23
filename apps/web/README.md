@@ -22,8 +22,11 @@ Current implementation includes:
 - Feature-level query hooks/modules with tuned cache policy
 - Dev-only query/mutation error telemetry events
 - Server-ordered board columns with richer ticket card metadata
-- URL-backed ticket detail side panel (description, metadata, action surface)
-- Shared loading/empty/error state cards across board and ticket detail
+- Shared loading/empty/error state cards across the board surface
+- Rounded capsule top navigation (org/project selectors + profile actions)
+- Custom nav dropdown menus for org/project switching + create actions
+- Create organization/project dialogs from top-nav controls
+- Board-first kanban layout with drag-and-drop ticket movement between columns
 
 ## Scripts
 

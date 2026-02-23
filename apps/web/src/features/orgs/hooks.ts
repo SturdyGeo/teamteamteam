@@ -1,4 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CreateOrgInput, CreateProjectInput } from "@teamteamteam/api-client/web";
+import { apiClient } from "@/lib/api-client";
+import { queryKeys } from "@/lib/query-keys";
 import {
   orgMembersQueryOptions,
   orgProjectsQueryOptions,
@@ -23,5 +26,37 @@ export function useOrgMembersQuery(orgId: string | null, enabled = true) {
   return useQuery({
     ...orgMembersQueryOptions(orgId ?? ""),
     enabled: enabled && Boolean(orgId),
+  });
+}
+
+export function useCreateOrgMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateOrgInput) => apiClient.createOrg(input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.orgs.list() });
+    },
+  });
+}
+
+export function useCreateProjectMutation(orgId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: CreateProjectInput) => {
+      if (!orgId) {
+        throw new Error("Select an organization first.");
+      }
+
+      return apiClient.createProject(orgId, input);
+    },
+    onSuccess: async () => {
+      if (!orgId) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.orgs.projects(orgId) });
+    },
   });
 }

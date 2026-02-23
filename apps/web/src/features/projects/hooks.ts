@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TicketQueryParams } from "@teamteamteam/api-client/web";
+import { apiClient } from "@/lib/api-client";
+import { queryKeys } from "@/lib/query-keys";
 import {
   projectColumnsQueryOptions,
-  projectTicketQueryOptions,
-  projectTagsQueryOptions,
   projectTicketsQueryOptions,
 } from "@/features/projects/queries";
 
@@ -25,16 +25,25 @@ export function useProjectTicketsQuery(
   });
 }
 
-export function useProjectTicketQuery(ticketId: string | null, enabled = true) {
-  return useQuery({
-    ...projectTicketQueryOptions(ticketId ?? ""),
-    enabled: enabled && Boolean(ticketId),
-  });
+interface MoveTicketVariables {
+  ticketId: string;
+  toColumnId: string;
 }
 
-export function useProjectTagsQuery(projectId: string | null, enabled = true) {
-  return useQuery({
-    ...projectTagsQueryOptions(projectId ?? ""),
-    enabled: enabled && Boolean(projectId),
+export function useMoveTicketMutation(projectId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ ticketId, toColumnId }: MoveTicketVariables) =>
+      apiClient.moveTicket(ticketId, { to_column_id: toColumnId }),
+    onSuccess: async () => {
+      if (!projectId) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.tickets(projectId),
+      });
+    },
   });
 }
