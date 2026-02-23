@@ -276,6 +276,7 @@ Phase 4 data layer is implemented:
 - Global web theme tokens now use a black-first neutral palette with restrained amber accents inspired by the IT Crowd aesthetic
 - Card/dropdown borders in the web UI are intentionally low-contrast to avoid bright outlines
 - Web shell now includes an "Amber CRT Ops" visual layer (subtle scanlines, ambient glow, LED-like board cues)
+- Board ticket cards now use flat surfaces (gradient removed per card)
 - Web shell/auth backgrounds use a flat black surface (gradients removed)
 
 Phase 5 board experience is implemented:

@@ -632,7 +632,7 @@ export function ProjectPage({
                               setDraggingTicketId(null);
                             }}
                             className={cn(
-                              "cursor-grab rounded-2xl border border-border/60 bg-[linear-gradient(180deg,hsl(var(--background)/0.96)_0%,hsl(var(--card)/0.92)_100%)] p-3 text-foreground shadow-[0_10px_22px_-20px_hsl(var(--background)/0.85)] transition hover:-translate-y-0.5 hover:bg-card active:cursor-grabbing",
+                              "cursor-grab rounded-2xl border border-border/60 bg-background p-3 text-foreground shadow-[0_10px_22px_-20px_hsl(var(--background)/0.85)] transition hover:-translate-y-0.5 hover:bg-card active:cursor-grabbing",
                               draggingTicketId === ticket.id ? "opacity-60" : "",
                             )}
                           >

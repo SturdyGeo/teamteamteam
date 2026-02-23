@@ -51,6 +51,7 @@ Current implementation includes:
 - Global token palette uses a black-first neutral base with restrained amber accents (bright amber reserved for high-intent actions)
 - Card/dropdown borders are now de-emphasized with low-contrast framing
 - "Amber CRT Ops" layer adds subtle scanline texture, warm ambient glow, and LED-style board column indicators
+- Ticket cards use flat backgrounds (no per-card gradient fill)
 - App shell/auth backgrounds now use a flat black surface (no gradient wash)
 - Escape hotkey closes active modals (ticket modal + create org/project dialogs)
 - Ticket modal activity feed is hidden by default behind a small underlined "Review activity" toggle below action buttons
