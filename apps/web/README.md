@@ -35,6 +35,7 @@ Current implementation includes:
 - Visual drop-target highlight while dragging cards across columns
 - Per-column `+` actions open the shared ticket modal in create mode
 - Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
+- Click assignee chip on a card to open a quick-assign dropdown with `Nobody`
 
 ## Scripts
 

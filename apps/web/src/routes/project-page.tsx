@@ -98,6 +98,8 @@ export function ProjectPage({
   const [draggingTicketId, setDraggingTicketId] = useState<string | null>(null);
   const [dropTargetColumnId, setDropTargetColumnId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
+  const [assignError, setAssignError] = useState<string | null>(null);
+  const [assigneeMenuTicketId, setAssigneeMenuTicketId] = useState<string | null>(null);
   const [createModalColumnId, setCreateModalColumnId] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState("");
   const [newCardTags, setNewCardTags] = useState("");
@@ -123,6 +125,30 @@ export function ProjectPage({
     setModalError(null);
     setNewTagInput("");
   }, [selectedTicketId, createModalColumnId]);
+
+  useEffect(() => {
+    if (!assigneeMenuTicketId) {
+      return;
+    }
+
+    function onPointerDown(event: MouseEvent): void {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (target.closest("[data-assignee-menu]") || target.closest("[data-assignee-trigger]")) {
+        return;
+      }
+
+      setAssigneeMenuTicketId(null);
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+    };
+  }, [assigneeMenuTicketId]);
 
   const assigneeById = useMemo(
     () => new Map(members.map((member) => [member.user.id, member.user.email])),
@@ -186,6 +212,7 @@ export function ProjectPage({
       return;
     }
 
+    setAssigneeMenuTicketId(null);
     setSelectedTicketId(ticketId);
     setModalError(null);
   }
@@ -246,6 +273,20 @@ export function ProjectPage({
       closeModal();
     } catch (error) {
       setModalError(toMessage(error));
+    }
+  }
+
+  async function handleQuickAssign(ticketId: string, assigneeId: string | null): Promise<void> {
+    setAssignError(null);
+    setAssigneeMenuTicketId(null);
+
+    try {
+      await assignMutation.mutateAsync({
+        ticketId,
+        assigneeId,
+      });
+    } catch (error) {
+      setAssignError(toMessage(error));
     }
   }
 
@@ -396,6 +437,15 @@ export function ProjectPage({
           />
         ) : null}
 
+        {assignError ? (
+          <StateCard
+            title="Assign failed"
+            description={assignError}
+            tone="destructive"
+            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+          />
+        ) : null}
+
         {!boardErrorMessage && isBoardLoading && totalTickets === 0 ? (
           <StateCard
             title="Loading board"
@@ -475,6 +525,7 @@ export function ProjectPage({
                             onDragStart={(event) => {
                               setDraggingTicketId(ticket.id);
                               setDropTargetColumnId(null);
+                              setAssigneeMenuTicketId(null);
                               event.dataTransfer.effectAllowed = "move";
                               event.dataTransfer.setData("text/plain", ticket.id);
                             }}
@@ -505,9 +556,49 @@ export function ProjectPage({
                                   {priority}
                                 </Badge>
                               ) : null}
-                              <Badge className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 text-zinc-300 hover:bg-zinc-900">
-                                {assignee}
-                              </Badge>
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  data-assignee-trigger
+                                  className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 py-0.5 text-xs text-zinc-300 hover:bg-zinc-800"
+                                  onMouseDown={(event) => event.stopPropagation()}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    setAssigneeMenuTicketId((current) =>
+                                      current === ticket.id ? null : ticket.id,
+                                    );
+                                  }}
+                                >
+                                  {assignee}
+                                </button>
+
+                                {assigneeMenuTicketId === ticket.id ? (
+                                  <div
+                                    data-assignee-menu
+                                    className="absolute left-0 top-7 z-30 w-52 rounded-xl border border-zinc-700 bg-zinc-900 p-1.5 shadow-xl"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => event.stopPropagation()}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                                      onClick={() => void handleQuickAssign(ticket.id, null)}
+                                    >
+                                      Nobody
+                                    </button>
+                                    {members.map((member) => (
+                                      <button
+                                        key={member.user.id}
+                                        type="button"
+                                        className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                                        onClick={() => void handleQuickAssign(ticket.id, member.user.id)}
+                                      >
+                                        {member.user.email}
+                                      </button>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
                               {ticket.tags.slice(0, 2).map((item) => (
                                 <Badge
                                   key={item}
