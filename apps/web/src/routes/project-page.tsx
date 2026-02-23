@@ -752,10 +752,6 @@ export function ProjectPage({
               </button>
             </header>
 
-            {!isCreateModal && ticketDetailQuery.isPending ? (
-              <p className="text-sm text-muted-foreground">Loading full ticket...</p>
-            ) : null}
-
             {isCreateModal ? (
               <form onSubmit={(event) => void handleCreateCard(event)} className="space-y-4">
                 <section>
