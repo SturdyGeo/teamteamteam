@@ -272,7 +272,7 @@ Web board UX refresh is implemented:
 - Create org/project dialogs launched directly from nav controls
 - Board-first project view with horizontal kanban columns
 - Drag-and-drop ticket moves across columns (backed by API mutation + refetch)
-- Per-column `+` card composers for quick ticket creation directly on the board
+- Per-column `+` actions now open the shared ticket modal in create mode
 - Single-click ticket modal with full detail view + quick edit actions
 - Updated visual theme to a dark mono "executive terminal" style across auth + app surfaces
 - Signed-in logo click now triggers a jumpy spin animation

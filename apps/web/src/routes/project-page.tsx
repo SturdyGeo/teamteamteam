@@ -97,8 +97,7 @@ export function ProjectPage({
   const [boardTickets, setBoardTickets] = useState<Ticket[]>(tickets);
   const [draggingTicketId, setDraggingTicketId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [composerColumnId, setComposerColumnId] = useState<string | null>(null);
+  const [createModalColumnId, setCreateModalColumnId] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState("");
   const [newCardTags, setNewCardTags] = useState("");
 
@@ -122,7 +121,7 @@ export function ProjectPage({
   useEffect(() => {
     setModalError(null);
     setNewTagInput("");
-  }, [selectedTicketId]);
+  }, [selectedTicketId, createModalColumnId]);
 
   const assigneeById = useMemo(
     () => new Map(members.map((member) => [member.user.id, member.user.email])),
@@ -138,6 +137,15 @@ export function ProjectPage({
 
     return ticketDetailQuery.data ?? boardTickets.find((ticket) => ticket.id === selectedTicketId) ?? null;
   }, [boardTickets, selectedTicketId, ticketDetailQuery.data]);
+  const createModalColumn = useMemo(() => {
+    if (!createModalColumnId) {
+      return null;
+    }
+
+    return columns.find((column) => column.id === createModalColumnId) ?? null;
+  }, [columns, createModalColumnId]);
+  const isModalOpen = Boolean(selectedTicketId || createModalColumnId);
+  const isCreateModal = Boolean(createModalColumnId);
 
   const modalBusy =
     assignMutation.isPending ||
@@ -145,6 +153,7 @@ export function ProjectPage({
     reopenMutation.isPending ||
     addTagMutation.isPending ||
     removeTagMutation.isPending ||
+    isCreatePending ||
     isMovePending;
 
   function parseTags(value: string): string[] {
@@ -154,24 +163,21 @@ export function ProjectPage({
       .filter((item) => item.length > 0);
   }
 
-  function openComposer(columnId: string): void {
-    setCreateError(null);
-    if (composerColumnId === columnId) {
-      setComposerColumnId(null);
-      setNewCardTitle("");
-      setNewCardTags("");
-      return;
-    }
-
-    setComposerColumnId(columnId);
+  function openCreateModal(columnId: string): void {
+    setSelectedTicketId(null);
+    setCreateModalColumnId(columnId);
+    setModalError(null);
     setNewCardTitle("");
     setNewCardTags("");
   }
 
-  function closeTicketModal(): void {
+  function closeModal(): void {
     setSelectedTicketId(null);
+    setCreateModalColumnId(null);
     setModalError(null);
     setNewTagInput("");
+    setNewCardTitle("");
+    setNewCardTags("");
   }
 
   function handleCardClick(ticketId: string): void {
@@ -218,26 +224,25 @@ export function ProjectPage({
     }
   }
 
-  async function handleCreateCard(
-    event: React.FormEvent<HTMLFormElement>,
-    columnId: string,
-  ): Promise<void> {
+  async function handleCreateCard(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    setCreateError(null);
+    setModalError(null);
+
+    if (!createModalColumnId) {
+      return;
+    }
 
     const title = newCardTitle.trim();
     if (!title) {
-      setCreateError("Card title is required.");
+      setModalError("Card title is required.");
       return;
     }
 
     try {
-      await onTicketCreate(columnId, title, parseTags(newCardTags));
-      setComposerColumnId(null);
-      setNewCardTitle("");
-      setNewCardTags("");
+      await onTicketCreate(createModalColumnId, title, parseTags(newCardTags));
+      closeModal();
     } catch (error) {
-      setCreateError(toMessage(error));
+      setModalError(toMessage(error));
     }
   }
 
@@ -388,15 +393,6 @@ export function ProjectPage({
           />
         ) : null}
 
-        {createError ? (
-          <StateCard
-            title="Create card failed"
-            description={createError}
-            tone="destructive"
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
-          />
-        ) : null}
-
         {!boardErrorMessage && isBoardLoading && totalTickets === 0 ? (
           <StateCard
             title="Loading board"
@@ -438,7 +434,7 @@ export function ProjectPage({
                       </Badge>
                       <button
                         type="button"
-                        onClick={() => openComposer(column.id)}
+                        onClick={() => openCreateModal(column.id)}
                         className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 text-sm leading-none text-zinc-200 transition hover:bg-zinc-800"
                         aria-label={`Add card in ${column.name}`}
                       >
@@ -448,42 +444,6 @@ export function ProjectPage({
                   </header>
 
                   <div className="space-y-3">
-                    {composerColumnId === column.id ? (
-                      <form
-                        onSubmit={(event) => void handleCreateCard(event, column.id)}
-                        className="space-y-2 rounded-2xl border border-zinc-700 bg-zinc-950/80 p-2.5"
-                      >
-                        <input
-                          value={newCardTitle}
-                          onChange={(event) => setNewCardTitle(event.target.value)}
-                          placeholder="Card title"
-                          className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                        />
-                        <input
-                          value={newCardTags}
-                          onChange={(event) => setNewCardTags(event.target.value)}
-                          placeholder="tags (comma separated)"
-                          className="h-8 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 text-xs text-zinc-300 outline-none focus:border-zinc-500"
-                        />
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            className="rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-                            onClick={() => openComposer(column.id)}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={isCreatePending}
-                            className="rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
-                          >
-                            {isCreatePending ? "Adding..." : "Add card"}
-                          </button>
-                        </div>
-                      </form>
-                    ) : null}
-
                     {columnTickets.length === 0 ? (
                       <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/70 p-4 text-center text-xs text-zinc-500">
                         Drop a ticket here
@@ -556,10 +516,10 @@ export function ProjectPage({
         ) : null}
       </div>
 
-      {selectedTicketId ? (
+      {isModalOpen ? (
         <div
           className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
-          onClick={closeTicketModal}
+          onClick={closeModal}
         >
           <section
             className="w-full max-w-3xl rounded-2xl border border-zinc-700 bg-zinc-900 p-5 text-zinc-100 shadow-2xl"
@@ -568,26 +528,85 @@ export function ProjectPage({
             <header className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <p className="font-mono text-xs text-zinc-500">
-                  {selectedTicket ? `${projectPrefix}-${selectedTicket.number}` : "Ticket"}
+                  {isCreateModal
+                    ? `New card${createModalColumn ? ` · ${createModalColumn.name}` : ""}`
+                    : (selectedTicket ? `${projectPrefix}-${selectedTicket.number}` : "Ticket")}
                 </p>
                 <h2 className="text-xl font-semibold">
-                  {selectedTicket?.title ?? "Loading ticket..."}
+                  {isCreateModal ? "Create ticket card" : (selectedTicket?.title ?? "Loading ticket...")}
                 </h2>
               </div>
               <button
                 type="button"
-                onClick={closeTicketModal}
+                onClick={closeModal}
                 className="rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1 text-sm text-zinc-300 hover:bg-zinc-800"
               >
                 Close
               </button>
             </header>
 
-            {ticketDetailQuery.isPending ? (
+            {!isCreateModal && ticketDetailQuery.isPending ? (
               <p className="text-sm text-zinc-500">Loading full ticket...</p>
             ) : null}
 
-            {selectedTicket ? (
+            {isCreateModal ? (
+              <form
+                onSubmit={(event) => void handleCreateCard(event)}
+                className="grid gap-5 md:grid-cols-[minmax(0,1fr),280px]"
+              >
+                <div className="space-y-4">
+                  <section>
+                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
+                    <input
+                      value={newCardTitle}
+                      onChange={(event) => setNewCardTitle(event.target.value)}
+                      placeholder="What needs to be done?"
+                      className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    />
+                  </section>
+
+                  <section>
+                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
+                    <input
+                      value={newCardTags}
+                      onChange={(event) => setNewCardTags(event.target.value)}
+                      placeholder="bug, urgent, backend"
+                      className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    />
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Comma-separated tags. You can edit tags later from the same modal.
+                    </p>
+                  </section>
+                </div>
+
+                <aside className="space-y-3 rounded-lg border border-zinc-700 bg-zinc-950 p-3">
+                  <h3 className="text-sm font-semibold text-zinc-300">Create settings</h3>
+                  <label className="block space-y-1 text-xs text-zinc-400">
+                    Column
+                    <select
+                      value={createModalColumnId ?? ""}
+                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                      onChange={(event) => setCreateModalColumnId(event.target.value)}
+                      disabled={modalBusy}
+                    >
+                      {columns.map((column) => (
+                        <option key={column.id} value={column.id}>
+                          {column.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <button
+                    type="submit"
+                    disabled={modalBusy}
+                    className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                  >
+                    {isCreatePending ? "Adding..." : "Add card"}
+                  </button>
+                </aside>
+              </form>
+            ) : selectedTicket ? (
               <div className="grid gap-5 md:grid-cols-[minmax(0,1fr),280px]">
                 <div className="space-y-4">
                   <section>
