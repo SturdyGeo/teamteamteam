@@ -14,6 +14,7 @@ Current implementation includes:
 
 - Supabase email OTP passcode auth (`/login`) with `/auth/callback` fallback support
 - AuthProvider-driven session lifecycle (memory + localStorage)
+- Boot splash shown from initial HTML until React mounts
 - Protected org/project routes
 - Authenticated `/` redirect to first available project board route
 - Unauthenticated `/` and `/login` use a dark mono no-nav auth shell

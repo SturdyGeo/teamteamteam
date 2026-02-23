@@ -4,8 +4,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>teamteamteam web</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: radial-gradient(circle at 16% 10%, rgba(59, 59, 59, 0.48), transparent 32%),
+          radial-gradient(circle at 86% 14%, rgba(120, 120, 120, 0.14), transparent 40%),
+          linear-gradient(180deg, #0c0c0c 0%, #121212 100%);
+      }
+
+      body {
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        z-index: 9999;
+        background: inherit;
+        transition: opacity 180ms ease;
+      }
+
+      .boot-shell {
+        width: min(92vw, 420px);
+        border: 1px solid #3f3f46;
+        background: rgba(24, 24, 27, 0.95);
+        border-radius: 14px;
+        padding: 18px 18px 16px;
+        color: #e4e4e7;
+        box-shadow: 0 24px 80px -40px rgba(0, 0, 0, 1);
+      }
+
+      .boot-title {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .boot-subtitle {
+        margin: 0;
+        font-size: 12px;
+        color: #a1a1aa;
+      }
+
+      .boot-track {
+        margin-top: 12px;
+        height: 5px;
+        border-radius: 999px;
+        background: #27272a;
+        overflow: hidden;
+      }
+
+      .boot-bar {
+        width: 34%;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #67e8f9 0%, #a7f3d0 100%);
+        animation: boot-slide 0.9s ease-in-out infinite alternate;
+      }
+
+      @keyframes boot-slide {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(175%);
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-splash" aria-live="polite" aria-label="Loading application">
+      <section class="boot-shell">
+        <p class="boot-title">teamteamteam</p>
+        <p class="boot-subtitle">Loading workspace...</p>
+        <div class="boot-track">
+          <div class="boot-bar"></div>
+        </div>
+      </section>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
