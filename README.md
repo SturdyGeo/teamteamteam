@@ -243,7 +243,7 @@ The web client lives in `apps/web` and uses:
 Phase 2 auth/shell is implemented:
 
 - Session hydration on app boot (in-memory auth state + Supabase localStorage persistence)
-- Immediate boot splash loader on hard refresh (avoids blank white pre-mount screen)
+- Boot splash loader persists through auth hydration and initial route loading (avoids blank/empty gaps on refresh)
 - Email OTP passcode verification on `/login` plus callback fallback for magic-link redirects
 - Global app-shell org/project selectors that persist context in localStorage
 

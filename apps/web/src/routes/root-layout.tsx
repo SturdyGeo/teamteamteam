@@ -79,10 +79,12 @@ export function RootLayout(): React.JSX.Element {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const routerStatus = useRouterState({ select: (state) => state.status });
   const routeContext = parseRouteContext(pathname);
   const { session, status, signOut } = useAuth();
   const isAuthenticated = status === "authenticated";
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
+  const splashDismissedRef = useRef(false);
 
   const [preferredOrgId, setPreferredOrgId] = useState<string | null>(() => getStoredOrgId());
   const [preferredProjectId, setPreferredProjectId] = useState<string | null>(() =>
@@ -116,6 +118,29 @@ export function RootLayout(): React.JSX.Element {
       document.removeEventListener("mousedown", onPointerDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (splashDismissedRef.current) {
+      return;
+    }
+
+    // Keep the boot splash visible until auth hydration and the initial route load settle.
+    if (status === "loading" || routerStatus === "pending") {
+      return;
+    }
+
+    const splash = document.getElementById("boot-splash");
+    if (!splash) {
+      splashDismissedRef.current = true;
+      return;
+    }
+
+    splashDismissedRef.current = true;
+    splash.style.opacity = "0";
+    window.setTimeout(() => {
+      splash.remove();
+    }, 180);
+  }, [routerStatus, status]);
 
   useEffect(() => {
     if (!routeContext.orgId) {
