@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import {
   createTicket,
+  updateTicket,
   moveTicket,
   assignTicket,
   closeTicket,
@@ -236,6 +237,80 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
   }
 
   return c.json(result.data, 201);
+});
+
+const UpdateTicketBody = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().max(10000),
+});
+
+tickets.patch("/tickets/:ticketId", async (c) => {
+  const { supabase, user } = getAuth(c);
+  const ticketId = c.req.param("ticketId");
+
+  const body = await c.req.json();
+  const parsed = UpdateTicketBody.safeParse(body);
+  if (!parsed.success) {
+    return c.json(
+      {
+        error: {
+          code: "INVALID_INPUT",
+          message: parsed.error.issues[0].message,
+        },
+      },
+      400,
+    );
+  }
+
+  const { data: ticketData, error: ticketError } = await supabase
+    .from("tickets")
+    .select(TICKET_SELECT)
+    .eq("id", ticketId)
+    .single();
+
+  if (ticketError) {
+    if (ticketError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Ticket not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: ticketError.message } },
+      500,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ticket = enrichTicketWithTags(ticketData as any);
+
+  const now = new Date().toISOString();
+  const result = updateTicket(ticket, {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    actor_id: user.id,
+    now,
+  });
+
+  const { error: updateError } = await supabase
+    .from("tickets")
+    .update({
+      title: result.data.title,
+      description: result.data.description,
+      updated_at: result.data.updated_at,
+    })
+    .eq("id", ticketId);
+
+  if (updateError) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: updateError.message } },
+      500,
+    );
+  }
+
+  await persistActivityEvents(supabase, result.events);
+
+  return c.json(result.data);
 });
 
 const MoveTicketBody = z.object({

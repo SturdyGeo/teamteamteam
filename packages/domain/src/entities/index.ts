@@ -14,6 +14,7 @@ export {
   TicketCreatedEventSchema,
   StatusChangedEventSchema,
   AssigneeChangedEventSchema,
+  TicketUpdatedEventSchema,
   TagAddedEventSchema,
   TagRemovedEventSchema,
   TicketClosedEventSchema,

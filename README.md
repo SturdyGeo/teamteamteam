@@ -258,6 +258,9 @@ Phase 4 data layer is implemented:
 - Feature query modules/hooks wrapping shared `@teamteamteam/api-client`
 - Cache policy tuning (feature stale times, retry behavior, reconnect refetch)
 - Dev-only telemetry hooks for query/mutation error events
+- Ticket detail modal now supports persisted inline editing for title + description
+- Ticket activity is collapsed by default behind a "Review activity" toggle
+- Assignee pickers are searchable in both quick-card assign and ticket modal
 
 Phase 5 board experience is implemented:
 

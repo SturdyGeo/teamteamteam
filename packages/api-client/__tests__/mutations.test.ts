@@ -51,6 +51,18 @@ describe("MutationMethods", () => {
     });
   });
 
+  it("updateTicket calls PATCH /tickets/:id", async () => {
+    const mutations = createMutationMethods(http);
+    await mutations.updateTicket("t-1", {
+      title: "Updated title",
+      description: "Updated description",
+    });
+    expect(http.patch).toHaveBeenCalledWith("/tickets/t-1", {
+      title: "Updated title",
+      description: "Updated description",
+    });
+  });
+
   it("assignTicket calls PATCH /tickets/:id/assign", async () => {
     const mutations = createMutationMethods(http);
     await mutations.assignTicket("t-1", { assignee_id: "user-2" });

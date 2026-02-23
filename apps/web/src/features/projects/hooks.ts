@@ -3,6 +3,7 @@ import type {
   CreateTicketInput,
   ReopenTicketInput,
   TicketQueryParams,
+  UpdateTicketInput,
 } from "@teamteamteam/api-client/web";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
@@ -120,6 +121,23 @@ export function useMoveTicketMutation(projectId: string | null) {
   return useMutation({
     mutationFn: async ({ ticketId, toColumnId }: MoveTicketVariables) =>
       apiClient.moveTicket(ticketId, { to_column_id: toColumnId }),
+    onSuccess: async (_ticket, variables) => {
+      await invalidateTicketQueries(projectId, queryClient, variables.ticketId);
+    },
+  });
+}
+
+export function useUpdateTicketMutation(projectId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      ticketId,
+      input,
+    }: {
+      ticketId: string;
+      input: UpdateTicketInput;
+    }) => apiClient.updateTicket(ticketId, input),
     onSuccess: async (_ticket, variables) => {
       await invalidateTicketQueries(projectId, queryClient, variables.ticketId);
     },

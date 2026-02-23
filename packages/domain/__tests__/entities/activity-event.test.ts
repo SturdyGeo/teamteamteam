@@ -38,6 +38,19 @@ describe("ActivityEventSchema", () => {
     expect(ActivityEventSchema.parse(event)).toEqual(event);
   });
 
+  it("accepts ticket_updated event", () => {
+    const event = {
+      ...base,
+      event_type: "ticket_updated",
+      payload: {
+        from_title: "Old title",
+        to_title: "New title",
+        description_changed: true,
+      },
+    };
+    expect(ActivityEventSchema.parse(event)).toEqual(event);
+  });
+
   it("accepts tag_added event", () => {
     const event = {
       ...base,

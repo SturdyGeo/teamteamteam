@@ -15,7 +15,7 @@ Pure business logic for Teamteamteam. This package is the **single source of tru
 | `WorkflowColumn` | Kanban column (id, project_id, name, position) |
 | `Ticket` | Kanban ticket (id, project_id, number, title, description, status_column_id, assignee_id, reporter_id, tags, timestamps) |
 | `Tag` | Project-scoped tag (id, project_id, name) |
-| `ActivityEvent` | Append-only event log entry (discriminated union of 7 event types) |
+| `ActivityEvent` | Append-only event log entry (discriminated union of 8 event types) |
 
 All entities have Zod schemas for validation (e.g., `TicketSchema`, `OrgSchema`).
 
@@ -26,6 +26,7 @@ All mutations go through command functions. Each command validates inputs, enfor
 | Command | Function | Description |
 |---------|----------|-------------|
 | Create ticket | `createTicket(input, columns)` | Creates ticket in initial column, generates key |
+| Update ticket | `updateTicket(ticket, input)` | Updates title and description |
 | Move ticket | `moveTicket(ticket, input, columns)` | Changes status column |
 | Assign ticket | `assignTicket(ticket, input)` | Changes assignee (or unassigns) |
 | Close ticket | `closeTicket(ticket, input)` | Sets closed_at timestamp |
@@ -112,6 +113,7 @@ Every command produces one or more `NewActivityEvent` records:
 | `ticket_created` | `createTicket` | (empty) |
 | `status_changed` | `moveTicket` | from_column_id, to_column_id |
 | `assignee_changed` | `assignTicket` | from_assignee_id, to_assignee_id |
+| `ticket_updated` | `updateTicket` | from_title, to_title, description_changed |
 | `ticket_closed` | `closeTicket` | (empty) |
 | `ticket_reopened` | `reopenTicket` | to_column_id |
 | `tag_added` | `addTag` | tag |

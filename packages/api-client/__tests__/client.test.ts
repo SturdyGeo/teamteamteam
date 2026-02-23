@@ -63,6 +63,7 @@ describe("createTeamteamteamClient", () => {
     // Mutation methods
     expect(typeof client.createOrg).toBe("function");
     expect(typeof client.createTicket).toBe("function");
+    expect(typeof client.updateTicket).toBe("function");
     expect(typeof client.moveTicket).toBe("function");
     expect(typeof client.closeTicket).toBe("function");
   });

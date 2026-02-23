@@ -4,6 +4,7 @@ import type {
   CreateOrgInput,
   CreateProjectInput,
   CreateTicketInput,
+  UpdateTicketInput,
   MoveTicketInput,
   AssignTicketInput,
   ReopenTicketInput,
@@ -15,6 +16,7 @@ export interface MutationMethods {
   createOrg(input: CreateOrgInput): Promise<Org>;
   createProject(orgId: string, input: CreateProjectInput): Promise<Project>;
   createTicket(projectId: string, input: CreateTicketInput): Promise<Ticket>;
+  updateTicket(ticketId: string, input: UpdateTicketInput): Promise<Ticket>;
   moveTicket(ticketId: string, input: MoveTicketInput): Promise<Ticket>;
   assignTicket(ticketId: string, input: AssignTicketInput): Promise<Ticket>;
   closeTicket(ticketId: string): Promise<Ticket>;
@@ -38,6 +40,10 @@ export function createMutationMethods(http: HttpClient): MutationMethods {
 
     createTicket(projectId: string, input: CreateTicketInput) {
       return http.post<Ticket>(`/projects/${projectId}/tickets`, input);
+    },
+
+    updateTicket(ticketId: string, input: UpdateTicketInput) {
+      return http.patch<Ticket>(`/tickets/${ticketId}`, input);
     },
 
     moveTicket(ticketId: string, input: MoveTicketInput) {

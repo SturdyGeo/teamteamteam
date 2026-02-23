@@ -260,10 +260,12 @@ function ProjectRouteComponent(): React.JSX.Element {
   async function handleTicketCreate(
     toColumnId: string,
     title: string,
+    description: string,
     tags: string[],
   ): Promise<void> {
     const created = await createTicketMutation.mutateAsync({
       title,
+      description,
       tags,
     });
 

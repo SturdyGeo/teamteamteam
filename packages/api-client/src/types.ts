@@ -43,6 +43,11 @@ export interface CreateTicketInput {
   tags?: string[];
 }
 
+export interface UpdateTicketInput {
+  title: string;
+  description: string;
+}
+
 export interface MoveTicketInput {
   to_column_id: string;
 }

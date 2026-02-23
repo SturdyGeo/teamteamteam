@@ -28,6 +28,15 @@ export const AssigneeChangedEventSchema = BaseEventSchema.extend({
   }),
 });
 
+export const TicketUpdatedEventSchema = BaseEventSchema.extend({
+  event_type: z.literal("ticket_updated"),
+  payload: z.object({
+    from_title: z.string(),
+    to_title: z.string(),
+    description_changed: z.boolean(),
+  }),
+});
+
 export const TagAddedEventSchema = BaseEventSchema.extend({
   event_type: z.literal("tag_added"),
   payload: z.object({
@@ -58,6 +67,7 @@ export const ActivityEventSchema = z.discriminatedUnion("event_type", [
   TicketCreatedEventSchema,
   StatusChangedEventSchema,
   AssigneeChangedEventSchema,
+  TicketUpdatedEventSchema,
   TagAddedEventSchema,
   TagRemovedEventSchema,
   TicketClosedEventSchema,

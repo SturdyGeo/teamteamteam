@@ -11,6 +11,7 @@ import {
   useReopenTicketMutation,
   useTicketActivityQuery,
   useTicketDetailQuery,
+  useUpdateTicketMutation,
 } from "@/features/projects/hooks";
 import { ticketsForColumn } from "@/features/projects/selectors";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,12 @@ interface ProjectPageProps {
   isMovePending: boolean;
   isCreatePending: boolean;
   onTicketMove: (ticketId: string, toColumnId: string) => Promise<void>;
-  onTicketCreate: (toColumnId: string, title: string, tags: string[]) => Promise<void>;
+  onTicketCreate: (
+    toColumnId: string,
+    title: string,
+    description: string,
+    tags: string[],
+  ) => Promise<void>;
 }
 
 type TicketWithPriority = Ticket & { priority?: string };
@@ -67,6 +73,8 @@ function formatActivityText(
       const toAssignee = event.payload.to_assignee_id;
       return toAssignee ? `assigned to ${assigneeById.get(toAssignee) ?? "user"}` : "unassigned ticket";
     }
+    case "ticket_updated":
+      return "updated ticket details";
     case "tag_added":
       return `added tag ${event.payload.tag}`;
     case "tag_removed":
@@ -100,17 +108,25 @@ export function ProjectPage({
   const [moveError, setMoveError] = useState<string | null>(null);
   const [assignError, setAssignError] = useState<string | null>(null);
   const [assigneeMenuTicketId, setAssigneeMenuTicketId] = useState<string | null>(null);
+  const [assigneeMenuSearch, setAssigneeMenuSearch] = useState("");
   const [createModalColumnId, setCreateModalColumnId] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState("");
+  const [newCardDescription, setNewCardDescription] = useState("");
   const [newCardTags, setNewCardTags] = useState("");
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [modalAssigneeSearch, setModalAssigneeSearch] = useState("");
+  const [isActivityOpen, setIsActivityOpen] = useState(false);
   const lastDragAtRef = useRef<number>(0);
+  const initializedTicketIdRef = useRef<string | null>(null);
 
   const ticketDetailQuery = useTicketDetailQuery(selectedTicketId, Boolean(selectedTicketId));
   const ticketActivityQuery = useTicketActivityQuery(selectedTicketId, Boolean(selectedTicketId));
+  const updateMutation = useUpdateTicketMutation(projectId);
   const assignMutation = useAssignTicketMutation(projectId);
   const closeMutation = useCloseTicketMutation(projectId);
   const reopenMutation = useReopenTicketMutation(projectId);
@@ -124,6 +140,8 @@ export function ProjectPage({
   useEffect(() => {
     setModalError(null);
     setNewTagInput("");
+    setModalAssigneeSearch("");
+    setIsActivityOpen(false);
   }, [selectedTicketId, createModalColumnId]);
 
   useEffect(() => {
@@ -154,6 +172,26 @@ export function ProjectPage({
     () => new Map(members.map((member) => [member.user.id, member.user.email])),
     [members],
   );
+  const quickAssignMembers = useMemo(() => {
+    const query = assigneeMenuSearch.trim().toLowerCase();
+    if (!query) {
+      return members;
+    }
+
+    return members.filter((member) =>
+      member.user.email.toLowerCase().includes(query),
+    );
+  }, [assigneeMenuSearch, members]);
+  const modalAssigneeMembers = useMemo(() => {
+    const query = modalAssigneeSearch.trim().toLowerCase();
+    if (!query) {
+      return members;
+    }
+
+    return members.filter((member) =>
+      member.user.email.toLowerCase().includes(query),
+    );
+  }, [members, modalAssigneeSearch]);
 
   const totalTickets = boardTickets.length;
 
@@ -164,6 +202,22 @@ export function ProjectPage({
 
     return ticketDetailQuery.data ?? boardTickets.find((ticket) => ticket.id === selectedTicketId) ?? null;
   }, [boardTickets, selectedTicketId, ticketDetailQuery.data]);
+
+  useEffect(() => {
+    if (selectedTicket && initializedTicketIdRef.current !== selectedTicket.id) {
+      setEditTitle(selectedTicket.title);
+      setEditDescription(selectedTicket.description ?? "");
+      initializedTicketIdRef.current = selectedTicket.id;
+      return;
+    }
+
+    if (!selectedTicketId) {
+      initializedTicketIdRef.current = null;
+      setEditTitle("");
+      setEditDescription("");
+    }
+  }, [selectedTicket, selectedTicketId]);
+
   const createModalColumn = useMemo(() => {
     if (!createModalColumnId) {
       return null;
@@ -175,6 +229,7 @@ export function ProjectPage({
   const isCreateModal = Boolean(createModalColumnId);
 
   const modalBusy =
+    updateMutation.isPending ||
     assignMutation.isPending ||
     closeMutation.isPending ||
     reopenMutation.isPending ||
@@ -195,6 +250,7 @@ export function ProjectPage({
     setCreateModalColumnId(columnId);
     setModalError(null);
     setNewCardTitle("");
+    setNewCardDescription("");
     setNewCardTags("");
   }
 
@@ -204,7 +260,10 @@ export function ProjectPage({
     setModalError(null);
     setNewTagInput("");
     setNewCardTitle("");
+    setNewCardDescription("");
     setNewCardTags("");
+    setModalAssigneeSearch("");
+    setIsActivityOpen(false);
   }
 
   function handleCardClick(ticketId: string): void {
@@ -269,8 +328,40 @@ export function ProjectPage({
     }
 
     try {
-      await onTicketCreate(createModalColumnId, title, parseTags(newCardTags));
+      await onTicketCreate(
+        createModalColumnId,
+        title,
+        newCardDescription,
+        parseTags(newCardTags),
+      );
       closeModal();
+    } catch (error) {
+      setModalError(toMessage(error));
+    }
+  }
+
+  async function handleSaveDetails(): Promise<void> {
+    if (!selectedTicket) {
+      return;
+    }
+
+    setModalError(null);
+
+    const title = editTitle.trim();
+    if (!title) {
+      setModalError("Title is required.");
+      return;
+    }
+
+    try {
+      await updateMutation.mutateAsync({
+        ticketId: selectedTicket.id,
+        input: {
+          title,
+          description: editDescription,
+        },
+      });
+      await ticketDetailQuery.refetch();
     } catch (error) {
       setModalError(toMessage(error));
     }
@@ -564,9 +655,13 @@ export function ProjectPage({
                                   onMouseDown={(event) => event.stopPropagation()}
                                   onClick={(event) => {
                                     event.stopPropagation();
-                                    setAssigneeMenuTicketId((current) =>
-                                      current === ticket.id ? null : ticket.id,
-                                    );
+                                    setAssigneeMenuTicketId((current) => {
+                                      const next = current === ticket.id ? null : ticket.id;
+                                      if (next) {
+                                        setAssigneeMenuSearch("");
+                                      }
+                                      return next;
+                                    });
                                   }}
                                 >
                                   {assignee}
@@ -579,6 +674,12 @@ export function ProjectPage({
                                     onMouseDown={(event) => event.stopPropagation()}
                                     onClick={(event) => event.stopPropagation()}
                                   >
+                                    <input
+                                      value={assigneeMenuSearch}
+                                      onChange={(event) => setAssigneeMenuSearch(event.target.value)}
+                                      placeholder="Search assignee..."
+                                      className="mb-1 h-8 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 text-xs text-zinc-200 outline-none focus:border-zinc-500"
+                                    />
                                     <button
                                       type="button"
                                       className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-800"
@@ -586,7 +687,7 @@ export function ProjectPage({
                                     >
                                       Nobody
                                     </button>
-                                    {members.map((member) => (
+                                    {quickAssignMembers.map((member) => (
                                       <button
                                         key={member.user.id}
                                         type="button"
@@ -596,6 +697,9 @@ export function ProjectPage({
                                         {member.user.email}
                                       </button>
                                     ))}
+                                    {quickAssignMembers.length === 0 ? (
+                                      <p className="px-2.5 py-1.5 text-xs text-zinc-500">No matching members</p>
+                                    ) : null}
                                   </div>
                                 ) : null}
                               </div>
@@ -637,7 +741,7 @@ export function ProjectPage({
                     : (selectedTicket ? `${projectPrefix}-${selectedTicket.number}` : "Ticket")}
                 </p>
                 <h2 className="text-xl font-semibold">
-                  {isCreateModal ? "Create ticket card" : (selectedTicket?.title ?? "Loading ticket...")}
+                  {isCreateModal ? "Create ticket card" : (editTitle || selectedTicket?.title || "Loading ticket...")}
                 </h2>
               </div>
               <button
@@ -654,43 +758,90 @@ export function ProjectPage({
             ) : null}
 
             {isCreateModal ? (
-              <form
-                onSubmit={(event) => void handleCreateCard(event)}
-                className="grid gap-5 md:grid-cols-[minmax(0,1fr),280px]"
-              >
-                <div className="space-y-4">
-                  <section>
-                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
-                    <input
-                      value={newCardTitle}
-                      onChange={(event) => setNewCardTitle(event.target.value)}
-                      placeholder="What needs to be done?"
-                      className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                    />
-                  </section>
+              <form onSubmit={(event) => void handleCreateCard(event)} className="space-y-4">
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
+                  <input
+                    value={newCardTitle}
+                    onChange={(event) => setNewCardTitle(event.target.value)}
+                    placeholder="What needs to be done?"
+                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                  />
+                </section>
 
-                  <section>
-                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
-                    <input
-                      value={newCardTags}
-                      onChange={(event) => setNewCardTags(event.target.value)}
-                      placeholder="bug, urgent, backend"
-                      className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                    />
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Comma-separated tags. You can edit tags later from the same modal.
-                    </p>
-                  </section>
-                </div>
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Description</h3>
+                  <textarea
+                    value={newCardDescription}
+                    onChange={(event) => setNewCardDescription(event.target.value)}
+                    placeholder="Add details..."
+                    className="min-h-28 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                  />
+                </section>
 
-                <aside className="space-y-3 rounded-lg border border-zinc-700 bg-zinc-950 p-3">
-                  <h3 className="text-sm font-semibold text-zinc-300">Create settings</h3>
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
+                  <input
+                    value={newCardTags}
+                    onChange={(event) => setNewCardTags(event.target.value)}
+                    placeholder="bug, urgent, backend"
+                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                  />
+                </section>
+
+                <label className="block space-y-1 text-xs text-zinc-400">
+                  Column
+                  <select
+                    value={createModalColumnId ?? ""}
+                    className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                    onChange={(event) => setCreateModalColumnId(event.target.value)}
+                    disabled={modalBusy}
+                  >
+                    {columns.map((column) => (
+                      <option key={column.id} value={column.id}>
+                        {column.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={modalBusy}
+                  className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                >
+                  {isCreatePending ? "Adding..." : "Add card"}
+                </button>
+              </form>
+            ) : selectedTicket ? (
+              <div className="space-y-4">
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
+                  <input
+                    value={editTitle}
+                    onChange={(event) => setEditTitle(event.target.value)}
+                    placeholder="Ticket title"
+                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                  />
+                </section>
+
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Description</h3>
+                  <textarea
+                    value={editDescription}
+                    onChange={(event) => setEditDescription(event.target.value)}
+                    placeholder="Add details..."
+                    className="min-h-28 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                  />
+                </section>
+
+                <div className="grid gap-3 md:grid-cols-2">
                   <label className="block space-y-1 text-xs text-zinc-400">
-                    Column
+                    Status column
                     <select
-                      value={createModalColumnId ?? ""}
+                      value={selectedTicket.status_column_id}
                       className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
-                      onChange={(event) => setCreateModalColumnId(event.target.value)}
+                      onChange={(event) => void handleModalMove(event.target.value)}
                       disabled={modalBusy}
                     >
                       {columns.map((column) => (
@@ -701,66 +852,102 @@ export function ProjectPage({
                     </select>
                   </label>
 
-                  <button
-                    type="submit"
-                    disabled={modalBusy}
-                    className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
-                  >
-                    {isCreatePending ? "Adding..." : "Add card"}
-                  </button>
-                </aside>
-              </form>
-            ) : selectedTicket ? (
-              <div className="grid gap-5 md:grid-cols-[minmax(0,1fr),280px]">
-                <div className="space-y-4">
                   <section>
-                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Description</h3>
-                    <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-sm text-zinc-200 whitespace-pre-wrap">
-                      {selectedTicket.description?.trim() || "No description."}
-                    </div>
-                  </section>
-
-                  <section>
-                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
-                    <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-3">
-                      <div className="mb-3 flex flex-wrap gap-2">
-                        {selectedTicket.tags.length === 0 ? (
-                          <p className="text-xs text-zinc-500">No tags</p>
-                        ) : (
-                          selectedTicket.tags.map((tag) => (
-                            <button
-                              key={tag}
-                              type="button"
-                              className="rounded-full border border-amber-700 bg-amber-900/80 px-2.5 py-0.5 text-xs text-amber-200 hover:bg-amber-800"
-                              onClick={() => void handleRemoveTag(tag)}
-                              disabled={modalBusy}
-                            >
-                              {tag} x
-                            </button>
-                          ))
-                        )}
-                      </div>
-                      <form onSubmit={(event) => void handleAddTag(event)} className="flex gap-2">
-                        <input
-                          value={newTagInput}
-                          onChange={(event) => setNewTagInput(event.target.value)}
-                          placeholder="add tag"
-                          className="h-8 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-zinc-100 outline-none focus:border-zinc-500"
-                        />
+                    <h3 className="mb-1 text-xs text-zinc-400">Assignee</h3>
+                    <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-2">
+                      <input
+                        value={modalAssigneeSearch}
+                        onChange={(event) => setModalAssigneeSearch(event.target.value)}
+                        placeholder="Search assignee..."
+                        className="mb-2 h-8 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-zinc-100 outline-none focus:border-zinc-500"
+                        disabled={modalBusy}
+                      />
+                      <div className="max-h-36 space-y-1 overflow-auto">
                         <button
-                          type="submit"
+                          type="button"
+                          className={cn(
+                            "w-full rounded-md px-2 py-1.5 text-left text-xs transition hover:bg-zinc-800",
+                            selectedTicket.assignee_id === null
+                              ? "bg-zinc-800 text-zinc-100"
+                              : "text-zinc-300",
+                          )}
+                          onClick={() => void handleAssign(null)}
                           disabled={modalBusy}
-                          className="rounded-md border border-zinc-700 bg-zinc-900 px-2.5 text-xs text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
                         >
-                          Add
+                          Nobody
                         </button>
-                      </form>
+                        {modalAssigneeMembers.map((member) => (
+                          <button
+                            key={member.user.id}
+                            type="button"
+                            className={cn(
+                              "w-full rounded-md px-2 py-1.5 text-left text-xs transition hover:bg-zinc-800",
+                              selectedTicket.assignee_id === member.user.id
+                                ? "bg-zinc-800 text-zinc-100"
+                                : "text-zinc-300",
+                            )}
+                            onClick={() => void handleAssign(member.user.id)}
+                            disabled={modalBusy}
+                          >
+                            {member.user.email}
+                          </button>
+                        ))}
+                        {modalAssigneeMembers.length === 0 ? (
+                          <p className="px-2 py-1 text-xs text-zinc-500">No matching members</p>
+                        ) : null}
+                      </div>
                     </div>
                   </section>
+                </div>
 
-                  <section>
-                    <h3 className="mb-1 text-sm font-semibold text-zinc-300">Activity</h3>
-                    <div className="max-h-52 overflow-auto rounded-lg border border-zinc-700 bg-zinc-950 p-3">
+                <section>
+                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
+                  <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-3">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {selectedTicket.tags.length === 0 ? (
+                        <p className="text-xs text-zinc-500">No tags</p>
+                      ) : (
+                        selectedTicket.tags.map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            className="rounded-full border border-amber-700 bg-amber-900/80 px-2.5 py-0.5 text-xs text-amber-200 hover:bg-amber-800"
+                            onClick={() => void handleRemoveTag(tag)}
+                            disabled={modalBusy}
+                          >
+                            {tag} x
+                          </button>
+                        ))
+                      )}
+                    </div>
+                    <form onSubmit={(event) => void handleAddTag(event)} className="flex gap-2">
+                      <input
+                        value={newTagInput}
+                        onChange={(event) => setNewTagInput(event.target.value)}
+                        placeholder="add tag"
+                        className="h-8 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-zinc-100 outline-none focus:border-zinc-500"
+                      />
+                      <button
+                        type="submit"
+                        disabled={modalBusy}
+                        className="rounded-md border border-zinc-700 bg-zinc-900 px-2.5 text-xs text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                      >
+                        Add
+                      </button>
+                    </form>
+                  </div>
+                </section>
+
+                <section>
+                  <button
+                    type="button"
+                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200 hover:bg-zinc-800"
+                    onClick={() => setIsActivityOpen((current) => !current)}
+                  >
+                    {isActivityOpen ? "Hide activity" : "Review activity"}
+                  </button>
+                  {isActivityOpen ? (
+                    <div className="mt-2 max-h-52 overflow-auto rounded-lg border border-zinc-700 bg-zinc-950 p-3">
                       {ticketActivityQuery.isPending ? (
                         <p className="text-xs text-zinc-500">Loading activity...</p>
                       ) : ticketActivityQuery.data && ticketActivityQuery.data.length > 0 ? (
@@ -779,62 +966,32 @@ export function ProjectPage({
                         <p className="text-xs text-zinc-500">No activity yet.</p>
                       )}
                     </div>
-                  </section>
-                </div>
+                  ) : null}
+                </section>
 
-                <aside className="space-y-3 rounded-lg border border-zinc-700 bg-zinc-950 p-3">
-                  <h3 className="text-sm font-semibold text-zinc-300">Quick edit</h3>
-
-                  <label className="block space-y-1 text-xs text-zinc-400">
-                    Status column
-                    <select
-                      value={selectedTicket.status_column_id}
-                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
-                      onChange={(event) => void handleModalMove(event.target.value)}
-                      disabled={modalBusy}
-                    >
-                      {columns.map((column) => (
-                        <option key={column.id} value={column.id}>
-                          {column.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="block space-y-1 text-xs text-zinc-400">
-                    Assignee
-                    <select
-                      value={selectedTicket.assignee_id ?? "unassigned"}
-                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        void handleAssign(value === "unassigned" ? null : value);
-                      }}
-                      disabled={modalBusy}
-                    >
-                      <option value="unassigned">Unassigned</option>
-                      {members.map((member) => (
-                        <option key={member.user.id} value={member.user.id}>
-                          {member.user.email}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={modalBusy}
+                    onClick={() => void handleSaveDetails()}
+                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                  >
+                    {updateMutation.isPending ? "Saving..." : "Save changes"}
+                  </button>
                   <button
                     type="button"
                     disabled={modalBusy}
                     onClick={() => void handleCloseOrReopen()}
-                    className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
                   >
                     {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
                   </button>
+                </div>
 
-                  <div className="text-xs text-zinc-500">
-                    <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
-                    {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
-                  </div>
-                </aside>
+                <div className="text-xs text-zinc-500">
+                  <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
+                  {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
+                </div>
               </div>
             ) : null}
 

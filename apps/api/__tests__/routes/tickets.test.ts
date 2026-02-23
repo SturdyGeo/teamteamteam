@@ -225,6 +225,67 @@ describe("POST /projects/:projectId/tickets", () => {
 });
 
 // ---------------------------------------------------------------------------
+// PATCH /tickets/:ticketId
+// ---------------------------------------------------------------------------
+
+describe("PATCH /tickets/:ticketId", () => {
+  it("updates ticket title and description", async () => {
+    const app = setup([
+      { data: rawTicket(), error: null },           // ticket fetch
+      { data: null, error: null },                  // ticket update
+      { data: null, error: null },                  // activity event
+    ]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}`,
+      patch({ title: "Updated title", description: "Updated description" }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.title).toBe("Updated title");
+    expect(body.description).toBe("Updated description");
+  });
+
+  it("returns 400 when title is missing", async () => {
+    const app = setup([]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}`,
+      patch({ description: "Only description" }),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.code).toBe("INVALID_INPUT");
+  });
+
+  it("returns 404 when ticket not found", async () => {
+    const app = setup([
+      { data: null, error: { message: "not found", code: "PGRST116" } },
+    ]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}`,
+      patch({ title: "Updated title", description: "Updated description" }),
+    );
+    expect(res.status).toBe(404);
+    expect((await res.json()).error.code).toBe("NOT_FOUND");
+  });
+
+  it("returns 500 when ticket update fails", async () => {
+    const app = setup([
+      { data: rawTicket(), error: null },
+      { data: null, error: { message: "update failed" } },
+    ]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}`,
+      patch({ title: "Updated title", description: "Updated description" }),
+    );
+    expect(res.status).toBe(500);
+    expect((await res.json()).error.code).toBe("DB_ERROR");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // PATCH /tickets/:ticketId/move
 // ---------------------------------------------------------------------------
 

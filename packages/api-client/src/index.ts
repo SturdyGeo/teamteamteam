@@ -19,6 +19,7 @@ export type {
   CreateOrgInput,
   CreateProjectInput,
   CreateTicketInput,
+  UpdateTicketInput,
   MoveTicketInput,
   AssignTicketInput,
   ReopenTicketInput,
