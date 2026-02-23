@@ -559,10 +559,10 @@ export function ProjectPage({
                 <section
                   key={column.id}
                   className={cn(
-                    "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-border bg-card/95 p-3 shadow-[0_24px_60px_-42px_hsl(var(--background))] backdrop-blur",
+                    "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-border/60 bg-[linear-gradient(180deg,hsl(var(--card)/0.98)_0%,hsl(var(--background)/0.94)_100%)] p-3 shadow-[0_24px_58px_-42px_hsl(var(--primary)/0.5)] backdrop-blur",
                     draggingTicketId ? "ring-1 ring-border/80" : "",
                     dropTargetColumnId === column.id
-                      ? "border-primary/80 bg-primary/15 ring-2 ring-primary/80"
+                      ? "border-primary/80 bg-[linear-gradient(180deg,hsl(var(--card)/0.98)_0%,hsl(var(--background)/0.94)_100%)] ring-2 ring-primary/80"
                       : "",
                   )}
                   onDragOver={(event) => {
@@ -577,7 +577,13 @@ export function ProjectPage({
                   }}
                 >
                   <header className="mb-3 flex items-center justify-between px-1">
-                    <h2 className="text-sm font-semibold text-foreground">{column.name}</h2>
+                    <h2 className="flex items-center text-sm font-semibold text-foreground">
+                      <span
+                        className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-primary/80 shadow-[0_0_12px_hsl(var(--primary)/0.8)]"
+                        aria-hidden
+                      />
+                      {column.name}
+                    </h2>
                     <div className="flex items-center gap-2">
                       <Badge className="rounded-full border border-border bg-background text-foreground hover:bg-background">
                         {columnTickets.length}
@@ -626,7 +632,7 @@ export function ProjectPage({
                               setDraggingTicketId(null);
                             }}
                             className={cn(
-                              "cursor-grab rounded-2xl border border-border bg-background p-3 text-foreground shadow-[0_12px_35px_-26px_hsl(var(--background))] transition hover:-translate-y-0.5 hover:bg-card active:cursor-grabbing",
+                              "cursor-grab rounded-2xl border border-border/60 bg-[linear-gradient(180deg,hsl(var(--background)/0.96)_0%,hsl(var(--card)/0.92)_100%)] p-3 text-foreground shadow-[0_14px_32px_-26px_hsl(var(--primary)/0.45)] transition hover:-translate-y-0.5 hover:bg-card active:cursor-grabbing",
                               draggingTicketId === ticket.id ? "opacity-60" : "",
                             )}
                           >

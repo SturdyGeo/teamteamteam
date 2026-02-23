@@ -50,6 +50,7 @@ Current implementation includes:
 - Color styling is tokenized through global CSS variables (`styles.css`) across routes/components
 - Global token palette uses a black-first neutral base with restrained amber accents (bright amber reserved for high-intent actions)
 - Card/dropdown borders are now de-emphasized with low-contrast framing
+- "Amber CRT Ops" layer adds subtle scanline texture, warm ambient glow, and LED-style board column indicators
 - App shell/auth backgrounds now use a flat black surface (no gradient wash)
 - Escape hotkey closes active modals (ticket modal + create org/project dialogs)
 - Ticket modal activity feed is hidden by default behind a small underlined "Review activity" toggle below action buttons

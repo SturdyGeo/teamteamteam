@@ -275,6 +275,7 @@ Phase 4 data layer is implemented:
 - Primary action buttons use a consistent bright amber style across login/create/save/add web flows
 - Global web theme tokens now use a black-first neutral palette with restrained amber accents inspired by the IT Crowd aesthetic
 - Card/dropdown borders in the web UI are intentionally low-contrast to avoid bright outlines
+- Web shell now includes an "Amber CRT Ops" visual layer (subtle scanlines, ambient glow, LED-like board cues)
 - Web shell/auth backgrounds use a flat black surface (gradients removed)
 
 Phase 5 board experience is implemented:

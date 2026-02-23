@@ -378,7 +378,7 @@ export function RootLayout(): React.JSX.Element {
       <header className="sticky top-2 z-30 px-3 pt-1">
         <div
           ref={menuContainerRef}
-          className="mx-auto flex max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-card/95 px-2.5 py-1.5 text-foreground shadow-[0_28px_65px_-40px_hsl(var(--background))] backdrop-blur"
+          className="mx-auto flex max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-[linear-gradient(180deg,hsl(var(--card)/0.98)_0%,hsl(var(--card)/0.86)_100%)] px-2.5 py-1.5 text-foreground shadow-[0_24px_52px_-42px_hsl(var(--primary)/0.75)] backdrop-blur"
         >
           <Link
             to="/"
