@@ -154,6 +154,8 @@ ttteam org invite <email>      # Invite a user by email (--role admin|member)
 
 If you have only one org, it is auto-selected without needing `org use`.
 
+`org invite` now supports brand-new email addresses by triggering OTP auto-provisioning; if the account does not finalize immediately, retry after the user signs in once.
+
 ### Projects
 
 ```sh
@@ -369,7 +371,7 @@ The Bun server runs on `http://localhost:3001` by default (configurable via `POR
 | `POST` | `/orgs/:orgId/projects` | Create project (+ default columns) |
 | `DELETE` | `/orgs/:orgId/projects/:projectId` | Delete project (owner/admin) |
 | `GET` | `/orgs/:orgId/members` | List org members |
-| `POST` | `/orgs/:orgId/members` | Invite member by email |
+| `POST` | `/orgs/:orgId/members` | Invite member by email (auto-provisions via OTP if new) |
 | `GET` | `/projects/:projectId/columns` | List workflow columns |
 | `GET` | `/projects/:projectId/tickets` | List tickets (with filters) |
 | `GET` | `/projects/:projectId/tags` | List project tags |

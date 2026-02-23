@@ -5,11 +5,19 @@ export interface MockResult {
   error?: { message: string; code?: string } | null;
 }
 
+export interface MockSupabaseOptions {
+  otpError?: { message: string; code?: string } | null;
+  onSignInWithOtp?: (args: { email: string; options?: { shouldCreateUser?: boolean } }) => void;
+}
+
 /**
  * Creates a mock Supabase client that returns results from an ordered queue.
  * Each awaited query chain consumes the next result from the queue.
  */
-export function createMockSupabase(results: MockResult[]) {
+export function createMockSupabase(
+  results: MockResult[],
+  options: MockSupabaseOptions = {},
+) {
   const queue = [...results];
 
   function createBuilder() {
@@ -25,6 +33,7 @@ export function createMockSupabase(results: MockResult[]) {
       "delete",
       "upsert",
       "single",
+      "maybeSingle",
     ]) {
       builder[method] = () => builder;
     }
@@ -40,5 +49,14 @@ export function createMockSupabase(results: MockResult[]) {
   return {
     from: () => createBuilder(),
     rpc: () => createBuilder(),
+    auth: {
+      signInWithOtp: async (args: { email: string; options?: { shouldCreateUser?: boolean } }) => {
+        options.onSignInWithOtp?.(args);
+        return {
+          data: null,
+          error: options.otpError ?? null,
+        };
+      },
+    },
   };
 }

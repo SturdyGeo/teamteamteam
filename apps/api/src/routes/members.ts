@@ -4,6 +4,23 @@ import { getAuth } from "../middleware/auth.js";
 
 const members = new Hono();
 
+async function lookupUserIdByEmail(
+  supabase: ReturnType<typeof getAuth>["supabase"],
+  email: string,
+): Promise<{ userId: string | null; errorMessage: string | null }> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (error) {
+    return { userId: null, errorMessage: error.message };
+  }
+
+  return { userId: data?.id ?? null, errorMessage: null };
+}
+
 members.get("/orgs/:orgId/members", async (c) => {
   const { supabase } = getAuth(c);
   const orgId = c.req.param("orgId");
@@ -48,19 +65,60 @@ members.post("/orgs/:orgId/members", async (c) => {
     );
   }
 
-  // Look up user by email
-  const { data: userRow, error: userError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", parsed.data.email)
-    .single();
+  const email = parsed.data.email.trim().toLowerCase();
 
-  if (userError || !userRow) {
+  let userLookup = await lookupUserIdByEmail(supabase, email);
+  if (userLookup.errorMessage) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: userLookup.errorMessage } },
+      500,
+    );
+  }
+
+  // If the user does not exist yet, trigger Supabase OTP signup/login for this
+  // email, then retry lookup briefly so invite works for brand-new users.
+  if (!userLookup.userId) {
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
+
+    if (otpError) {
+      return c.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: `No user found with that email address, and we could not send a sign-in code (${otpError.message}).`,
+          },
+        },
+        404,
+      );
+    }
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      userLookup = await lookupUserIdByEmail(supabase, email);
+      if (userLookup.errorMessage) {
+        return c.json(
+          { error: { code: "DB_ERROR", message: userLookup.errorMessage } },
+          500,
+        );
+      }
+
+      if (userLookup.userId) {
+        break;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 120));
+    }
+  }
+
+  if (!userLookup.userId) {
     return c.json(
       {
         error: {
           code: "NOT_FOUND",
-          message: "No user found with that email address",
+          message:
+            "No user found with that email address yet. A sign-in code was sent; ask them to sign in once, then retry the invite.",
         },
       },
       404,
@@ -72,7 +130,7 @@ members.post("/orgs/:orgId/members", async (c) => {
     .from("memberships")
     .insert({
       org_id: orgId,
-      user_id: userRow.id,
+      user_id: userLookup.userId,
       role: parsed.data.role,
     })
     .select()

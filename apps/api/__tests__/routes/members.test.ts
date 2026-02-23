@@ -1,12 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { createMockSupabase } from "../helpers/mock-supabase.js";
+import { createMockSupabase, type MockSupabaseOptions } from "../helpers/mock-supabase.js";
 import { createTestApp } from "../helpers/test-app.js";
 import { members } from "../../src/routes/members.js";
 
 const ORG_ID = "00000000-0000-0000-0000-000000000020";
 
-function setup(results: Parameters<typeof createMockSupabase>[0]) {
-  return createTestApp(members, createMockSupabase(results));
+function setup(
+  results: Parameters<typeof createMockSupabase>[0],
+  options?: MockSupabaseOptions,
+) {
+  return createTestApp(members, createMockSupabase(results, options));
 }
 
 function post(body: unknown) {
@@ -95,17 +98,33 @@ describe("POST /orgs/:orgId/members", () => {
     expect((await res.json()).error.code).toBe("INVALID_INPUT");
   });
 
-  it("returns 404 when user not found by email", async () => {
+  it("provisions user via OTP and creates membership when email is new", async () => {
     const app = setup([
-      { data: null, error: { message: "not found", code: "PGRST116" } },
+      { data: null, error: null },               // initial user lookup
+      { data: { id: "user-2" }, error: null },   // post-OTP user lookup
+      { data: membership, error: null },         // membership insert
     ]);
 
     const res = await app.request(
       `/orgs/${ORG_ID}/members`,
       post({ email: "nobody@example.com" }),
     );
+    expect(res.status).toBe(201);
+    expect(await res.json()).toEqual(membership);
+  });
+
+  it("returns 404 when user is missing and OTP bootstrap fails", async () => {
+    const app = setup(
+      [{ data: null, error: null }],
+      { otpError: { message: "otp blocked" } },
+    );
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members`,
+      post({ email: "nobody@example.com" }),
+    );
     expect(res.status).toBe(404);
-    expect((await res.json()).error.code).toBe("NOT_FOUND");
+    expect((await res.json()).error.message).toContain("could not send a sign-in code");
   });
 
   it("returns 409 when user is already a member", async () => {
