@@ -913,39 +913,6 @@ export function ProjectPage({
                   </div>
                 </section>
 
-                <section>
-                  <button
-                    type="button"
-                    className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-foreground hover:bg-accent"
-                    onClick={() => setIsActivityOpen((current) => !current)}
-                    aria-expanded={isActivityOpen}
-                  >
-                    <span>{isActivityOpen ? "Hide activity" : "Review activity"}</span>
-                    <span aria-hidden>{isActivityOpen ? "▴" : "▾"}</span>
-                  </button>
-                  {isActivityOpen ? (
-                    <div className="mt-2 max-h-52 overflow-auto rounded-lg border border-border bg-background p-3">
-                      {ticketActivityQuery.isPending ? (
-                        <p className="text-xs text-muted-foreground">Loading activity...</p>
-                      ) : ticketActivityQuery.data && ticketActivityQuery.data.length > 0 ? (
-                        <div className="space-y-2">
-                          {ticketActivityQuery.data.map((event) => (
-                            <article key={event.id} className="text-xs text-foreground">
-                              <p>
-                                <span className="text-muted-foreground">{event.actor.email}</span>{" "}
-                                {formatActivityText(event, assigneeById)}
-                              </p>
-                              <p className="text-muted-foreground">{formatUpdatedAt(event.created_at)}</p>
-                            </article>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">No activity yet.</p>
-                      )}
-                    </div>
-                  ) : null}
-                </section>
-
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="submit"
@@ -968,6 +935,39 @@ export function ProjectPage({
                     {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
                   </button>
                 </div>
+
+                <section className="space-y-2">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                    onClick={() => setIsActivityOpen((current) => !current)}
+                    aria-expanded={isActivityOpen}
+                  >
+                    <span>{isActivityOpen ? "Hide activity" : "Review activity"}</span>
+                    <span aria-hidden>{isActivityOpen ? "▴" : "▾"}</span>
+                  </button>
+                  {isActivityOpen ? (
+                    <div className="max-h-52 overflow-auto rounded-lg border border-border bg-background p-3">
+                      {ticketActivityQuery.isPending ? (
+                        <p className="text-xs text-muted-foreground">Loading activity...</p>
+                      ) : ticketActivityQuery.data && ticketActivityQuery.data.length > 0 ? (
+                        <div className="space-y-2">
+                          {ticketActivityQuery.data.map((event) => (
+                            <article key={event.id} className="text-xs text-foreground">
+                              <p>
+                                <span className="text-muted-foreground">{event.actor.email}</span>{" "}
+                                {formatActivityText(event, assigneeById)}
+                              </p>
+                              <p className="text-muted-foreground">{formatUpdatedAt(event.created_at)}</p>
+                            </article>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No activity yet.</p>
+                      )}
+                    </div>
+                  ) : null}
+                </section>
 
                 <div className="text-xs text-muted-foreground">
                   <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
