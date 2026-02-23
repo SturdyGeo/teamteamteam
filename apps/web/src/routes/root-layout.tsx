@@ -473,7 +473,7 @@ export function RootLayout(): React.JSX.Element {
                     className="inline-flex h-auto items-center gap-1 border-0 bg-transparent px-1 py-0 font-mono text-xs text-foreground transition hover:bg-transparent hover:text-foreground disabled:opacity-45"
                   >
                     <span className="truncate max-w-44">
-                      {activeProject ? `${activeProject.prefix} · ${activeProject.name}` : "Select project"}
+                      {activeProject ? activeProject.name : "Select project"}
                     </span>
                     <span>▾</span>
                   </Button>
@@ -493,7 +493,7 @@ export function RootLayout(): React.JSX.Element {
                             onClick={() => void selectProject(project.id)}
                             className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
                           >
-                            {project.prefix} · {project.name}
+                            {project.name}
                           </Button>
                         ))}
                       </div>
