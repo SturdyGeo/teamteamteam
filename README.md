@@ -260,6 +260,7 @@ Phase 4 data layer is implemented:
 - Cache policy tuning (feature stale times, retry behavior, reconnect refetch)
 - Web visual theming uses global CSS design tokens (no hardcoded route/component color literals)
 - `/orgs/$orgId` now supports inviting members by email with `member`/`admin` role selection
+- Org/project list cards are click-to-open across web org views (buttonless card navigation)
 - Dev-only telemetry hooks for query/mutation error events
 - Ticket detail modal now supports persisted inline editing for title + description
 - Ticket activity is collapsed by default behind a "Review activity" toggle

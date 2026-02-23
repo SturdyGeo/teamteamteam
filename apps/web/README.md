@@ -21,6 +21,7 @@ Current implementation includes:
 - OTP login modal mirrors the brand's executive-terminal visual style
 - App-shell org/project context selectors persisted to localStorage
 - Org detail page includes an invite-member form (email + member/admin role)
+- Org and project list cards are fully clickable (no separate "Open" buttons)
 - Route-level error boundaries + not-found handling
 - Error and not-found surfaces now use the same dark mono visual theme as app pages
 - URL-backed routing contracts for project board state

@@ -1,10 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import type { OrgWithRole } from "@teamteamteam/api-client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -33,28 +31,24 @@ export function OrgsPage({ orgs }: OrgsPageProps): React.JSX.Element {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {orgs.map((org) => (
-            <Card key={org.id} className="border-border bg-card text-card-foreground">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between gap-2">
-                  <span>{org.name}</span>
-                  <Badge className="border-border bg-muted text-muted-foreground hover:bg-muted">
-                    {org.membership_role}
-                  </Badge>
-                </CardTitle>
-                <CardDescription className="font-mono text-muted-foreground">{org.id}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  asChild
-                  size="sm"
-                  className="rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <Link to="/orgs/$orgId" params={{ orgId: org.id }}>
-                    Open org
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <Link
+              key={org.id}
+              to="/orgs/$orgId"
+              params={{ orgId: org.id }}
+              className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Card className="h-full border-border bg-card text-card-foreground transition hover:-translate-y-0.5 hover:border-primary/60 hover:bg-accent/40">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between gap-2">
+                    <span>{org.name}</span>
+                    <Badge className="border-border bg-muted text-muted-foreground hover:bg-muted">
+                      {org.membership_role}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="font-mono text-muted-foreground">{org.id}</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
