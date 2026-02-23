@@ -34,7 +34,7 @@ export function AuthCallbackPage(): React.JSX.Element {
       }
 
       setStatus("Signed in. Redirecting...");
-      await navigate({ to: "/orgs" });
+      await navigate({ to: "/" });
     }
 
     void completeSignIn();

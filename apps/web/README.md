@@ -15,15 +15,19 @@ Current implementation includes:
 - Supabase email OTP passcode auth (`/login`) with `/auth/callback` fallback support
 - AuthProvider-driven session lifecycle (memory + localStorage)
 - Protected org/project routes
+- Authenticated `/` redirect to first available project board route
+- Unauthenticated `/` minimal white landing with centered `boss.png` and sign-in CTA
+- `/login` route uses a dedicated no-nav centered auth shell
 - App-shell org/project context selectors persisted to localStorage
 - Route-level error boundaries + not-found handling
-- URL-backed filtering/sorting/pagination contracts for org and project views
+- URL-backed routing contracts for project board state
 - Canonical query key strategy for org/project/ticket scopes
 - Feature-level query hooks/modules with tuned cache policy
 - Dev-only query/mutation error telemetry events
 - Server-ordered board columns with richer ticket card metadata
 - Shared loading/empty/error state cards across the board surface
 - Rounded capsule top navigation (org/project selectors + profile actions)
+- Boss logo jump-spin animation on click for authenticated sessions
 - Custom nav dropdown menus for org/project switching + create actions
 - Create organization/project dialogs from top-nav controls
 - Board-first kanban layout with drag-and-drop ticket movement between columns

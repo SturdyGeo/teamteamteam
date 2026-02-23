@@ -249,7 +249,7 @@ Phase 2 auth/shell is implemented:
 Phase 3 routing is implemented:
 
 - Route-level error boundaries and not-found pages
-- URL-backed view contracts for org/project filtering, sorting, and pagination
+- URL-backed view contracts for project board routing and state
 
 Phase 4 data layer is implemented:
 
@@ -273,6 +273,10 @@ Web board UX refresh is implemented:
 - Board-first project view with horizontal kanban columns
 - Drag-and-drop ticket moves across columns (backed by API mutation + refetch)
 - Updated visual theme with softer rounded surfaces and a richer color palette
+- Signed-in logo click now triggers a jumpy spin animation
+- `/` now redirects authenticated users to the first available project board
+- Unauthenticated `/` is a minimal white landing with centered `boss.png` + sign-in button
+- `/login` now renders as a standalone centered modal shell (no app nav)
 
 Run a production build:
 

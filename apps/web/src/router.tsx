@@ -55,8 +55,42 @@ async function requireSession(): Promise<void> {
 async function redirectIfAuthenticated(): Promise<void> {
   const { data } = await supabase.auth.getSession();
   if (data.session) {
+    throw redirect({ to: "/" });
+  }
+}
+
+async function redirectToDefaultProject(
+  queryClient: QueryClient,
+): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) {
+    return;
+  }
+
+  const orgs = await queryClient.ensureQueryData(orgsQueryOptions());
+  const firstOrg = orgs[0];
+
+  if (!firstOrg) {
     throw redirect({ to: "/orgs" });
   }
+
+  const projects = await queryClient.ensureQueryData(orgProjectsQueryOptions(firstOrg.id));
+  const firstProject = projects[0];
+
+  if (!firstProject) {
+    throw redirect({
+      to: "/orgs/$orgId",
+      params: { orgId: firstOrg.id },
+    });
+  }
+
+  throw redirect({
+    to: "/orgs/$orgId/projects/$projectId",
+    params: {
+      orgId: firstOrg.id,
+      projectId: firstProject.id,
+    },
+  });
 }
 
 const rootRoute = createRootRouteWithContext<RouterContext>()({
@@ -68,6 +102,10 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  loader: async ({ context }) => {
+    await redirectToDefaultProject(context.queryClient);
+    return null;
+  },
   component: HomePage,
   errorComponent: RouteErrorBoundary,
 });

@@ -97,6 +97,7 @@ export function RootLayout(): React.JSX.Element {
   const [newProjectPrefix, setNewProjectPrefix] = useState("");
   const [createOrgError, setCreateOrgError] = useState<string | null>(null);
   const [createProjectError, setCreateProjectError] = useState<string | null>(null);
+  const [isLogoSpinning, setIsLogoSpinning] = useState(false);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent): void {
@@ -291,7 +292,40 @@ export function RootLayout(): React.JSX.Element {
     }
   }
 
+  function handleLogoClick(): void {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    setIsLogoSpinning(false);
+    window.requestAnimationFrame(() => {
+      setIsLogoSpinning(true);
+    });
+  }
+
   const userEmail = session?.user.email ?? "";
+  const isPublicLanding = pathname === "/" && status !== "authenticated";
+  const isLoginRoute = pathname === "/login";
+
+  if (isPublicLanding) {
+    return (
+      <div className="min-h-screen bg-white">
+        <main className="grid min-h-screen place-items-center px-4">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
+  if (isLoginRoute) {
+    return (
+      <div className="min-h-screen bg-slate-100/70">
+        <main className="grid min-h-screen place-items-center px-4">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_15%_8%,rgba(253,186,116,0.32),transparent_35%),radial-gradient(circle_at_85%_12%,rgba(45,212,191,0.3),transparent_40%),linear-gradient(180deg,#fffaf3_0%,#f4f8ff_55%,#eefbf9_100%)]">
@@ -303,8 +337,14 @@ export function RootLayout(): React.JSX.Element {
           <Link
             to="/"
             className="inline-flex items-center"
+            onClick={handleLogoClick}
           >
-            <img src={bossLogo} alt="Boss logo" className="h-9 w-9 object-cover" />
+            <img
+              src={bossLogo}
+              alt="Boss logo"
+              className={`h-9 w-9 object-cover ${isLogoSpinning ? "animate-boss-logo-jump-spin" : ""}`}
+              onAnimationEnd={() => setIsLogoSpinning(false)}
+            />
           </Link>
 
           {status === "loading" ? (

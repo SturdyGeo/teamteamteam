@@ -66,7 +66,7 @@ export function LoginPage(): React.JSX.Element {
     }
 
     setMessage("Signed in. Redirecting...");
-    await navigate({ to: "/orgs" });
+    await navigate({ to: "/" });
   }
 
   return (
