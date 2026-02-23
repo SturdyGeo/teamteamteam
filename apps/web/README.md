@@ -41,6 +41,7 @@ Current implementation includes:
 - Per-column `+` actions open the shared ticket modal in create mode
 - Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
 - Ticket modal title + description are editable text inputs with persisted save
+- Saving ticket title/description closes the modal; unchanged edits also close without error
 - Pressing Enter in ticket title now submits "Save changes"
 - Save/Close/Reopen actions are color-coded for clearer intent
 - Primary action buttons now use a consistent green treatment across auth, create, and save/add flows

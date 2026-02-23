@@ -357,16 +357,28 @@ export function ProjectPage({
       return;
     }
 
+    const nextDescription = editDescription;
+    const currentDescription = selectedTicket.description ?? "";
+    if (title === selectedTicket.title && nextDescription === currentDescription) {
+      closeModal();
+      return;
+    }
+
     try {
       await updateMutation.mutateAsync({
         ticketId: selectedTicket.id,
         input: {
           title,
-          description: editDescription,
+          description: nextDescription,
         },
       });
-      await ticketDetailQuery.refetch();
+      closeModal();
     } catch (error) {
+      if (toMessage(error).toLowerCase().includes("ticket details are unchanged")) {
+        closeModal();
+        return;
+      }
+
       setModalError(toTicketUpdateMessage(error));
     }
   }

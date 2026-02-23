@@ -263,6 +263,7 @@ Phase 4 data layer is implemented:
 - Org/project list cards are click-to-open across web org views (buttonless card navigation)
 - Dev-only telemetry hooks for query/mutation error events
 - Ticket detail modal now supports persisted inline editing for title + description
+- Saving ticket detail edits now closes the modal; unchanged edits close without surfacing an error
 - Ticket activity is collapsed by default behind a small underlined "Review activity" toggle below action buttons
 - Assignee changes are optimistic (immediate UI update with rollback on failure)
 - Ticket modal assignee uses a dropdown selector (quick-card assign remains searchable)
