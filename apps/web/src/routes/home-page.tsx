@@ -4,11 +4,28 @@ import { Button } from "@/components/ui/button";
 
 export function HomePage(): React.JSX.Element {
   return (
-    <div className="flex flex-col items-center justify-center gap-6">
-      <img src={bossLogo} alt="Boss logo" className="h-44 w-44 object-contain md:h-52 md:w-52" />
-      <Button asChild className="rounded-full px-8">
-        <Link to="/login">Sign in</Link>
-      </Button>
+    <div className="w-full max-w-[560px] rounded-lg border border-zinc-800 bg-zinc-900/95 p-8 text-zinc-200 shadow-[0_24px_90px_-50px_rgba(0,0,0,1)] md:p-10">
+      <div className="text-center">
+        <img
+          src={bossLogo}
+          alt="Teamteamteam boss logo"
+          className="mx-auto mb-5 h-44 w-44 rounded-lg object-contain md:h-52 md:w-52"
+        />
+        <h1 className="text-[22px] font-semibold tracking-tight text-white">Teamteamteam</h1>
+        <p className="mt-1 text-sm text-zinc-400">Terminal-first Kanban</p>
+      </div>
+
+      <div className="mt-8 border-t border-zinc-800 pt-6 text-center">
+        <p className="mb-5 text-sm text-zinc-400">
+          Corporate composure. Basement IT energy.
+        </p>
+        <Button
+          asChild
+          className="rounded-md border border-zinc-700 bg-zinc-950 px-8 font-mono text-zinc-100 hover:bg-zinc-900"
+        >
+          <Link to="/login">Sign in</Link>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -304,23 +304,14 @@ export function RootLayout(): React.JSX.Element {
   }
 
   const userEmail = session?.user.email ?? "";
-  const isPublicLanding = pathname === "/" && status !== "authenticated";
-  const isLoginRoute = pathname === "/login";
+  const isAuthSurfaceRoute =
+    status !== "authenticated" &&
+    (pathname === "/" || pathname === "/login" || pathname === "/auth/callback");
 
-  if (isPublicLanding) {
+  if (isAuthSurfaceRoute) {
     return (
-      <div className="min-h-screen bg-white">
-        <main className="grid min-h-screen place-items-center px-4">
-          <Outlet />
-        </main>
-      </div>
-    );
-  }
-
-  if (isLoginRoute) {
-    return (
-      <div className="min-h-screen bg-slate-100/70">
-        <main className="grid min-h-screen place-items-center px-4">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_18%_12%,rgba(54,54,54,0.55),transparent_38%),radial-gradient(circle_at_84%_16%,rgba(115,115,115,0.2),transparent_42%),linear-gradient(180deg,#0f0f0f_0%,#101010_100%)]">
+        <main className="grid min-h-screen place-items-center px-4 py-10">
           <Outlet />
         </main>
       </div>
@@ -328,11 +319,11 @@ export function RootLayout(): React.JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_8%,rgba(253,186,116,0.32),transparent_35%),radial-gradient(circle_at_85%_12%,rgba(45,212,191,0.3),transparent_40%),linear-gradient(180deg,#fffaf3_0%,#f4f8ff_55%,#eefbf9_100%)]">
-      <header className="sticky top-3 z-30 px-4">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_16%_8%,rgba(59,59,59,0.5),transparent_33%),radial-gradient(circle_at_88%_12%,rgba(120,120,120,0.16),transparent_42%),linear-gradient(180deg,#0c0c0c_0%,#121212_100%)]">
+      <header className="sticky top-3 z-30 px-4 pt-1">
         <div
           ref={menuContainerRef}
-          className="mx-auto flex max-w-6xl items-center gap-3 rounded-full border border-slate-800/20 bg-slate-950/90 px-3 py-2 text-slate-100 shadow-[0_28px_65px_-38px_rgba(15,23,42,1)] backdrop-blur"
+          className="mx-auto flex max-w-6xl items-center gap-3 rounded-full border border-zinc-700/70 bg-zinc-900/95 px-3 py-2 text-zinc-100 shadow-[0_28px_65px_-40px_rgba(0,0,0,1)] backdrop-blur"
         >
           <Link
             to="/"
@@ -348,12 +339,16 @@ export function RootLayout(): React.JSX.Element {
           </Link>
 
           {status === "loading" ? (
-            <p className="text-xs text-slate-300">Loading session...</p>
+            <p className="text-xs text-zinc-400">Loading session...</p>
           ) : null}
 
           {status === "unauthenticated" ? (
             <div className="ml-auto">
-              <Button asChild size="sm" className="rounded-full">
+              <Button
+                asChild
+                size="sm"
+                className="rounded-full border border-zinc-700 bg-zinc-950 font-mono text-zinc-100 hover:bg-zinc-800"
+              >
                 <Link to="/login">Sign in</Link>
               </Button>
             </div>
@@ -366,15 +361,15 @@ export function RootLayout(): React.JSX.Element {
                   <button
                     type="button"
                     onClick={() => setOpenMenu((current) => (current === "org" ? null : "org"))}
-                    className="inline-flex h-9 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-xs text-white transition hover:bg-white/15"
+                    className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-950 px-3 font-mono text-xs text-zinc-100 transition hover:bg-zinc-800"
                   >
                     <span className="truncate max-w-40">{activeOrg?.name ?? "Select org"}</span>
                     <span>▾</span>
                   </button>
 
                   {openMenu === "org" ? (
-                    <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 text-slate-900 shadow-xl">
-                      <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-slate-500">
+                    <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-zinc-700 bg-zinc-900 p-2 font-mono text-zinc-100 shadow-xl">
+                      <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-zinc-500">
                         Organizations
                       </p>
                       <div className="max-h-56 overflow-auto">
@@ -383,7 +378,7 @@ export function RootLayout(): React.JSX.Element {
                             key={org.id}
                             type="button"
                             onClick={() => void selectOrg(org.id)}
-                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-slate-100"
+                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-800"
                           >
                             {org.name}
                           </button>
@@ -396,7 +391,7 @@ export function RootLayout(): React.JSX.Element {
                           setCreateOrgError(null);
                           setShowCreateOrgDialog(true);
                         }}
-                        className="mt-1 w-full rounded-xl border border-dashed border-slate-300 px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="mt-1 w-full rounded-xl border border-dashed border-zinc-700 px-3 py-2 text-left text-sm font-medium text-zinc-200 hover:bg-zinc-800"
                       >
                         + Add organization
                       </button>
@@ -411,7 +406,7 @@ export function RootLayout(): React.JSX.Element {
                     onClick={() =>
                       setOpenMenu((current) => (current === "project" ? null : "project"))
                     }
-                    className="inline-flex h-9 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-xs text-white transition hover:bg-white/15 disabled:opacity-45"
+                    className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-950 px-3 font-mono text-xs text-zinc-100 transition hover:bg-zinc-800 disabled:opacity-45"
                   >
                     <span className="truncate max-w-44">
                       {activeProject ? `${activeProject.prefix} · ${activeProject.name}` : "Select project"}
@@ -420,8 +415,8 @@ export function RootLayout(): React.JSX.Element {
                   </button>
 
                   {openMenu === "project" ? (
-                    <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-2 text-slate-900 shadow-xl">
-                      <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-slate-500">
+                    <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-zinc-700 bg-zinc-900 p-2 font-mono text-zinc-100 shadow-xl">
+                      <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-zinc-500">
                         Projects
                       </p>
                       <div className="max-h-56 overflow-auto">
@@ -430,7 +425,7 @@ export function RootLayout(): React.JSX.Element {
                             key={project.id}
                             type="button"
                             onClick={() => void selectProject(project.id)}
-                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-slate-100"
+                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-800"
                           >
                             {project.prefix} · {project.name}
                           </button>
@@ -443,7 +438,7 @@ export function RootLayout(): React.JSX.Element {
                           setCreateProjectError(null);
                           setShowCreateProjectDialog(true);
                         }}
-                        className="mt-1 w-full rounded-xl border border-dashed border-slate-300 px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="mt-1 w-full rounded-xl border border-dashed border-zinc-700 px-3 py-2 text-left text-sm font-medium text-zinc-200 hover:bg-zinc-800"
                       >
                         + Add project
                       </button>
@@ -456,28 +451,28 @@ export function RootLayout(): React.JSX.Element {
                 <button
                   type="button"
                   onClick={() => setOpenMenu((current) => (current === "profile" ? null : "profile"))}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-300 to-cyan-500 text-xs font-semibold text-slate-900"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 to-orange-300 text-xs font-semibold text-zinc-900"
                 >
                   {profileInitials(userEmail)}
                 </button>
 
                 {openMenu === "profile" ? (
-                  <div className="absolute right-0 z-50 mt-2 w-60 rounded-2xl border border-slate-200 bg-white p-2 text-slate-900 shadow-xl">
-                    <p className="truncate px-2 py-1 text-xs text-slate-500">{userEmail}</p>
+                  <div className="absolute right-0 z-50 mt-2 w-60 rounded-2xl border border-zinc-700 bg-zinc-900 p-2 font-mono text-zinc-100 shadow-xl">
+                    <p className="truncate px-2 py-1 text-xs text-zinc-500">{userEmail}</p>
                     <button
                       type="button"
                       onClick={() => {
                         setOpenMenu(null);
                         void navigate({ to: "/orgs" });
                       }}
-                      className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-slate-100"
+                      className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-800"
                     >
                       Organizations
                     </button>
                     <button
                       type="button"
                       onClick={() => void handleSignOut()}
-                      className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-slate-100"
+                      className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-800"
                     >
                       Sign out
                     </button>
@@ -489,37 +484,37 @@ export function RootLayout(): React.JSX.Element {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1400px] px-4 py-5">
+      <main className="mx-auto max-w-[1400px] px-4 py-5 font-mono text-zinc-100">
         <Outlet />
       </main>
 
       {showCreateOrgDialog ? (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-slate-900/40 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
           <form
             onSubmit={(event) => void handleCreateOrg(event)}
-            className="w-full max-w-md rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-2xl"
+            className="w-full max-w-md rounded-[1.75rem] border border-zinc-700 bg-zinc-900 p-5 font-mono text-zinc-100 shadow-2xl"
           >
-            <h2 className="text-lg font-semibold text-slate-900">Create organization</h2>
-            <p className="mt-1 text-sm text-slate-500">Add a new organization workspace.</p>
+            <h2 className="text-lg font-semibold text-zinc-100">Create organization</h2>
+            <p className="mt-1 text-sm text-zinc-500">Add a new organization workspace.</p>
 
-            <label className="mt-4 block text-sm font-medium text-slate-700" htmlFor="new-org-name">
+            <label className="mt-4 block text-sm font-medium text-zinc-300" htmlFor="new-org-name">
               Name
             </label>
             <input
               id="new-org-name"
-              className="mt-1 h-10 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-teal-500"
+              className="mt-1 h-10 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
               value={newOrgName}
               onChange={(event) => setNewOrgName(event.target.value)}
               placeholder="Acme Engineering"
             />
 
-            {createOrgError ? <p className="mt-2 text-sm text-rose-600">{createOrgError}</p> : null}
+            {createOrgError ? <p className="mt-2 text-sm text-rose-400">{createOrgError}</p> : null}
 
             <div className="mt-5 flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-full"
+                className="rounded-full border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800"
                 onClick={() => {
                   setShowCreateOrgDialog(false);
                   setCreateOrgError(null);
@@ -527,7 +522,11 @@ export function RootLayout(): React.JSX.Element {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="rounded-full" disabled={createOrgMutation.isPending}>
+              <Button
+                type="submit"
+                className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                disabled={createOrgMutation.isPending}
+              >
                 {createOrgMutation.isPending ? "Creating..." : "Create org"}
               </Button>
             </div>
@@ -536,31 +535,31 @@ export function RootLayout(): React.JSX.Element {
       ) : null}
 
       {showCreateProjectDialog ? (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-slate-900/40 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
           <form
             onSubmit={(event) => void handleCreateProject(event)}
-            className="w-full max-w-md rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-2xl"
+            className="w-full max-w-md rounded-[1.75rem] border border-zinc-700 bg-zinc-900 p-5 font-mono text-zinc-100 shadow-2xl"
           >
-            <h2 className="text-lg font-semibold text-slate-900">Create project</h2>
-            <p className="mt-1 text-sm text-slate-500">Projects are created under the selected org.</p>
+            <h2 className="text-lg font-semibold text-zinc-100">Create project</h2>
+            <p className="mt-1 text-sm text-zinc-500">Projects are created under the selected org.</p>
 
-            <label className="mt-4 block text-sm font-medium text-slate-700" htmlFor="new-project-name">
+            <label className="mt-4 block text-sm font-medium text-zinc-300" htmlFor="new-project-name">
               Name
             </label>
             <input
               id="new-project-name"
-              className="mt-1 h-10 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-teal-500"
+              className="mt-1 h-10 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
               value={newProjectName}
               onChange={(event) => setNewProjectName(event.target.value)}
               placeholder="Mobile App"
             />
 
-            <label className="mt-3 block text-sm font-medium text-slate-700" htmlFor="new-project-prefix">
+            <label className="mt-3 block text-sm font-medium text-zinc-300" htmlFor="new-project-prefix">
               Prefix
             </label>
             <input
               id="new-project-prefix"
-              className="mt-1 h-10 w-full rounded-xl border border-slate-300 px-3 text-sm uppercase outline-none focus:border-teal-500"
+              className="mt-1 h-10 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 text-sm uppercase text-zinc-100 outline-none focus:border-zinc-500"
               value={newProjectPrefix}
               onChange={(event) => setNewProjectPrefix(event.target.value.toUpperCase())}
               placeholder="MOB"
@@ -568,14 +567,14 @@ export function RootLayout(): React.JSX.Element {
             />
 
             {createProjectError ? (
-              <p className="mt-2 text-sm text-rose-600">{createProjectError}</p>
+              <p className="mt-2 text-sm text-rose-400">{createProjectError}</p>
             ) : null}
 
             <div className="mt-5 flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-full"
+                className="rounded-full border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800"
                 onClick={() => {
                   setShowCreateProjectDialog(false);
                   setCreateProjectError(null);
@@ -585,7 +584,7 @@ export function RootLayout(): React.JSX.Element {
               </Button>
               <Button
                 type="submit"
-                className="rounded-full"
+                className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
                 disabled={createProjectMutation.isPending || !activeOrgId}
               >
                 {createProjectMutation.isPending ? "Creating..." : "Create project"}

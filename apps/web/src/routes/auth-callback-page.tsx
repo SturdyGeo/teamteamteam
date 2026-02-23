@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 
 export function AuthCallbackPage(): React.JSX.Element {
@@ -45,14 +38,12 @@ export function AuthCallbackPage(): React.JSX.Element {
   }, [navigate]);
 
   return (
-    <Card className="mx-auto max-w-md">
-      <CardHeader>
-        <CardTitle>Auth callback</CardTitle>
-        <CardDescription>{status}</CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
+    <div className="w-full max-w-[560px] rounded-lg border border-zinc-800 bg-zinc-900/95 p-8 text-zinc-200 shadow-[0_24px_90px_-50px_rgba(0,0,0,1)] md:p-10">
+      <h1 className="font-mono text-xl font-semibold text-white">Auth callback</h1>
+      <p className="mt-2 font-mono text-sm text-zinc-300">{status}</p>
+      <p className="mt-4 text-sm text-zinc-500">
         If this page stalls, return to login and use OTP passcode sign-in.
-      </CardContent>
-    </Card>
+      </p>
+    </div>
   );
 }

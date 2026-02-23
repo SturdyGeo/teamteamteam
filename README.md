@@ -272,11 +272,11 @@ Web board UX refresh is implemented:
 - Create org/project dialogs launched directly from nav controls
 - Board-first project view with horizontal kanban columns
 - Drag-and-drop ticket moves across columns (backed by API mutation + refetch)
-- Updated visual theme with softer rounded surfaces and a richer color palette
+- Updated visual theme to a dark mono "executive terminal" style across auth + app surfaces
 - Signed-in logo click now triggers a jumpy spin animation
 - `/` now redirects authenticated users to the first available project board
-- Unauthenticated `/` is a minimal white landing with centered `boss.png` + sign-in button
-- `/login` now renders as a standalone centered modal shell (no app nav)
+- Unauthenticated `/` and `/login` now use a dark mono, no-nav auth shell
+- OTP login modal styling now mirrors the brand's "executive terminal" look
 
 Run a production build:
 

@@ -105,17 +105,17 @@ export function ProjectPage({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[2rem] border border-slate-300/60 bg-white/65 p-4 shadow-[0_20px_50px_-35px_rgba(15,23,42,0.65)] backdrop-blur">
+      <div className="rounded-[2rem] border border-zinc-700 bg-zinc-900/95 p-4 shadow-[0_20px_50px_-35px_rgba(0,0,0,1)] backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-lg font-semibold tracking-tight text-slate-900">{projectName}</h1>
-          <Badge className="rounded-full bg-cyan-700 px-3 text-cyan-50 hover:bg-cyan-700">
+          <h1 className="text-lg font-semibold tracking-tight text-zinc-100">{projectName}</h1>
+          <Badge className="rounded-full border border-zinc-600 bg-zinc-800 px-3 text-zinc-200 hover:bg-zinc-800">
             {projectPrefix}
           </Badge>
-          <Badge variant="outline" className="rounded-full border-slate-300 bg-white/80">
+          <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
             {totalTickets} tickets
           </Badge>
           {isMovePending ? (
-            <Badge className="rounded-full bg-emerald-600 px-3 text-emerald-50 hover:bg-emerald-600">
+            <Badge className="rounded-full border border-emerald-700 bg-emerald-900/70 px-3 text-emerald-200 hover:bg-emerald-900/70">
               Saving move...
             </Badge>
           ) : null}
@@ -127,7 +127,7 @@ export function ProjectPage({
           title="Board failed to load"
           description={boardErrorMessage}
           tone="destructive"
-          className="rounded-[1.75rem] bg-white/70"
+          className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
         />
       ) : null}
 
@@ -136,7 +136,7 @@ export function ProjectPage({
           title="Move failed"
           description={moveError}
           tone="destructive"
-          className="rounded-[1.75rem] bg-white/70"
+          className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
         />
       ) : null}
 
@@ -144,7 +144,7 @@ export function ProjectPage({
         <StateCard
           title="Loading board"
           description="Loading columns and tickets..."
-          className="rounded-[1.75rem] bg-white/70"
+          className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
         />
       ) : null}
 
@@ -152,7 +152,7 @@ export function ProjectPage({
         <StateCard
           title="No workflow columns"
           description="Create project columns from the CLI/API first."
-          className="rounded-[1.75rem] bg-white/70"
+          className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
         />
       ) : null}
 
@@ -164,8 +164,8 @@ export function ProjectPage({
               <section
                 key={column.id}
                 className={cn(
-                  "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-slate-300/70 bg-white/70 p-3 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.75)] backdrop-blur",
-                  draggingTicketId ? "ring-1 ring-cyan-200/70" : "",
+                  "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-zinc-700 bg-zinc-900/95 p-3 shadow-[0_24px_60px_-42px_rgba(0,0,0,1)] backdrop-blur",
+                  draggingTicketId ? "ring-1 ring-zinc-500/80" : "",
                 )}
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
@@ -174,18 +174,15 @@ export function ProjectPage({
                 }}
               >
                 <header className="mb-3 flex items-center justify-between px-1">
-                  <h2 className="text-sm font-semibold text-slate-900">{column.name}</h2>
-                  <Badge
-                    variant="outline"
-                    className="rounded-full border-slate-300 bg-white/90 text-slate-700"
-                  >
+                  <h2 className="text-sm font-semibold text-zinc-100">{column.name}</h2>
+                  <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
                     {columnTickets.length}
                   </Badge>
                 </header>
 
                 <div className="space-y-3">
                   {columnTickets.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white/50 p-4 text-center text-xs text-slate-500">
+                    <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/70 p-4 text-center text-xs text-zinc-500">
                       Drop a ticket here
                     </div>
                   ) : (
@@ -207,15 +204,15 @@ export function ProjectPage({
                           }}
                           onDragEnd={() => setDraggingTicketId(null)}
                           className={cn(
-                            "cursor-grab rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.9)] transition hover:-translate-y-0.5 active:cursor-grabbing",
+                            "cursor-grab rounded-2xl border border-zinc-700 bg-zinc-950 p-3 text-zinc-100 shadow-[0_12px_35px_-26px_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:bg-zinc-900 active:cursor-grabbing",
                             draggingTicketId === ticket.id ? "opacity-60" : "",
                           )}
                         >
                           <div className="mb-2 flex items-center justify-between gap-2">
-                            <span className="font-mono text-[11px] text-slate-500">
+                            <span className="font-mono text-[11px] text-zinc-500">
                               {projectPrefix}-{ticket.number}
                             </span>
-                            <span className="text-[11px] text-slate-500">
+                            <span className="text-[11px] text-zinc-500">
                               {formatUpdatedAt(ticket.updated_at)}
                             </span>
                           </div>
@@ -224,20 +221,17 @@ export function ProjectPage({
 
                           <div className="flex flex-wrap gap-1.5">
                             {priority ? (
-                              <Badge className="rounded-full bg-rose-500/90 px-2.5 text-rose-50 hover:bg-rose-500/90">
+                              <Badge className="rounded-full border border-rose-700 bg-rose-900/80 px-2.5 text-rose-200 hover:bg-rose-900/80">
                                 {priority}
                               </Badge>
                             ) : null}
-                            <Badge
-                              variant="outline"
-                              className="rounded-full border-slate-300 bg-slate-50 px-2.5 text-slate-700"
-                            >
+                            <Badge className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 text-zinc-300 hover:bg-zinc-900">
                               {assignee}
                             </Badge>
                             {ticket.tags.slice(0, 2).map((item) => (
                               <Badge
                                 key={item}
-                                className="rounded-full bg-amber-500/90 px-2.5 text-amber-950 hover:bg-amber-500/90"
+                                className="rounded-full border border-amber-700 bg-amber-900/80 px-2.5 text-amber-200 hover:bg-amber-900/80"
                               >
                                 {item}
                               </Badge>

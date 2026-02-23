@@ -22,17 +22,17 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{orgName}</h1>
-        <p className="text-sm text-muted-foreground">{orgId}</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{orgName}</h1>
+        <p className="font-mono text-sm text-zinc-500">{orgId}</p>
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Projects</h2>
+        <h2 className="text-xl font-semibold text-zinc-100">Projects</h2>
         {projects.length === 0 ? (
-          <Card>
+          <Card className="border-zinc-700 bg-zinc-900/95 text-zinc-100">
             <CardHeader>
               <CardTitle>No projects</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-zinc-400">
                 Create one from CLI (`ttteam project create`) to start using the web board.
               </CardDescription>
             </CardHeader>
@@ -40,16 +40,22 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {projects.map((project) => (
-              <Card key={project.id}>
+              <Card key={project.id} className="border-zinc-700 bg-zinc-900/95 text-zinc-100">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between gap-2">
                     <span>{project.name}</span>
-                    <Badge variant="outline">{project.prefix}</Badge>
+                    <Badge className="border border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-800">
+                      {project.prefix}
+                    </Badge>
                   </CardTitle>
-                  <CardDescription>{project.id}</CardDescription>
+                  <CardDescription className="font-mono text-zinc-500">{project.id}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild size="sm">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                  >
                     <Link
                       to="/orgs/$orgId/projects/$projectId"
                       params={{ orgId: project.org_id, projectId: project.id }}
@@ -65,15 +71,18 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Members</h2>
-        <Card>
+        <h2 className="text-xl font-semibold text-zinc-100">Members</h2>
+        <Card className="border-zinc-700 bg-zinc-900/95 text-zinc-100">
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-2">
               {members.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No visible members.</p>
+                <p className="text-sm text-zinc-500">No visible members.</p>
               ) : (
                 members.map((member) => (
-                  <Badge key={member.id} variant="secondary">
+                  <Badge
+                    key={member.id}
+                    className="border border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-800"
+                  >
                     {member.user.email} ({member.role})
                   </Badge>
                 ))

@@ -54,7 +54,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
 
   ::selection {
