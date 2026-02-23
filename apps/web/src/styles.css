@@ -64,19 +64,11 @@
 
 @layer utilities {
   .bg-app-auth-surface {
-    background:
-      radial-gradient(circle at 18% 12%, hsl(var(--muted) / 0.62), transparent 38%),
-      radial-gradient(circle at 84% 16%, hsl(var(--primary) / 0.18), transparent 43%),
-      radial-gradient(circle at 52% 82%, hsl(var(--secondary) / 0.18), transparent 50%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.96) 100%);
+    background: hsl(var(--background));
   }
 
   .bg-app-shell {
-    background:
-      radial-gradient(circle at 16% 8%, hsl(var(--muted) / 0.56), transparent 33%),
-      radial-gradient(circle at 88% 12%, hsl(var(--primary) / 0.16), transparent 44%),
-      radial-gradient(circle at 62% 84%, hsl(var(--secondary) / 0.16), transparent 52%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.96) 100%);
+    background: hsl(var(--background));
   }
 
   .animate-boss-logo-jump-spin {
