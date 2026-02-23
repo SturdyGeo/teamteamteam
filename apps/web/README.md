@@ -28,7 +28,7 @@ Current implementation includes:
 - Shared loading/empty/error state cards across the board surface
 - Rounded capsule top navigation (org/project selectors + profile actions)
 - Dark mono executive-terminal visual language across org/project board surfaces
-- Boss logo jump-spin animation on click for authenticated sessions
+- Boss logo fast twirl + snap-stop animation on click for authenticated sessions
 - Custom nav dropdown menus for org/project switching + create actions
 - Create organization/project dialogs from top-nav controls
 - Board-first kanban layout with drag-and-drop ticket movement between columns
