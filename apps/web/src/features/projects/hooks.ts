@@ -5,6 +5,7 @@ import type {
   TicketQueryParams,
   UpdateTicketInput,
 } from "@teamteamteam/api-client/web";
+import type { Ticket } from "@teamteamteam/domain";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import {
@@ -69,6 +70,11 @@ interface AddTagVariables {
 interface RemoveTagVariables {
   ticketId: string;
   tag: string;
+}
+
+interface AssignTicketContext {
+  previousTicketLists: Array<[readonly unknown[], Ticket[] | undefined]>;
+  previousTicket: Ticket | undefined;
 }
 
 async function invalidateTicketQueries(
@@ -150,6 +156,81 @@ export function useAssignTicketMutation(projectId: string | null) {
   return useMutation({
     mutationFn: async ({ ticketId, assigneeId }: AssignTicketVariables) =>
       apiClient.assignTicket(ticketId, { assignee_id: assigneeId }),
+    onMutate: async ({ ticketId, assigneeId }): Promise<AssignTicketContext> => {
+      if (!projectId) {
+        return {
+          previousTicketLists: [],
+          previousTicket: undefined,
+        };
+      }
+
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: queryKeys.projects.tickets(projectId),
+        }),
+        queryClient.cancelQueries({
+          queryKey: queryKeys.projects.ticket(ticketId),
+        }),
+      ]);
+
+      const previousTicketLists = queryClient.getQueriesData<Ticket[]>({
+        queryKey: queryKeys.projects.tickets(projectId),
+      });
+      const previousTicket = queryClient.getQueryData<Ticket>(
+        queryKeys.projects.ticket(ticketId),
+      );
+      const now = new Date().toISOString();
+
+      for (const [key, list] of previousTicketLists) {
+        if (!list) {
+          continue;
+        }
+
+        queryClient.setQueryData<Ticket[]>(
+          key,
+          list.map((ticket) =>
+            ticket.id === ticketId
+              ? {
+                  ...ticket,
+                  assignee_id: assigneeId,
+                  updated_at: now,
+                }
+              : ticket,
+          ),
+        );
+      }
+
+      queryClient.setQueryData<Ticket | undefined>(
+        queryKeys.projects.ticket(ticketId),
+        (ticket) =>
+          ticket
+            ? {
+                ...ticket,
+                assignee_id: assigneeId,
+                updated_at: now,
+              }
+            : ticket,
+      );
+
+      return {
+        previousTicketLists,
+        previousTicket,
+      };
+    },
+    onError: (_error, variables, context) => {
+      if (!context) {
+        return;
+      }
+
+      for (const [key, list] of context.previousTicketLists) {
+        queryClient.setQueryData<Ticket[] | undefined>(key, list);
+      }
+
+      queryClient.setQueryData<Ticket | undefined>(
+        queryKeys.projects.ticket(variables.ticketId),
+        context.previousTicket,
+      );
+    },
     onSuccess: async (_ticket, variables) => {
       await invalidateTicketQueries(projectId, queryClient, variables.ticketId);
     },

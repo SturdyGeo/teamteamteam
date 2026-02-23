@@ -39,7 +39,9 @@ Current implementation includes:
 - Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
 - Ticket modal title + description are editable text inputs with persisted save
 - Ticket modal activity feed is hidden by default behind a "Review activity" drawer toggle
-- Assignee selection is searchable in both quick-assign popovers and modal edit controls
+- Assignee changes are optimistic (instant UI update with rollback on mutation failure)
+- Ticket modal assignee uses a dropdown selector
+- Card quick-assign popovers remain searchable
 - Ticket detail save expects latest API + migration rollout (`build:edge`, deploy function, `supabase db push`)
 - Click assignee chip on a card to open a quick-assign dropdown with `Nobody`
 

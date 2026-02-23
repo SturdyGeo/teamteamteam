@@ -136,7 +136,6 @@ export function ProjectPage({
   const [newTagInput, setNewTagInput] = useState("");
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [modalAssigneeSearch, setModalAssigneeSearch] = useState("");
   const [isActivityOpen, setIsActivityOpen] = useState(false);
   const lastDragAtRef = useRef<number>(0);
   const initializedTicketIdRef = useRef<string | null>(null);
@@ -157,7 +156,6 @@ export function ProjectPage({
   useEffect(() => {
     setModalError(null);
     setNewTagInput("");
-    setModalAssigneeSearch("");
     setIsActivityOpen(false);
   }, [selectedTicketId, createModalColumnId]);
 
@@ -199,16 +197,6 @@ export function ProjectPage({
       member.user.email.toLowerCase().includes(query),
     );
   }, [assigneeMenuSearch, members]);
-  const modalAssigneeMembers = useMemo(() => {
-    const query = modalAssigneeSearch.trim().toLowerCase();
-    if (!query) {
-      return members;
-    }
-
-    return members.filter((member) =>
-      member.user.email.toLowerCase().includes(query),
-    );
-  }, [members, modalAssigneeSearch]);
 
   const totalTickets = boardTickets.length;
 
@@ -279,7 +267,6 @@ export function ProjectPage({
     setNewCardTitle("");
     setNewCardDescription("");
     setNewCardTags("");
-    setModalAssigneeSearch("");
     setIsActivityOpen(false);
   }
 
@@ -387,6 +374,10 @@ export function ProjectPage({
   async function handleQuickAssign(ticketId: string, assigneeId: string | null): Promise<void> {
     setAssignError(null);
     setAssigneeMenuTicketId(null);
+    const ticket = boardTickets.find((item) => item.id === ticketId);
+    if (ticket && ticket.assignee_id === assigneeId) {
+      return;
+    }
 
     try {
       await assignMutation.mutateAsync({
@@ -400,6 +391,10 @@ export function ProjectPage({
 
   async function handleAssign(assigneeId: string | null): Promise<void> {
     if (!selectedTicket) {
+      return;
+    }
+
+    if (selectedTicket.assignee_id === assigneeId) {
       return;
     }
 
@@ -856,52 +851,25 @@ export function ProjectPage({
                     </select>
                   </label>
 
-                  <section>
-                    <h3 className="mb-1 text-xs text-zinc-400">Assignee</h3>
-                    <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-2">
-                      <input
-                        value={modalAssigneeSearch}
-                        onChange={(event) => setModalAssigneeSearch(event.target.value)}
-                        placeholder="Search assignee..."
-                        className="mb-2 h-8 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-zinc-100 outline-none focus:border-zinc-500"
-                        disabled={modalBusy}
-                      />
-                      <div className="max-h-36 space-y-1 overflow-auto">
-                        <button
-                          type="button"
-                          className={cn(
-                            "w-full rounded-md px-2 py-1.5 text-left text-xs transition hover:bg-zinc-800",
-                            selectedTicket.assignee_id === null
-                              ? "bg-zinc-800 text-zinc-100"
-                              : "text-zinc-300",
-                          )}
-                          onClick={() => void handleAssign(null)}
-                          disabled={modalBusy}
-                        >
-                          Nobody
-                        </button>
-                        {modalAssigneeMembers.map((member) => (
-                          <button
-                            key={member.user.id}
-                            type="button"
-                            className={cn(
-                              "w-full rounded-md px-2 py-1.5 text-left text-xs transition hover:bg-zinc-800",
-                              selectedTicket.assignee_id === member.user.id
-                                ? "bg-zinc-800 text-zinc-100"
-                                : "text-zinc-300",
-                            )}
-                            onClick={() => void handleAssign(member.user.id)}
-                            disabled={modalBusy}
-                          >
-                            {member.user.email}
-                          </button>
-                        ))}
-                        {modalAssigneeMembers.length === 0 ? (
-                          <p className="px-2 py-1 text-xs text-zinc-500">No matching members</p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </section>
+                  <label className="block space-y-1 text-xs text-zinc-400">
+                    Assignee
+                    <select
+                      value={selectedTicket.assignee_id ?? "unassigned"}
+                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        void handleAssign(value === "unassigned" ? null : value);
+                      }}
+                      disabled={modalBusy}
+                    >
+                      <option value="unassigned">Nobody</option>
+                      {members.map((member) => (
+                        <option key={member.user.id} value={member.user.id}>
+                          {member.user.email}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
 
                 <section>
