@@ -279,6 +279,7 @@ function ProjectRouteComponent(): React.JSX.Element {
 
   return (
     <ProjectPage
+      projectId={project.id}
       projectName={project.name}
       projectPrefix={project.prefix}
       columns={currentColumns}

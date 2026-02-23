@@ -33,6 +33,7 @@ Current implementation includes:
 - Create organization/project dialogs from top-nav controls
 - Board-first kanban layout with drag-and-drop ticket movement between columns
 - Per-column `+` actions with inline composer to add cards directly from the board
+- Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
 
 ## Scripts
 

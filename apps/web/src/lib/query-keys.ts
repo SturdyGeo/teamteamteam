@@ -27,6 +27,7 @@ export const queryKeys = {
     all: ["projects"] as const,
     detail: (projectId: string) => [...queryKeys.projects.all, "detail", projectId] as const,
     ticket: (ticketId: string) => [...queryKeys.projects.all, "ticket", ticketId] as const,
+    activity: (ticketId: string) => [...queryKeys.projects.all, "activity", ticketId] as const,
     columns: (projectId: string) => [...queryKeys.projects.all, projectId, "columns"] as const,
     tags: (projectId: string) => [...queryKeys.projects.all, projectId, "tags"] as const,
     tickets: (projectId: string, params?: TicketQueryParams) =>
