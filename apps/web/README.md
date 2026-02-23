@@ -42,6 +42,7 @@ Current implementation includes:
 - Pressing Enter in ticket title now submits "Save changes"
 - Save/Close/Reopen actions are color-coded for clearer intent
 - Primary action buttons now use a consistent green treatment across auth, create, and save/add flows
+- Color styling is tokenized through global CSS variables (`styles.css`) across routes/components
 - Ticket modal activity feed is hidden by default behind a "Review activity" drawer toggle
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
 - Ticket modal assignee uses a dropdown selector

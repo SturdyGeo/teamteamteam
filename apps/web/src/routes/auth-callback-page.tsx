@@ -38,10 +38,10 @@ export function AuthCallbackPage(): React.JSX.Element {
   }, [navigate]);
 
   return (
-    <div className="w-full max-w-[560px] rounded-lg border border-zinc-800 bg-zinc-900/95 p-8 text-zinc-200 shadow-[0_24px_90px_-50px_rgba(0,0,0,1)] md:p-10">
-      <h1 className="font-mono text-xl font-semibold text-white">Auth callback</h1>
-      <p className="mt-2 font-mono text-sm text-zinc-300">{status}</p>
-      <p className="mt-4 text-sm text-zinc-500">
+    <div className="w-full max-w-[560px] rounded-lg border border-border bg-card p-8 text-card-foreground shadow-[0_24px_90px_-50px_hsl(var(--background))] md:p-10">
+      <h1 className="font-mono text-xl font-semibold text-foreground">Auth callback</h1>
+      <p className="mt-2 font-mono text-sm text-foreground">{status}</p>
+      <p className="mt-4 text-sm text-muted-foreground">
         If this page stalls, return to login and use OTP passcode sign-in.
       </p>
     </div>

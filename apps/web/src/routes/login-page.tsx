@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
 
 const PRIMARY_BUTTON_CLASS =
-  "border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80";
+  "border border-primary bg-primary text-primary-foreground hover:bg-primary/90";
 
 export function LoginPage(): React.JSX.Element {
   const navigate = useNavigate();
@@ -66,21 +66,21 @@ export function LoginPage(): React.JSX.Element {
   }
 
   return (
-    <div className="w-full max-w-[560px] rounded-lg border border-zinc-800 bg-zinc-900/95 p-8 text-zinc-200 shadow-[0_24px_90px_-50px_rgba(0,0,0,1)] md:p-10">
+    <div className="w-full max-w-[560px] rounded-lg border border-border bg-card p-8 text-card-foreground shadow-[0_24px_90px_-50px_hsl(var(--background))] md:p-10">
       <div className="mb-6 text-center">
         <img
           src={bossLogo}
           alt="Teamteamteam logo"
           className="mx-auto mb-4 h-24 w-24 rounded-lg object-contain"
         />
-        <h1 className="text-[22px] font-semibold text-white">Teamteamteam</h1>
-        <p className="mt-1 text-sm text-zinc-400">Terminal-first Kanban</p>
+        <h1 className="text-[22px] font-semibold text-foreground">Teamteamteam</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Terminal-first Kanban</p>
       </div>
 
       <form onSubmit={handleVerifyOtp} className="space-y-6 font-mono">
         {!otpRequested ? (
           <div className="space-y-3">
-            <p className="text-sm text-zinc-300">Login requested for:</p>
+            <p className="text-sm text-muted-foreground">Login requested for:</p>
             <Label htmlFor="email" className="sr-only">
               Email
             </Label>
@@ -91,16 +91,16 @@ export function LoginPage(): React.JSX.Element {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@company.com"
               required
-              className="h-11 rounded-md border-zinc-700 bg-zinc-950 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-zinc-500"
+              className="h-11 rounded-md border-input bg-background text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-ring"
             />
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-zinc-300">Login requested for:</p>
-            <p className="break-all text-base font-semibold text-white">{email}</p>
+            <p className="text-sm text-muted-foreground">Login requested for:</p>
+            <p className="break-all text-base font-semibold text-foreground">{email}</p>
 
-            <p className="text-sm text-zinc-300">Your one-time login code:</p>
-            <div className="rounded-md border border-zinc-700 bg-zinc-950 p-4 text-center">
+            <p className="text-sm text-muted-foreground">Your one-time login code:</p>
+            <div className="rounded-md border border-input bg-background p-4 text-center">
               <Label htmlFor="otp-code" className="sr-only">
                 One-time passcode
               </Label>
@@ -113,17 +113,17 @@ export function LoginPage(): React.JSX.Element {
                 required
                 autoComplete="one-time-code"
                 inputMode="numeric"
-                className="h-auto border-none bg-transparent px-0 text-center text-3xl font-semibold tracking-[0.45em] text-white shadow-none outline-none placeholder:text-zinc-500 focus-visible:ring-0"
+                className="h-auto border-none bg-transparent px-0 text-center text-3xl font-semibold tracking-[0.45em] text-foreground shadow-none outline-none placeholder:text-muted-foreground focus-visible:ring-0"
               />
             </div>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               This code expires shortly and can only be used once.
             </p>
           </div>
         )}
 
-        {message ? <p className="text-sm text-zinc-400">{message}</p> : null}
-        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+        {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
         <div className="space-y-2">
           {!otpRequested ? (
@@ -148,7 +148,7 @@ export function LoginPage(): React.JSX.Element {
                 disabled={sendingOtp}
                 type="button"
                 variant="outline"
-                className="h-11 w-full rounded-md border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800/70"
+                className="h-11 w-full rounded-md border-border bg-transparent text-foreground hover:bg-accent"
                 onClick={() => void handleSendOtp()}
               >
                 {sendingOtp ? "Resending..." : "Resend passcode"}
@@ -156,7 +156,7 @@ export function LoginPage(): React.JSX.Element {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-10 w-full rounded-md text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-100"
+                className="h-10 w-full rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
                 onClick={() => {
                   setOtpRequested(false);
                   setOtpCode("");
@@ -171,8 +171,8 @@ export function LoginPage(): React.JSX.Element {
         </div>
       </form>
 
-      <hr className="my-7 border-zinc-800" />
-      <p className="font-mono text-xs text-zinc-500">
+      <hr className="my-7 border-border" />
+      <p className="font-mono text-xs text-muted-foreground">
         CLI:
         <br />
         ttteam login {email || "you@company.com"}

@@ -501,8 +501,8 @@ export function ProjectPage({
     <>
       <div className="space-y-4">
         <div className="px-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{projectName}</h1>
-          <p className="font-mono text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{projectName}</h1>
+          <p className="font-mono text-sm text-muted-foreground">
             {projectPrefix} · {totalTickets} tickets
             {isMovePending ? " · saving move..." : ""}
             {isCreatePending ? " · adding card..." : ""}
@@ -514,7 +514,7 @@ export function ProjectPage({
             title="Board failed to load"
             description={boardErrorMessage}
             tone="destructive"
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+            className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
           />
         ) : null}
 
@@ -523,7 +523,7 @@ export function ProjectPage({
             title="Move failed"
             description={moveError}
             tone="destructive"
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+            className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
           />
         ) : null}
 
@@ -532,7 +532,7 @@ export function ProjectPage({
             title="Assign failed"
             description={assignError}
             tone="destructive"
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+            className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
           />
         ) : null}
 
@@ -540,7 +540,7 @@ export function ProjectPage({
           <StateCard
             title="Loading board"
             description="Loading columns and tickets..."
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+            className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
           />
         ) : null}
 
@@ -548,7 +548,7 @@ export function ProjectPage({
           <StateCard
             title="No workflow columns"
             description="Create project columns from the CLI/API first."
-            className="rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100"
+            className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
           />
         ) : null}
 
@@ -560,10 +560,10 @@ export function ProjectPage({
                 <section
                   key={column.id}
                   className={cn(
-                    "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-zinc-700 bg-zinc-900/95 p-3 shadow-[0_24px_60px_-42px_rgba(0,0,0,1)] backdrop-blur",
-                    draggingTicketId ? "ring-1 ring-zinc-500/80" : "",
+                    "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-border bg-card/95 p-3 shadow-[0_24px_60px_-42px_hsl(var(--background))] backdrop-blur",
+                    draggingTicketId ? "ring-1 ring-border/80" : "",
                     dropTargetColumnId === column.id
-                      ? "border-sky-500/80 bg-sky-950/30 ring-2 ring-sky-400/90"
+                      ? "border-primary/80 bg-primary/15 ring-2 ring-primary/80"
                       : "",
                   )}
                   onDragOver={(event) => {
@@ -578,15 +578,15 @@ export function ProjectPage({
                   }}
                 >
                   <header className="mb-3 flex items-center justify-between px-1">
-                    <h2 className="text-sm font-semibold text-zinc-100">{column.name}</h2>
+                    <h2 className="text-sm font-semibold text-foreground">{column.name}</h2>
                     <div className="flex items-center gap-2">
-                      <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
+                      <Badge className="rounded-full border border-border bg-background text-foreground hover:bg-background">
                         {columnTickets.length}
                       </Badge>
                       <button
                         type="button"
                         onClick={() => openCreateModal(column.id)}
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 text-sm leading-none text-zinc-200 transition hover:bg-zinc-800"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-sm leading-none text-foreground transition hover:bg-accent"
                         aria-label={`Add card in ${column.name}`}
                       >
                         +
@@ -596,7 +596,7 @@ export function ProjectPage({
 
                   <div className="space-y-3">
                     {columnTickets.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/70 p-4 text-center text-xs text-zinc-500">
+                      <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-center text-xs text-muted-foreground">
                         Drop a ticket here
                       </div>
                     ) : (
@@ -625,15 +625,15 @@ export function ProjectPage({
                               setDraggingTicketId(null);
                             }}
                             className={cn(
-                              "cursor-grab rounded-2xl border border-zinc-700 bg-zinc-950 p-3 text-zinc-100 shadow-[0_12px_35px_-26px_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:bg-zinc-900 active:cursor-grabbing",
+                              "cursor-grab rounded-2xl border border-border bg-background p-3 text-foreground shadow-[0_12px_35px_-26px_hsl(var(--background))] transition hover:-translate-y-0.5 hover:bg-card active:cursor-grabbing",
                               draggingTicketId === ticket.id ? "opacity-60" : "",
                             )}
                           >
                             <div className="mb-2 flex items-center justify-between gap-2">
-                              <span className="font-mono text-[11px] text-zinc-500">
+                              <span className="font-mono text-[11px] text-muted-foreground">
                                 {projectPrefix}-{ticket.number}
                               </span>
-                              <span className="text-[11px] text-zinc-500">
+                              <span className="text-[11px] text-muted-foreground">
                                 {formatUpdatedAt(ticket.updated_at)}
                               </span>
                             </div>
@@ -642,7 +642,7 @@ export function ProjectPage({
 
                             <div className="flex flex-wrap gap-1.5">
                               {priority ? (
-                                <Badge className="rounded-full border border-rose-700 bg-rose-900/80 px-2.5 text-rose-200 hover:bg-rose-900/80">
+                                <Badge className="rounded-full border border-destructive/60 bg-destructive/20 px-2.5 text-destructive hover:bg-destructive/20">
                                   {priority}
                                 </Badge>
                               ) : null}
@@ -650,7 +650,7 @@ export function ProjectPage({
                                 <button
                                   type="button"
                                   data-assignee-trigger
-                                  className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 py-0.5 text-xs text-zinc-300 hover:bg-zinc-800"
+                                  className="rounded-full border border-border bg-card px-2.5 py-0.5 text-xs text-foreground hover:bg-accent"
                                   onMouseDown={(event) => event.stopPropagation()}
                                   onClick={(event) => {
                                     event.stopPropagation();
@@ -669,7 +669,7 @@ export function ProjectPage({
                                 {assigneeMenuTicketId === ticket.id ? (
                                   <div
                                     data-assignee-menu
-                                    className="absolute left-0 top-7 z-30 w-52 rounded-xl border border-zinc-700 bg-zinc-900 p-1.5 shadow-xl"
+                                    className="absolute left-0 top-7 z-30 w-52 rounded-xl border border-border bg-card p-1.5 shadow-xl"
                                     onMouseDown={(event) => event.stopPropagation()}
                                     onClick={(event) => event.stopPropagation()}
                                   >
@@ -677,11 +677,11 @@ export function ProjectPage({
                                       value={assigneeMenuSearch}
                                       onChange={(event) => setAssigneeMenuSearch(event.target.value)}
                                       placeholder="Search assignee..."
-                                      className="mb-1 h-8 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 text-xs text-zinc-200 outline-none focus:border-zinc-500"
+                                      className="mb-1 h-8 w-full rounded-lg border border-border bg-background px-2.5 text-xs text-foreground outline-none focus:border-ring"
                                     />
                                     <button
                                       type="button"
-                                      className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                                      className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
                                       onClick={() => void handleQuickAssign(ticket.id, null)}
                                     >
                                       Nobody
@@ -690,14 +690,14 @@ export function ProjectPage({
                                       <button
                                         key={member.user.id}
                                         type="button"
-                                        className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                                        className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
                                         onClick={() => void handleQuickAssign(ticket.id, member.user.id)}
                                       >
                                         {member.user.email}
                                       </button>
                                     ))}
                                     {quickAssignMembers.length === 0 ? (
-                                      <p className="px-2.5 py-1.5 text-xs text-zinc-500">No matching members</p>
+                                      <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No matching members</p>
                                     ) : null}
                                   </div>
                                 ) : null}
@@ -705,7 +705,7 @@ export function ProjectPage({
                               {ticket.tags.slice(0, 2).map((item) => (
                                 <Badge
                                   key={item}
-                                  className="rounded-full border border-amber-700 bg-amber-900/80 px-2.5 text-amber-200 hover:bg-amber-900/80"
+                                  className="rounded-full border border-secondary bg-secondary/70 px-2.5 text-secondary-foreground hover:bg-secondary/70"
                                 >
                                   {item}
                                 </Badge>
@@ -725,16 +725,16 @@ export function ProjectPage({
 
       {isModalOpen ? (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 grid place-items-center bg-background/75 p-4 backdrop-blur-sm"
           onClick={closeModal}
         >
           <section
-            className="w-full max-w-3xl rounded-2xl border border-zinc-700 bg-zinc-900 p-5 text-zinc-100 shadow-2xl"
+            className="w-full max-w-3xl rounded-2xl border border-border bg-card p-5 text-foreground shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <header className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <p className="font-mono text-xs text-zinc-500">
+                <p className="font-mono text-xs text-muted-foreground">
                   {isCreateModal
                     ? `New card${createModalColumn ? ` · ${createModalColumn.name}` : ""}`
                     : (selectedTicket ? `${projectPrefix}-${selectedTicket.number}` : "Ticket")}
@@ -746,54 +746,54 @@ export function ProjectPage({
               <button
                 type="button"
                 onClick={closeModal}
-                className="rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1 text-sm text-zinc-300 hover:bg-zinc-800"
+                className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground hover:bg-accent"
               >
                 Close
               </button>
             </header>
 
             {!isCreateModal && ticketDetailQuery.isPending ? (
-              <p className="text-sm text-zinc-500">Loading full ticket...</p>
+              <p className="text-sm text-muted-foreground">Loading full ticket...</p>
             ) : null}
 
             {isCreateModal ? (
               <form onSubmit={(event) => void handleCreateCard(event)} className="space-y-4">
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
                   <input
                     value={newCardTitle}
                     onChange={(event) => setNewCardTitle(event.target.value)}
                     placeholder="What needs to be done?"
                     autoFocus
-                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
                   />
                 </section>
 
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Description</h3>
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Description</h3>
                   <textarea
                     value={newCardDescription}
                     onChange={(event) => setNewCardDescription(event.target.value)}
                     placeholder="Add details..."
-                    className="min-h-28 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    className="min-h-28 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
                   />
                 </section>
 
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Tags</h3>
                   <input
                     value={newCardTags}
                     onChange={(event) => setNewCardTags(event.target.value)}
                     placeholder="bug, urgent, backend"
-                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
                   />
                 </section>
 
-                <label className="block space-y-1 text-xs text-zinc-400">
+                <label className="block space-y-1 text-xs text-muted-foreground">
                   Column
                   <select
                     value={createModalColumnId ?? ""}
-                    className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                    className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                     onChange={(event) => setCreateModalColumnId(event.target.value)}
                     disabled={modalBusy}
                   >
@@ -808,7 +808,7 @@ export function ProjectPage({
                   <button
                     type="submit"
                     disabled={modalBusy}
-                    className="h-9 w-full rounded-md border border-emerald-700 bg-emerald-900/70 text-sm text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
+                    className="h-9 w-full rounded-md border border-primary bg-primary text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     {isCreatePending ? "Adding..." : "Add card"}
                   </button>
@@ -822,31 +822,31 @@ export function ProjectPage({
                 }}
               >
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
                   <input
                     value={editTitle}
                     onChange={(event) => setEditTitle(event.target.value)}
                     placeholder="Ticket title"
-                    className="h-10 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
                   />
                 </section>
 
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Description</h3>
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Description</h3>
                   <textarea
                     value={editDescription}
                     onChange={(event) => setEditDescription(event.target.value)}
                     placeholder="Add details..."
-                    className="min-h-28 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    className="min-h-28 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
                   />
                 </section>
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <label className="block space-y-1 text-xs text-zinc-400">
+                  <label className="block space-y-1 text-xs text-muted-foreground">
                     Status column
                     <select
                       value={selectedTicket.status_column_id}
-                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                      className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                       onChange={(event) => void handleModalMove(event.target.value)}
                       disabled={modalBusy}
                     >
@@ -858,11 +858,11 @@ export function ProjectPage({
                     </select>
                   </label>
 
-                  <label className="block space-y-1 text-xs text-zinc-400">
+                  <label className="block space-y-1 text-xs text-muted-foreground">
                     Assignee
                     <select
                       value={selectedTicket.assignee_id ?? "unassigned"}
-                      className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 text-sm text-zinc-100 outline-none"
+                      className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                       onChange={(event) => {
                         const value = event.target.value;
                         void handleAssign(value === "unassigned" ? null : value);
@@ -880,17 +880,17 @@ export function ProjectPage({
                 </div>
 
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-zinc-300">Tags</h3>
-                  <div className="rounded-lg border border-zinc-700 bg-zinc-950 p-3">
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">Tags</h3>
+                  <div className="rounded-lg border border-border bg-background p-3">
                     <div className="mb-3 flex flex-wrap gap-2">
                       {selectedTicket.tags.length === 0 ? (
-                        <p className="text-xs text-zinc-500">No tags</p>
+                        <p className="text-xs text-muted-foreground">No tags</p>
                       ) : (
                         selectedTicket.tags.map((tag) => (
                           <button
                             key={tag}
                             type="button"
-                            className="rounded-full border border-amber-700 bg-amber-900/80 px-2.5 py-0.5 text-xs text-amber-200 hover:bg-amber-800"
+                            className="rounded-full border border-secondary bg-secondary/70 px-2.5 py-0.5 text-xs text-secondary-foreground hover:bg-secondary/80"
                             onClick={() => void handleRemoveTag(tag)}
                             disabled={modalBusy}
                           >
@@ -904,12 +904,12 @@ export function ProjectPage({
                         value={newTagInput}
                         onChange={(event) => setNewTagInput(event.target.value)}
                         placeholder="add tag"
-                        className="h-8 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-zinc-100 outline-none focus:border-zinc-500"
+                        className="h-8 flex-1 rounded-md border border-border bg-card px-2 text-xs text-foreground outline-none focus:border-ring"
                       />
                       <button
                         type="submit"
                         disabled={modalBusy}
-                        className="rounded-md border border-emerald-700 bg-emerald-900/70 px-2.5 text-xs text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
+                        className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         Add
                       </button>
@@ -920,7 +920,7 @@ export function ProjectPage({
                 <section>
                   <button
                     type="button"
-                    className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200 hover:bg-zinc-800"
+                    className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-foreground hover:bg-accent"
                     onClick={() => setIsActivityOpen((current) => !current)}
                     aria-expanded={isActivityOpen}
                   >
@@ -928,23 +928,23 @@ export function ProjectPage({
                     <span aria-hidden>{isActivityOpen ? "▴" : "▾"}</span>
                   </button>
                   {isActivityOpen ? (
-                    <div className="mt-2 max-h-52 overflow-auto rounded-lg border border-zinc-700 bg-zinc-950 p-3">
+                    <div className="mt-2 max-h-52 overflow-auto rounded-lg border border-border bg-background p-3">
                       {ticketActivityQuery.isPending ? (
-                        <p className="text-xs text-zinc-500">Loading activity...</p>
+                        <p className="text-xs text-muted-foreground">Loading activity...</p>
                       ) : ticketActivityQuery.data && ticketActivityQuery.data.length > 0 ? (
                         <div className="space-y-2">
                           {ticketActivityQuery.data.map((event) => (
-                            <article key={event.id} className="text-xs text-zinc-300">
+                            <article key={event.id} className="text-xs text-foreground">
                               <p>
-                                <span className="text-zinc-400">{event.actor.email}</span>{" "}
+                                <span className="text-muted-foreground">{event.actor.email}</span>{" "}
                                 {formatActivityText(event, assigneeById)}
                               </p>
-                              <p className="text-zinc-500">{formatUpdatedAt(event.created_at)}</p>
+                              <p className="text-muted-foreground">{formatUpdatedAt(event.created_at)}</p>
                             </article>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-xs text-zinc-500">No activity yet.</p>
+                        <p className="text-xs text-muted-foreground">No activity yet.</p>
                       )}
                     </div>
                   ) : null}
@@ -954,7 +954,7 @@ export function ProjectPage({
                   <button
                     type="submit"
                     disabled={modalBusy}
-                    className="h-9 rounded-md border border-emerald-700 bg-emerald-900/70 px-3 text-sm text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
+                    className="h-9 rounded-md border border-primary bg-primary px-3 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     {updateMutation.isPending ? "Saving..." : "Save changes"}
                   </button>
@@ -965,22 +965,22 @@ export function ProjectPage({
                     className={cn(
                       "h-9 rounded-md border px-3 text-sm disabled:opacity-50",
                       selectedTicket.closed_at
-                        ? "border-sky-700 bg-sky-900/70 text-sky-100 hover:bg-sky-800/80"
-                        : "border-rose-700 bg-rose-900/70 text-rose-100 hover:bg-rose-800/80",
+                        ? "border-primary/60 bg-primary/20 text-primary hover:bg-primary/30"
+                        : "border-destructive/60 bg-destructive/20 text-destructive hover:bg-destructive/30",
                     )}
                   >
                     {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
                   </button>
                 </div>
 
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-muted-foreground">
                   <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
                   {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
                 </div>
               </form>
             ) : null}
 
-            {modalError ? <p className="mt-3 text-sm text-rose-400">{modalError}</p> : null}
+            {modalError ? <p className="mt-3 text-sm text-destructive">{modalError}</p> : null}
           </section>
         </div>
       ) : null}

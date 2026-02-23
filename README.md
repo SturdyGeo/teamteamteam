@@ -258,6 +258,7 @@ Phase 4 data layer is implemented:
 - Canonical query key strategy for org/project/ticket scopes
 - Feature query modules/hooks wrapping shared `@teamteamteam/api-client`
 - Cache policy tuning (feature stale times, retry behavior, reconnect refetch)
+- Web visual theming uses global CSS design tokens (no hardcoded route/component color literals)
 - Dev-only telemetry hooks for query/mutation error events
 - Ticket detail modal now supports persisted inline editing for title + description
 - Ticket activity is collapsed by default behind a "Review activity" toggle

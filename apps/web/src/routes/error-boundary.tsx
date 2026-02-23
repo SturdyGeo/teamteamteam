@@ -19,29 +19,29 @@ function toErrorMessage(error: unknown): string {
 
 export function RouteErrorBoundary({ error, reset }: ErrorComponentProps): React.JSX.Element {
   return (
-    <Card className="mx-auto max-w-2xl rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100 shadow-[0_24px_70px_-40px_rgba(0,0,0,1)] backdrop-blur">
+    <Card className="mx-auto max-w-2xl rounded-[1.75rem] border-border bg-card/95 text-card-foreground shadow-[0_24px_70px_-40px_hsl(var(--background))] backdrop-blur">
       <CardHeader>
-        <CardTitle className="text-zinc-100">Something went wrong</CardTitle>
-        <CardDescription className="text-zinc-400">
+        <CardTitle className="text-foreground">Something went wrong</CardTitle>
+        <CardDescription className="text-muted-foreground">
           The route failed to load. You can retry or navigate back to organizations.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <pre className="overflow-auto rounded-xl border border-zinc-700 bg-zinc-950 p-3 font-mono text-xs text-rose-200">
+        <pre className="overflow-auto rounded-xl border border-border bg-background p-3 font-mono text-xs text-destructive">
           {toErrorMessage(error)}
         </pre>
       </CardContent>
       <CardFooter className="gap-2">
         <Button
           variant="outline"
-          className="rounded-full border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800"
+          className="rounded-full border-border bg-transparent text-foreground hover:bg-accent"
           onClick={reset}
         >
           Retry
         </Button>
         <Button
           asChild
-          className="rounded-full border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80"
+          className="rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Link to="/orgs">Go to orgs</Link>
         </Button>
@@ -52,17 +52,17 @@ export function RouteErrorBoundary({ error, reset }: ErrorComponentProps): React
 
 export function NotFoundPage(): React.JSX.Element {
   return (
-    <Card className="mx-auto max-w-xl rounded-[1.75rem] border-zinc-700 bg-zinc-900/95 text-zinc-100 shadow-[0_24px_70px_-40px_rgba(0,0,0,1)] backdrop-blur">
+    <Card className="mx-auto max-w-xl rounded-[1.75rem] border-border bg-card/95 text-card-foreground shadow-[0_24px_70px_-40px_hsl(var(--background))] backdrop-blur">
       <CardHeader>
-        <CardTitle className="text-zinc-100">Page not found</CardTitle>
-        <CardDescription className="text-zinc-400">
+        <CardTitle className="text-foreground">Page not found</CardTitle>
+        <CardDescription className="text-muted-foreground">
           The route does not exist or is no longer accessible.
         </CardDescription>
       </CardHeader>
       <CardFooter>
         <Button
           asChild
-          className="rounded-full border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80"
+          className="rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Link to="/orgs">Go to orgs</Link>
         </Button>
