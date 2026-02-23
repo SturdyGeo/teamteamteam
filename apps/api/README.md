@@ -113,6 +113,8 @@ Common error codes:
 
 The API deploys as a Supabase Edge Function. See the root [README.md](../../README.md) for deployment instructions.
 
+The Edge Function adapter normalizes both `/orgs/...` and `/api/orgs/...` runtime path shapes before handing requests to Hono. This prevents route/CORS mismatches when proxied through `functions/v1/api`.
+
 For local development:
 
 ```sh

@@ -16,19 +16,30 @@ interface RouteContext {
   projectId: string | null;
 }
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function toScopedId(value: string | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return UUID_REGEX.test(value) ? value : null;
+}
+
 function parseRouteContext(pathname: string): RouteContext {
   const projectMatch = pathname.match(/^\/orgs\/([^/]+)\/projects\/([^/]+)/);
   if (projectMatch) {
     return {
-      orgId: projectMatch[1],
-      projectId: projectMatch[2],
+      orgId: toScopedId(projectMatch[1]),
+      projectId: toScopedId(projectMatch[2]),
     };
   }
 
   const orgMatch = pathname.match(/^\/orgs\/([^/]+)/);
   if (orgMatch) {
     return {
-      orgId: orgMatch[1],
+      orgId: toScopedId(orgMatch[1]),
       projectId: null,
     };
   }
@@ -60,6 +71,15 @@ export function RootLayout(): React.JSX.Element {
     setPreferredOrgId(routeContext.orgId);
     setStoredOrgId(routeContext.orgId);
   }, [routeContext.orgId]);
+
+  useEffect(() => {
+    const malformedOrgScopedPath = pathname.startsWith("/orgs/") && !routeContext.orgId;
+    if (!malformedOrgScopedPath) {
+      return;
+    }
+
+    void navigate({ to: "/orgs", replace: true });
+  }, [navigate, pathname, routeContext.orgId]);
 
   useEffect(() => {
     if (!routeContext.projectId) {

@@ -287,6 +287,8 @@ curl https://<project-ref>.supabase.co/functions/v1/api/health
 
 Set `TEAMTEAMTEAM_API_URL` in Doppler to your deployed Edge Function URL (e.g. `https://<project-ref>.supabase.co/functions/v1/api`).
 
+The Edge adapter normalizes both `/orgs/...` and `/api/orgs/...` runtime path shapes before requests hit Hono routes. If web requests start failing with browser CORS preflight errors, rebuild and redeploy the function so the latest adapter is live.
+
 **Local Edge Function serving** (optional, requires Docker):
 
 ```sh

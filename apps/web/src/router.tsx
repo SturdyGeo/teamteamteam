@@ -58,6 +58,12 @@ interface ProjectUrlState {
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isUuid(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   const parsed = Number(value);
@@ -265,20 +271,26 @@ function OrgsRouteComponent(): React.JSX.Element {
 }
 
 const orgRoute = createRoute({
-  getParentRoute: () => orgsRoute,
-  path: "$orgId",
-  beforeLoad: requireSession,
+  getParentRoute: () => rootRoute,
+  path: "/orgs/$orgId",
+  beforeLoad: async ({ params }) => {
+    await requireSession();
+    if (!isUuid(params.orgId)) {
+      throw redirect({ to: "/orgs" });
+    }
+  },
   loader: async ({ context, params }) => {
-    const [orgs, projects, members] = await Promise.all([
-      context.queryClient.ensureQueryData(orgsQueryOptions()),
-      context.queryClient.ensureQueryData(orgProjectsQueryOptions(params.orgId)),
-      context.queryClient.ensureQueryData(orgMembersQueryOptions(params.orgId)),
-    ]);
+    const orgs = await context.queryClient.ensureQueryData(orgsQueryOptions());
 
     const org = orgs.find((item) => item.id === params.orgId);
     if (!org) {
       throw redirect({ to: "/orgs" });
     }
+
+    const [projects, members] = await Promise.all([
+      context.queryClient.ensureQueryData(orgProjectsQueryOptions(params.orgId)),
+      context.queryClient.ensureQueryData(orgMembersQueryOptions(params.orgId)),
+    ]);
 
     return {
       org,
@@ -309,10 +321,21 @@ function OrgRouteComponent(): React.JSX.Element {
 }
 
 const projectRoute = createRoute({
-  getParentRoute: () => orgRoute,
-  path: "projects/$projectId",
-  beforeLoad: requireSession,
+  getParentRoute: () => rootRoute,
+  path: "/orgs/$orgId/projects/$projectId",
+  beforeLoad: async ({ params }) => {
+    await requireSession();
+    if (!isUuid(params.orgId) || !isUuid(params.projectId)) {
+      throw redirect({ to: "/orgs" });
+    }
+  },
   loader: async ({ context, params }) => {
+    const orgs = await context.queryClient.ensureQueryData(orgsQueryOptions());
+    const org = orgs.find((item) => item.id === params.orgId);
+    if (!org) {
+      throw redirect({ to: "/orgs" });
+    }
+
     const [projects, columns, tickets, tags, members] = await Promise.all([
       context.queryClient.ensureQueryData(orgProjectsQueryOptions(params.orgId)),
       context.queryClient.ensureQueryData(projectColumnsQueryOptions(params.projectId)),
@@ -323,7 +346,10 @@ const projectRoute = createRoute({
 
     const project = projects.find((item) => item.id === params.projectId);
     if (!project) {
-      throw new Error("Project not found for this organization.");
+      throw redirect({
+        to: "/orgs/$orgId",
+        params: { orgId: params.orgId },
+      });
     }
 
     return {
@@ -473,14 +499,13 @@ function ProjectRouteComponent(): React.JSX.Element {
   );
 }
 
-const orgRouteTree = orgRoute.addChildren([projectRoute]);
-const orgsRouteTree = orgsRoute.addChildren([orgRouteTree]);
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   authCallbackRoute,
-  orgsRouteTree,
+  orgsRoute,
+  orgRoute,
+  projectRoute,
 ]);
 
 export const router = createRouter({
