@@ -38,6 +38,8 @@ Current implementation includes:
 - Per-column `+` actions open the shared ticket modal in create mode
 - Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
 - Ticket modal title + description are editable text inputs with persisted save
+- Pressing Enter in ticket title now submits "Save changes"
+- Save/Close/Reopen actions are color-coded for clearer intent
 - Ticket modal activity feed is hidden by default behind a "Review activity" drawer toggle
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
 - Ticket modal assignee uses a dropdown selector

@@ -813,7 +813,13 @@ export function ProjectPage({
                 </button>
               </form>
             ) : selectedTicket ? (
-              <div className="space-y-4">
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void handleSaveDetails();
+                }}
+              >
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-zinc-300">Title</h3>
                   <input
@@ -945,10 +951,9 @@ export function ProjectPage({
 
                 <div className="flex flex-wrap gap-2">
                   <button
-                    type="button"
+                    type="submit"
                     disabled={modalBusy}
-                    onClick={() => void handleSaveDetails()}
-                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                    className="h-9 rounded-md border border-emerald-700 bg-emerald-900/70 px-3 text-sm text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
                   >
                     {updateMutation.isPending ? "Saving..." : "Save changes"}
                   </button>
@@ -956,7 +961,12 @@ export function ProjectPage({
                     type="button"
                     disabled={modalBusy}
                     onClick={() => void handleCloseOrReopen()}
-                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                    className={cn(
+                      "h-9 rounded-md border px-3 text-sm disabled:opacity-50",
+                      selectedTicket.closed_at
+                        ? "border-sky-700 bg-sky-900/70 text-sky-100 hover:bg-sky-800/80"
+                        : "border-rose-700 bg-rose-900/70 text-rose-100 hover:bg-rose-800/80",
+                    )}
                   >
                     {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
                   </button>
@@ -966,7 +976,7 @@ export function ProjectPage({
                   <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
                   {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
                 </div>
-              </div>
+              </form>
             ) : null}
 
             {modalError ? <p className="mt-3 text-sm text-rose-400">{modalError}</p> : null}
