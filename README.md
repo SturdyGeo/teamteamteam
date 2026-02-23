@@ -284,6 +284,7 @@ Phase 5 board experience is implemented:
 Web board UX refresh is implemented:
 
 - Compact rounded top navigation capsule with org/project selectors and profile menu
+- Boss logo in top nav is non-draggable and remains click-only
 - Custom org/project dropdown menus with inline "add" actions
 - Create org/project dialogs launched directly from nav controls
 - Board-first project view with horizontal kanban columns

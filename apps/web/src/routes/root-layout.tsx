@@ -386,6 +386,7 @@ export function RootLayout(): React.JSX.Element {
             <img
               src={bossLogo}
               alt="Boss logo"
+              draggable={false}
               className={`h-9 w-9 object-cover ${isLogoSpinning ? "animate-boss-logo-jump-spin" : ""}`}
               onAnimationEnd={() => setIsLogoSpinning(false)}
             />
