@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +59,22 @@ function toMessage(error: unknown): string {
   }
 
   return "Request failed.";
+}
+
+function toTicketUpdateMessage(error: unknown): string {
+  if (error instanceof ApiError && error.statusCode === 404) {
+    return "Ticket edit endpoint not found on deployed API. Run `doppler run -- bun run build:edge` and `doppler run -- supabase functions deploy api`.";
+  }
+
+  if (
+    error instanceof ApiError &&
+    error.code === "DB_ERROR" &&
+    error.message.toLowerCase().includes("activity_event_type")
+  ) {
+    return "Database is missing the `ticket_updated` activity migration. Run `doppler run -- supabase db push`.";
+  }
+
+  return toMessage(error);
 }
 
 function formatActivityText(
@@ -363,7 +380,7 @@ export function ProjectPage({
       });
       await ticketDetailQuery.refetch();
     } catch (error) {
-      setModalError(toMessage(error));
+      setModalError(toTicketUpdateMessage(error));
     }
   }
 

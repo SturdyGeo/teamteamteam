@@ -261,6 +261,7 @@ Phase 4 data layer is implemented:
 - Ticket detail modal now supports persisted inline editing for title + description
 - Ticket activity is collapsed by default behind a "Review activity" toggle
 - Assignee pickers are searchable in both quick-card assign and ticket modal
+- Ticket detail save requires the latest Edge Function deployment and DB migrations (`build:edge`, `functions deploy api`, `supabase db push`)
 
 Phase 5 board experience is implemented:
 
