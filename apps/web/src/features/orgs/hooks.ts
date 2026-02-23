@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { CreateOrgInput, CreateProjectInput } from "@teamteamteam/api-client/web";
+import type {
+  CreateOrgInput,
+  CreateProjectInput,
+  InviteMemberInput,
+} from "@teamteamteam/api-client/web";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import {
@@ -57,6 +61,27 @@ export function useCreateProjectMutation(orgId: string | null) {
       }
 
       await queryClient.invalidateQueries({ queryKey: queryKeys.orgs.projects(orgId) });
+    },
+  });
+}
+
+export function useInviteMemberMutation(orgId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: InviteMemberInput) => {
+      if (!orgId) {
+        throw new Error("Select an organization first.");
+      }
+
+      return apiClient.inviteMember(orgId, input);
+    },
+    onSuccess: async () => {
+      if (!orgId) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.orgs.members(orgId) });
     },
   });
 }

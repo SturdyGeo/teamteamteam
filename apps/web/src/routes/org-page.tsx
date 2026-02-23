@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { MemberWithUser } from "@teamteamteam/api-client";
 import type { Project } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useInviteMemberMutation } from "@/features/orgs/hooks";
 import {
   Card,
   CardContent,
@@ -18,7 +20,47 @@ interface OrgPageProps {
   members: MemberWithUser[];
 }
 
+type InviteRole = "member" | "admin";
+
+function toMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Request failed.";
+}
+
 export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): React.JSX.Element {
+  const inviteMutation = useInviteMemberMutation(orgId);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<InviteRole>("member");
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+
+  async function handleInvite(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    setInviteError(null);
+    setInviteMessage(null);
+
+    const email = inviteEmail.trim().toLowerCase();
+    if (!email) {
+      setInviteError("Email is required.");
+      return;
+    }
+
+    try {
+      await inviteMutation.mutateAsync({
+        email,
+        role: inviteRole,
+      });
+      setInviteMessage(`Invited ${email} as ${inviteRole}.`);
+      setInviteEmail("");
+      setInviteRole("member");
+    } catch (error) {
+      setInviteError(toMessage(error));
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -68,6 +110,49 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
             ))}
           </div>
         )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-foreground">Invite members</h2>
+        <Card className="border-border bg-card text-card-foreground">
+          <CardContent className="pt-6">
+            <form className="grid gap-3 md:grid-cols-[1fr_auto_auto]" onSubmit={(event) => void handleInvite(event)}>
+              <label className="space-y-1 text-sm text-muted-foreground" htmlFor="invite-email">
+                <span className="sr-only">Member email</span>
+                <input
+                  id="invite-email"
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(event) => setInviteEmail(event.target.value)}
+                  placeholder="teammate@company.com"
+                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
+                  required
+                />
+              </label>
+              <label className="space-y-1 text-sm text-muted-foreground">
+                <span className="sr-only">Role</span>
+                <select
+                  value={inviteRole}
+                  onChange={(event) => setInviteRole(event.target.value as InviteRole)}
+                  className="h-10 min-w-28 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
+                  disabled={inviteMutation.isPending}
+                >
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <Button
+                type="submit"
+                className="h-10 rounded-md border border-primary bg-primary px-4 text-primary-foreground hover:bg-primary/90"
+                disabled={inviteMutation.isPending}
+              >
+                {inviteMutation.isPending ? "Inviting..." : "Invite"}
+              </Button>
+            </form>
+            {inviteMessage ? <p className="mt-2 text-sm text-muted-foreground">{inviteMessage}</p> : null}
+            {inviteError ? <p className="mt-2 text-sm text-destructive">{inviteError}</p> : null}
+          </CardContent>
+        </Card>
       </section>
 
       <section className="space-y-3">
