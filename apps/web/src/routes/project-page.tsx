@@ -96,6 +96,7 @@ export function ProjectPage({
 }: ProjectPageProps): React.JSX.Element {
   const [boardTickets, setBoardTickets] = useState<Ticket[]>(tickets);
   const [draggingTicketId, setDraggingTicketId] = useState<string | null>(null);
+  const [dropTargetColumnId, setDropTargetColumnId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
   const [createModalColumnId, setCreateModalColumnId] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState("");
@@ -198,6 +199,7 @@ export function ProjectPage({
     const previous = boardTickets;
     const source = previous.find((ticket) => ticket.id === draggingTicketId);
     if (!source || source.status_column_id === targetColumnId) {
+      setDropTargetColumnId(null);
       setDraggingTicketId(null);
       return;
     }
@@ -220,6 +222,7 @@ export function ProjectPage({
       setBoardTickets(previous);
       setMoveError(toMessage(error));
     } finally {
+      setDropTargetColumnId(null);
       setDraggingTicketId(null);
     }
   }
@@ -419,8 +422,16 @@ export function ProjectPage({
                   className={cn(
                     "w-[19rem] shrink-0 snap-start rounded-[1.8rem] border border-zinc-700 bg-zinc-900/95 p-3 shadow-[0_24px_60px_-42px_rgba(0,0,0,1)] backdrop-blur",
                     draggingTicketId ? "ring-1 ring-zinc-500/80" : "",
+                    dropTargetColumnId === column.id
+                      ? "border-sky-500/80 bg-sky-950/30 ring-2 ring-sky-400/90"
+                      : "",
                   )}
-                  onDragOver={(event) => event.preventDefault()}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    if (draggingTicketId && dropTargetColumnId !== column.id) {
+                      setDropTargetColumnId(column.id);
+                    }
+                  }}
                   onDrop={(event) => {
                     event.preventDefault();
                     void handleDrop(column.id);
@@ -463,11 +474,13 @@ export function ProjectPage({
                             onClick={() => handleCardClick(ticket.id)}
                             onDragStart={(event) => {
                               setDraggingTicketId(ticket.id);
+                              setDropTargetColumnId(null);
                               event.dataTransfer.effectAllowed = "move";
                               event.dataTransfer.setData("text/plain", ticket.id);
                             }}
                             onDragEnd={() => {
                               lastDragAtRef.current = Date.now();
+                              setDropTargetColumnId(null);
                               setDraggingTicketId(null);
                             }}
                             className={cn(

@@ -32,6 +32,7 @@ Current implementation includes:
 - Custom nav dropdown menus for org/project switching + create actions
 - Create organization/project dialogs from top-nav controls
 - Board-first kanban layout with drag-and-drop ticket movement between columns
+- Visual drop-target highlight while dragging cards across columns
 - Per-column `+` actions open the shared ticket modal in create mode
 - Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
 
