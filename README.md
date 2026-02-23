@@ -239,6 +239,7 @@ The web client lives in `apps/web` and uses:
 - shadcn/ui
 - Supabase JS auth
 - Shared `@teamteamteam/api-client`
+- Shared shadcn route primitives for controls (`Button`, `Input`, `Select`, `Textarea`, `Label`)
 
 Phase 2 auth/shell is implemented:
 

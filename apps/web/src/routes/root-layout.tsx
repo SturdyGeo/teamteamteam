@@ -4,6 +4,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import bossLogo from "../../boss.png";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   useCreateOrgMutation,
   useCreateProjectMutation,
@@ -412,14 +414,16 @@ export function RootLayout(): React.JSX.Element {
             <>
               <div className="ml-auto flex items-center gap-2">
                 <div className="relative">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setOpenMenu((current) => (current === "org" ? null : "org"))}
                     className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-background px-3 font-mono text-xs text-foreground transition hover:bg-accent"
                   >
                     <span className="truncate max-w-40">{activeOrg?.name ?? "Select org"}</span>
                     <span>▾</span>
-                  </button>
+                  </Button>
 
                   {openMenu === "org" ? (
                     <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-border bg-card p-2 font-mono text-foreground shadow-xl">
@@ -428,18 +432,22 @@ export function RootLayout(): React.JSX.Element {
                       </p>
                       <div className="max-h-56 overflow-auto">
                         {orgs.map((org) => (
-                          <button
+                          <Button
                             key={org.id}
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => void selectOrg(org.id)}
                             className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
                           >
                             {org.name}
-                          </button>
+                          </Button>
                         ))}
                       </div>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
                         onClick={() => {
                           setOpenMenu(null);
                           setCreateOrgError(null);
@@ -448,14 +456,16 @@ export function RootLayout(): React.JSX.Element {
                         className="mt-1 w-full rounded-xl border border-dashed border-border px-3 py-2 text-left text-sm font-medium text-foreground hover:bg-accent"
                       >
                         + Add organization
-                      </button>
+                      </Button>
                     </div>
                   ) : null}
                 </div>
 
                 <div className="relative">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     disabled={!activeOrgId}
                     onClick={() =>
                       setOpenMenu((current) => (current === "project" ? null : "project"))
@@ -466,7 +476,7 @@ export function RootLayout(): React.JSX.Element {
                       {activeProject ? `${activeProject.prefix} · ${activeProject.name}` : "Select project"}
                     </span>
                     <span>▾</span>
-                  </button>
+                  </Button>
 
                   {openMenu === "project" ? (
                     <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-border bg-card p-2 font-mono text-foreground shadow-xl">
@@ -475,18 +485,22 @@ export function RootLayout(): React.JSX.Element {
                       </p>
                       <div className="max-h-56 overflow-auto">
                         {projects.map((project) => (
-                          <button
+                          <Button
                             key={project.id}
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => void selectProject(project.id)}
                             className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
                           >
                             {project.prefix} · {project.name}
-                          </button>
+                          </Button>
                         ))}
                       </div>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
                         onClick={() => {
                           setOpenMenu(null);
                           setCreateProjectError(null);
@@ -495,26 +509,30 @@ export function RootLayout(): React.JSX.Element {
                         className="mt-1 w-full rounded-xl border border-dashed border-border px-3 py-2 text-left text-sm font-medium text-foreground hover:bg-accent"
                       >
                         + Add project
-                      </button>
+                      </Button>
                     </div>
                   ) : null}
                 </div>
               </div>
 
               <div className="relative">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setOpenMenu((current) => (current === "profile" ? null : "profile"))}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,hsl(var(--primary))_0%,hsl(var(--secondary))_100%)] text-xs font-semibold text-primary-foreground"
                 >
                   {profileInitials(userEmail)}
-                </button>
+                </Button>
 
                 {openMenu === "profile" ? (
                   <div className="absolute right-0 z-50 mt-2 w-60 rounded-2xl border border-border bg-card p-2 font-mono text-foreground shadow-xl">
                     <p className="truncate px-2 py-1 text-xs text-muted-foreground">{userEmail}</p>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         setOpenMenu(null);
                         void navigate({ to: "/orgs" });
@@ -522,14 +540,16 @@ export function RootLayout(): React.JSX.Element {
                       className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
                     >
                       Organizations
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => void handleSignOut()}
                       className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
                     >
                       Sign out
-                    </button>
+                    </Button>
                   </div>
                 ) : null}
               </div>
@@ -551,12 +571,12 @@ export function RootLayout(): React.JSX.Element {
             <h2 className="text-lg font-semibold text-foreground">Create organization</h2>
             <p className="mt-1 text-sm text-muted-foreground">Add a new organization workspace.</p>
 
-            <label className="mt-4 block text-sm font-medium text-foreground" htmlFor="new-org-name">
+            <Label className="mt-4 block text-sm font-medium text-foreground" htmlFor="new-org-name">
               Name
-            </label>
-            <input
+            </Label>
+            <Input
               id="new-org-name"
-              className="mt-1 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
+              className="mt-1 h-10 w-full rounded-xl border-border bg-background text-sm text-foreground"
               value={newOrgName}
               onChange={(event) => setNewOrgName(event.target.value)}
               placeholder="Acme Engineering"
@@ -594,23 +614,23 @@ export function RootLayout(): React.JSX.Element {
             <h2 className="text-lg font-semibold text-foreground">Create project</h2>
             <p className="mt-1 text-sm text-muted-foreground">Projects are created under the selected org.</p>
 
-            <label className="mt-4 block text-sm font-medium text-foreground" htmlFor="new-project-name">
+            <Label className="mt-4 block text-sm font-medium text-foreground" htmlFor="new-project-name">
               Name
-            </label>
-            <input
+            </Label>
+            <Input
               id="new-project-name"
-              className="mt-1 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
+              className="mt-1 h-10 w-full rounded-xl border-border bg-background text-sm text-foreground"
               value={newProjectName}
               onChange={(event) => setNewProjectName(event.target.value)}
               placeholder="Mobile App"
             />
 
-            <label className="mt-3 block text-sm font-medium text-foreground" htmlFor="new-project-prefix">
+            <Label className="mt-3 block text-sm font-medium text-foreground" htmlFor="new-project-prefix">
               Prefix
-            </label>
-            <input
+            </Label>
+            <Input
               id="new-project-prefix"
-              className="mt-1 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm uppercase text-foreground outline-none focus:border-ring"
+              className="mt-1 h-10 w-full rounded-xl border-border bg-background text-sm uppercase text-foreground"
               value={newProjectPrefix}
               onChange={(event) => setNewProjectPrefix(event.target.value.toUpperCase())}
               placeholder="MOB"

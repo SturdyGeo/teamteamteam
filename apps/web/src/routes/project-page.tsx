@@ -4,9 +4,13 @@ import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select } from "@/components/ui/select";
 import { StateCard } from "@/components/ui/state-card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   useAddTagMutation,
   useAssignTicketMutation,
@@ -578,14 +582,16 @@ export function ProjectPage({
                       <Badge className="rounded-full border border-border bg-background text-foreground hover:bg-background">
                         {columnTickets.length}
                       </Badge>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => openCreateModal(column.id)}
                         className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-sm leading-none text-foreground transition hover:bg-accent"
                         aria-label={`Add card in ${column.name}`}
                       >
                         +
-                      </button>
+                      </Button>
                     </div>
                   </header>
 
@@ -657,14 +663,16 @@ export function ProjectPage({
                                 }}
                               >
                                 <PopoverTrigger asChild>
-                                  <button
+                                  <Button
                                     type="button"
+                                    variant="ghost"
+                                    size="sm"
                                     className="rounded-full border border-border bg-card px-2.5 py-0.5 text-xs text-foreground hover:bg-accent"
                                     onMouseDown={(event) => event.stopPropagation()}
                                     onClick={(event) => event.stopPropagation()}
                                   >
                                     {assignee}
-                                  </button>
+                                  </Button>
                                 </PopoverTrigger>
                                 <PopoverContent
                                   align="start"
@@ -678,22 +686,26 @@ export function ProjectPage({
                                     placeholder="Search assignee..."
                                     className="mb-1 h-8 border-border bg-background px-2.5 text-xs text-foreground"
                                   />
-                                  <button
+                                  <Button
                                     type="button"
+                                    variant="ghost"
+                                    size="sm"
                                     className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
                                     onClick={() => void handleQuickAssign(ticket.id, null)}
                                   >
                                     Nobody
-                                  </button>
+                                  </Button>
                                   {quickAssignMembers.map((member) => (
-                                    <button
+                                    <Button
                                       key={member.user.id}
                                       type="button"
+                                      variant="ghost"
+                                      size="sm"
                                       className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
                                       onClick={() => void handleQuickAssign(ticket.id, member.user.id)}
                                     >
                                       {member.user.email}
-                                    </button>
+                                    </Button>
                                   ))}
                                   {quickAssignMembers.length === 0 ? (
                                     <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No matching members</p>
@@ -741,20 +753,22 @@ export function ProjectPage({
                   {isCreateModal ? "Create ticket card" : (editTitle || selectedTicket?.title || "Loading ticket...")}
                 </h2>
               </div>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={closeModal}
                 className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground hover:bg-accent"
               >
                 Close
-              </button>
+              </Button>
             </header>
 
             {isCreateModal ? (
               <form onSubmit={(event) => void handleCreateCard(event)} className="space-y-4">
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
-                  <input
+                  <Input
                     value={newCardTitle}
                     onChange={(event) => setNewCardTitle(event.target.value)}
                     placeholder="What needs to be done?"
@@ -765,7 +779,7 @@ export function ProjectPage({
 
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Description</h3>
-                  <textarea
+                  <Textarea
                     value={newCardDescription}
                     onChange={(event) => setNewCardDescription(event.target.value)}
                     placeholder="Add details..."
@@ -775,7 +789,7 @@ export function ProjectPage({
 
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Tags</h3>
-                  <input
+                  <Input
                     value={newCardTags}
                     onChange={(event) => setNewCardTags(event.target.value)}
                     placeholder="bug, urgent, backend"
@@ -783,9 +797,12 @@ export function ProjectPage({
                   />
                 </section>
 
-                <label className="block space-y-1 text-xs text-muted-foreground">
-                  Column
-                  <select
+                <div className="block space-y-1 text-xs text-muted-foreground">
+                  <Label htmlFor="create-card-column" className="text-xs text-muted-foreground">
+                    Column
+                  </Label>
+                  <Select
+                    id="create-card-column"
                     value={createModalColumnId ?? ""}
                     className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                     onChange={(event) => setCreateModalColumnId(event.target.value)}
@@ -796,16 +813,16 @@ export function ProjectPage({
                         {column.name}
                       </option>
                     ))}
-                  </select>
-                </label>
+                  </Select>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={modalBusy}
-                    className="h-9 w-full rounded-md border border-primary bg-primary text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-                  >
-                    {isCreatePending ? "Adding..." : "Add card"}
-                  </button>
+                <Button
+                  type="submit"
+                  disabled={modalBusy}
+                  className="h-9 w-full rounded-md border border-primary bg-primary text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {isCreatePending ? "Adding..." : "Add card"}
+                </Button>
               </form>
             ) : selectedTicket ? (
               <form
@@ -817,7 +834,7 @@ export function ProjectPage({
               >
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
-                  <input
+                  <Input
                     value={editTitle}
                     onChange={(event) => setEditTitle(event.target.value)}
                     placeholder="Ticket title"
@@ -827,7 +844,7 @@ export function ProjectPage({
 
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Description</h3>
-                  <textarea
+                  <Textarea
                     value={editDescription}
                     onChange={(event) => setEditDescription(event.target.value)}
                     placeholder="Add details..."
@@ -836,9 +853,12 @@ export function ProjectPage({
                 </section>
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <label className="block space-y-1 text-xs text-muted-foreground">
-                    Status column
-                    <select
+                  <div className="block space-y-1 text-xs text-muted-foreground">
+                    <Label htmlFor="ticket-status-column" className="text-xs text-muted-foreground">
+                      Status column
+                    </Label>
+                    <Select
+                      id="ticket-status-column"
                       value={selectedTicket.status_column_id}
                       className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                       onChange={(event) => void handleModalMove(event.target.value)}
@@ -849,12 +869,15 @@ export function ProjectPage({
                           {column.name}
                         </option>
                       ))}
-                    </select>
-                  </label>
+                    </Select>
+                  </div>
 
-                  <label className="block space-y-1 text-xs text-muted-foreground">
-                    Assignee
-                    <select
+                  <div className="block space-y-1 text-xs text-muted-foreground">
+                    <Label htmlFor="ticket-assignee" className="text-xs text-muted-foreground">
+                      Assignee
+                    </Label>
+                    <Select
+                      id="ticket-assignee"
                       value={selectedTicket.assignee_id ?? "unassigned"}
                       className="h-9 w-full rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none"
                       onChange={(event) => {
@@ -869,8 +892,8 @@ export function ProjectPage({
                           {member.user.email}
                         </option>
                       ))}
-                    </select>
-                  </label>
+                    </Select>
+                  </div>
                 </div>
 
                 <section>
@@ -881,45 +904,48 @@ export function ProjectPage({
                         <p className="text-xs text-muted-foreground">No tags</p>
                       ) : (
                         selectedTicket.tags.map((tag) => (
-                          <button
+                          <Button
                             key={tag}
                             type="button"
+                            variant="secondary"
+                            size="sm"
                             className="rounded-full border border-secondary bg-secondary/70 px-2.5 py-0.5 text-xs text-secondary-foreground hover:bg-secondary/80"
                             onClick={() => void handleRemoveTag(tag)}
                             disabled={modalBusy}
                           >
                             {tag} x
-                          </button>
+                          </Button>
                         ))
                       )}
                     </div>
                     <form onSubmit={(event) => void handleAddTag(event)} className="flex gap-2">
-                      <input
+                      <Input
                         value={newTagInput}
                         onChange={(event) => setNewTagInput(event.target.value)}
                         placeholder="add tag"
                         className="h-8 flex-1 rounded-md border border-border bg-card px-2 text-xs text-foreground outline-none focus:border-ring"
                       />
-                      <button
+                      <Button
                         type="submit"
+                        size="sm"
                         disabled={modalBusy}
                         className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         Add
-                      </button>
+                      </Button>
                     </form>
                   </div>
                 </section>
 
                 <div className="flex flex-wrap gap-2">
-                  <button
+                  <Button
                     type="submit"
                     disabled={modalBusy}
                     className="h-9 rounded-md border border-primary bg-primary px-3 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     {updateMutation.isPending ? "Saving..." : "Save changes"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     disabled={modalBusy}
                     onClick={() => void handleCloseOrReopen()}
@@ -931,19 +957,21 @@ export function ProjectPage({
                     )}
                   >
                     {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
-                  </button>
+                  </Button>
                 </div>
 
                 <section className="space-y-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="link"
+                    size="sm"
                     className="inline-flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
                     onClick={() => setIsActivityOpen((current) => !current)}
                     aria-expanded={isActivityOpen}
                   >
                     <span>{isActivityOpen ? "Hide activity" : "Review activity"}</span>
                     <span aria-hidden>{isActivityOpen ? "▴" : "▾"}</span>
-                  </button>
+                  </Button>
                   {isActivityOpen ? (
                     <div className="max-h-52 overflow-auto rounded-lg border border-border bg-background p-3">
                       {ticketActivityQuery.isPending ? (

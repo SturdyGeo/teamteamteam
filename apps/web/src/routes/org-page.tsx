@@ -4,6 +4,9 @@ import type { MemberWithUser } from "@teamteamteam/api-client";
 import type { Project } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { useInviteMemberMutation } from "@/features/orgs/hooks";
 import {
   Card,
@@ -110,30 +113,30 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
         <Card className="border-border bg-card text-card-foreground">
           <CardContent className="pt-6">
             <form className="grid gap-3 md:grid-cols-[1fr_auto_auto]" onSubmit={(event) => void handleInvite(event)}>
-              <label className="space-y-1 text-sm text-muted-foreground" htmlFor="invite-email">
-                <span className="sr-only">Member email</span>
-                <input
+              <div className="space-y-1">
+                <Label className="sr-only" htmlFor="invite-email">Member email</Label>
+                <Input
                   id="invite-email"
                   type="email"
                   value={inviteEmail}
                   onChange={(event) => setInviteEmail(event.target.value)}
                   placeholder="teammate@company.com"
-                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
                   required
                 />
-              </label>
-              <label className="space-y-1 text-sm text-muted-foreground">
-                <span className="sr-only">Role</span>
-                <select
+              </div>
+              <div className="space-y-1">
+                <Label className="sr-only" htmlFor="invite-role">Role</Label>
+                <Select
+                  id="invite-role"
                   value={inviteRole}
                   onChange={(event) => setInviteRole(event.target.value as InviteRole)}
-                  className="h-10 min-w-28 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
+                  className="min-w-28"
                   disabled={inviteMutation.isPending}
                 >
                   <option value="member">Member</option>
                   <option value="admin">Admin</option>
-                </select>
-              </label>
+                </Select>
+              </div>
               <Button
                 type="submit"
                 className="h-10 rounded-md border border-primary bg-primary px-4 text-primary-foreground hover:bg-primary/90"
