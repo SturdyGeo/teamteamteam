@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
@@ -269,6 +270,10 @@ export function ProjectPage({
     setNewCardTags("");
     setIsActivityOpen(false);
   }
+
+  useHotkey("Escape", () => {
+    closeModal();
+  }, { enabled: isModalOpen });
 
   function handleCardClick(ticketId: string): void {
     if (Date.now() - lastDragAtRef.current < 200) {

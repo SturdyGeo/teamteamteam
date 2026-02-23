@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import bossLogo from "../../boss.png";
@@ -319,6 +320,31 @@ export function RootLayout(): React.JSX.Element {
     }
   }
 
+  function closeCreateOrgDialog(): void {
+    setShowCreateOrgDialog(false);
+    setCreateOrgError(null);
+  }
+
+  function closeCreateProjectDialog(): void {
+    setShowCreateProjectDialog(false);
+    setCreateProjectError(null);
+  }
+
+  useHotkey(
+    "Escape",
+    () => {
+      if (showCreateProjectDialog) {
+        closeCreateProjectDialog();
+        return;
+      }
+
+      if (showCreateOrgDialog) {
+        closeCreateOrgDialog();
+      }
+    },
+    { enabled: showCreateOrgDialog || showCreateProjectDialog },
+  );
+
   function handleLogoClick(): void {
     if (!isAuthenticated) {
       return;
@@ -542,10 +568,7 @@ export function RootLayout(): React.JSX.Element {
                 type="button"
                 variant="outline"
                 className="rounded-full border-border bg-transparent text-foreground hover:bg-accent"
-                onClick={() => {
-                  setShowCreateOrgDialog(false);
-                  setCreateOrgError(null);
-                }}
+                onClick={closeCreateOrgDialog}
               >
                 Cancel
               </Button>
@@ -602,10 +625,7 @@ export function RootLayout(): React.JSX.Element {
                 type="button"
                 variant="outline"
                 className="rounded-full border-border bg-transparent text-foreground hover:bg-accent"
-                onClick={() => {
-                  setShowCreateProjectDialog(false);
-                  setCreateProjectError(null);
-                }}
+                onClick={closeCreateProjectDialog}
               >
                 Cancel
               </Button>

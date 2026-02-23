@@ -46,6 +46,7 @@ Current implementation includes:
 - Save/Close/Reopen actions are color-coded for clearer intent
 - Primary action buttons now use a consistent green treatment across auth, create, and save/add flows
 - Color styling is tokenized through global CSS variables (`styles.css`) across routes/components
+- Escape hotkey closes active modals (ticket modal + create org/project dialogs)
 - Ticket modal activity feed is hidden by default behind a small underlined "Review activity" toggle below action buttons
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
 - Ticket modal assignee uses a dropdown selector
