@@ -7,14 +7,15 @@
     <style>
       :root {
         color-scheme: dark;
-        --background: 225 31% 8%;
-        --foreground: 210 33% 96%;
-        --card: 224 23% 12%;
-        --muted: 220 17% 17%;
-        --muted-foreground: 215 16% 65%;
-        --primary: 160 84% 39%;
-        --ring: 160 84% 39%;
-        --border: 220 15% 24%;
+        --background: 0 0% 4%;
+        --foreground: 35 84% 91%;
+        --card: 0 0% 8%;
+        --muted: 0 0% 13%;
+        --muted-foreground: 28 14% 62%;
+        --primary: 33 91% 58%;
+        --secondary: 19 62% 30%;
+        --ring: 33 91% 58%;
+        --border: 20 18% 24%;
       }
 
       html,
@@ -23,8 +24,9 @@
         min-height: 100%;
         background:
           radial-gradient(circle at 16% 8%, hsl(var(--muted) / 0.56), transparent 33%),
-          radial-gradient(circle at 88% 12%, hsl(var(--primary) / 0.14), transparent 42%),
-          linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 100%);
+          radial-gradient(circle at 88% 12%, hsl(var(--primary) / 0.16), transparent 44%),
+          radial-gradient(circle at 62% 84%, hsl(var(--secondary) / 0.16), transparent 52%),
+          linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.96) 100%);
       }
 
       body {

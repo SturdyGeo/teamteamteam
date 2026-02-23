@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 225 31% 8%;
-    --foreground: 210 33% 96%;
-    --card: 224 23% 12%;
-    --card-foreground: 210 33% 96%;
-    --popover: 224 23% 12%;
-    --popover-foreground: 210 33% 96%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 151 100% 97%;
-    --secondary: 214 21% 22%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 17% 17%;
-    --muted-foreground: 215 16% 65%;
-    --accent: 220 18% 20%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 72% 45%;
+    --background: 0 0% 4%;
+    --foreground: 35 84% 91%;
+    --card: 0 0% 8%;
+    --card-foreground: 35 84% 91%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 35 84% 91%;
+    --primary: 33 91% 58%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 19 62% 30%;
+    --secondary-foreground: 35 84% 91%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 28 14% 62%;
+    --accent: 22 55% 24%;
+    --accent-foreground: 35 84% 91%;
+    --destructive: 2 74% 56%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 15% 24%;
-    --input: 220 15% 24%;
-    --ring: 160 84% 39%;
+    --border: 20 18% 24%;
+    --input: 20 18% 24%;
+    --ring: 33 91% 58%;
     --radius: 1.05rem;
   }
 
   .dark {
-    --background: 225 31% 8%;
-    --foreground: 210 33% 96%;
-    --card: 224 23% 12%;
-    --card-foreground: 210 33% 96%;
-    --popover: 224 23% 12%;
-    --popover-foreground: 210 33% 96%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 151 100% 97%;
-    --secondary: 214 21% 22%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 17% 17%;
-    --muted-foreground: 215 16% 65%;
-    --accent: 220 18% 20%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 72% 45%;
+    --background: 0 0% 4%;
+    --foreground: 35 84% 91%;
+    --card: 0 0% 8%;
+    --card-foreground: 35 84% 91%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 35 84% 91%;
+    --primary: 33 91% 58%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 19 62% 30%;
+    --secondary-foreground: 35 84% 91%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 28 14% 62%;
+    --accent: 22 55% 24%;
+    --accent-foreground: 35 84% 91%;
+    --destructive: 2 74% 56%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 15% 24%;
-    --input: 220 15% 24%;
-    --ring: 160 84% 39%;
+    --border: 20 18% 24%;
+    --input: 20 18% 24%;
+    --ring: 33 91% 58%;
   }
 
   * {
@@ -66,15 +66,17 @@
   .bg-app-auth-surface {
     background:
       radial-gradient(circle at 18% 12%, hsl(var(--muted) / 0.62), transparent 38%),
-      radial-gradient(circle at 84% 16%, hsl(var(--primary) / 0.18), transparent 42%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 100%);
+      radial-gradient(circle at 84% 16%, hsl(var(--primary) / 0.18), transparent 43%),
+      radial-gradient(circle at 52% 82%, hsl(var(--secondary) / 0.18), transparent 50%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.96) 100%);
   }
 
   .bg-app-shell {
     background:
       radial-gradient(circle at 16% 8%, hsl(var(--muted) / 0.56), transparent 33%),
-      radial-gradient(circle at 88% 12%, hsl(var(--primary) / 0.14), transparent 42%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 100%);
+      radial-gradient(circle at 88% 12%, hsl(var(--primary) / 0.16), transparent 44%),
+      radial-gradient(circle at 62% 84%, hsl(var(--secondary) / 0.16), transparent 52%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.96) 100%);
   }
 
   .animate-boss-logo-jump-spin {

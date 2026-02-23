@@ -44,8 +44,9 @@ Current implementation includes:
 - Saving ticket title/description closes the modal; unchanged edits also close without error
 - Pressing Enter in ticket title now submits "Save changes"
 - Save/Close/Reopen actions are color-coded for clearer intent
-- Primary action buttons now use a consistent green treatment across auth, create, and save/add flows
+- Primary action buttons now use a consistent amber treatment across auth, create, and save/add flows
 - Color styling is tokenized through global CSS variables (`styles.css`) across routes/components
+- Global token palette refreshed to a black + amber IT-Crowd-inspired look
 - Escape hotkey closes active modals (ticket modal + create org/project dialogs)
 - Ticket modal activity feed is hidden by default behind a small underlined "Review activity" toggle below action buttons
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
