@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
 
+const PRIMARY_BUTTON_CLASS =
+  "border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80";
+
 export function LoginPage(): React.JSX.Element {
   const navigate = useNavigate();
   // Redirect on auth handled by beforeLoad; no useEffect needed here
@@ -127,7 +130,7 @@ export function LoginPage(): React.JSX.Element {
             <Button
               disabled={sendingOtp || email.trim().length === 0}
               type="button"
-              className="h-11 w-full rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+              className={`h-11 w-full rounded-md ${PRIMARY_BUTTON_CLASS}`}
               onClick={() => void handleSendOtp()}
             >
               {sendingOtp ? "Sending..." : "Send passcode"}
@@ -137,7 +140,7 @@ export function LoginPage(): React.JSX.Element {
               <Button
                 disabled={verifyingOtp || otpCode.trim().length === 0}
                 type="submit"
-                className="h-11 w-full rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                className={`h-11 w-full rounded-md ${PRIMARY_BUTTON_CLASS}`}
               >
                 {verifyingOtp ? "Verifying..." : "Verify passcode"}
               </Button>

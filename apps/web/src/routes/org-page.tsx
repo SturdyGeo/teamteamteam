@@ -54,7 +54,7 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
                   <Button
                     asChild
                     size="sm"
-                    className="rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                    className="rounded-md border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80"
                   >
                     <Link
                       to="/orgs/$orgId/projects/$projectId"

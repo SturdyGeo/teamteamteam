@@ -264,6 +264,7 @@ Phase 4 data layer is implemented:
 - Ticket modal assignee uses a dropdown selector (quick-card assign remains searchable)
 - Ticket detail save requires the latest Edge Function deployment and DB migrations (`build:edge`, `functions deploy api`, `supabase db push`)
 - Ticket edit modal supports Enter-to-save (title input) with color-coded Save vs Close/Reopen actions
+- Primary action buttons use a consistent green style across login/create/save/add web flows
 
 Phase 5 board experience is implemented:
 

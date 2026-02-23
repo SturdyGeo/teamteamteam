@@ -804,13 +804,13 @@ export function ProjectPage({
                   </select>
                 </label>
 
-                <button
-                  type="submit"
-                  disabled={modalBusy}
-                  className="h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-sm text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
-                >
-                  {isCreatePending ? "Adding..." : "Add card"}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={modalBusy}
+                    className="h-9 w-full rounded-md border border-emerald-700 bg-emerald-900/70 text-sm text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
+                  >
+                    {isCreatePending ? "Adding..." : "Add card"}
+                  </button>
               </form>
             ) : selectedTicket ? (
               <form
@@ -908,7 +908,7 @@ export function ProjectPage({
                       <button
                         type="submit"
                         disabled={modalBusy}
-                        className="rounded-md border border-zinc-700 bg-zinc-900 px-2.5 text-xs text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+                        className="rounded-md border border-emerald-700 bg-emerald-900/70 px-2.5 text-xs text-emerald-100 hover:bg-emerald-800/80 disabled:opacity-50"
                       >
                         Add
                       </button>

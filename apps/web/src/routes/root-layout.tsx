@@ -74,6 +74,8 @@ function toMessage(error: unknown): string {
 }
 
 type OpenMenu = "org" | "project" | "profile" | null;
+const PRIMARY_BUTTON_CLASS =
+  "border border-emerald-700 bg-emerald-900/70 text-emerald-100 hover:bg-emerald-800/80";
 
 export function RootLayout(): React.JSX.Element {
   const navigate = useNavigate();
@@ -372,7 +374,7 @@ export function RootLayout(): React.JSX.Element {
               <Button
                 asChild
                 size="sm"
-                className="rounded-full border border-zinc-700 bg-zinc-950 font-mono text-zinc-100 hover:bg-zinc-800"
+                className={`rounded-full font-mono ${PRIMARY_BUTTON_CLASS}`}
               >
                 <Link to="/login">Sign in</Link>
               </Button>
@@ -549,7 +551,7 @@ export function RootLayout(): React.JSX.Element {
               </Button>
               <Button
                 type="submit"
-                className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                className={`rounded-full ${PRIMARY_BUTTON_CLASS}`}
                 disabled={createOrgMutation.isPending}
               >
                 {createOrgMutation.isPending ? "Creating..." : "Create org"}
@@ -609,7 +611,7 @@ export function RootLayout(): React.JSX.Element {
               </Button>
               <Button
                 type="submit"
-                className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-100 hover:bg-zinc-800"
+                className={`rounded-full ${PRIMARY_BUTTON_CLASS}`}
                 disabled={createProjectMutation.isPending || !activeOrgId}
               >
                 {createProjectMutation.isPending ? "Creating..." : "Create project"}

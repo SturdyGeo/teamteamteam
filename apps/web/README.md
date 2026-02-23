@@ -40,6 +40,7 @@ Current implementation includes:
 - Ticket modal title + description are editable text inputs with persisted save
 - Pressing Enter in ticket title now submits "Save changes"
 - Save/Close/Reopen actions are color-coded for clearer intent
+- Primary action buttons now use a consistent green treatment across auth, create, and save/add flows
 - Ticket modal activity feed is hidden by default behind a "Review activity" drawer toggle
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
 - Ticket modal assignee uses a dropdown selector
