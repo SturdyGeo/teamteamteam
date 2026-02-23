@@ -913,10 +913,12 @@ export function ProjectPage({
                 <section>
                   <button
                     type="button"
-                    className="h-9 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200 hover:bg-zinc-800"
+                    className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200 hover:bg-zinc-800"
                     onClick={() => setIsActivityOpen((current) => !current)}
+                    aria-expanded={isActivityOpen}
                   >
-                    {isActivityOpen ? "Hide activity" : "Review activity"}
+                    <span>{isActivityOpen ? "Hide activity" : "Review activity"}</span>
+                    <span aria-hidden>{isActivityOpen ? "▴" : "▾"}</span>
                   </button>
                   {isActivityOpen ? (
                     <div className="mt-2 max-h-52 overflow-auto rounded-lg border border-zinc-700 bg-zinc-950 p-3">
