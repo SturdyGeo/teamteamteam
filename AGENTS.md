@@ -44,6 +44,24 @@ Chalk for color output
 
 No direct DB access from UI layer
 
+Web App (SPA Dashboard)
+
+Vite + React
+
+TanStack Router (typed nested routes)
+
+TanStack Query (server-state cache, mutations, optimistic updates)
+
+Tailwind CSS
+
+shadcn/ui for dashboard primitives (required web component system)
+
+React Hook Form + zod for forms
+
+Supabase JS auth in web client
+
+JWT injected into shared `packages/api-client`
+
 Backend
 
 Supabase
@@ -54,7 +72,7 @@ Postgres
 
 Row Level Security
 
-Optional thin HTTP API (recommended for future web UI)
+Supabase Edge Function API (Hono) is the canonical backend contract
 
 Validation & Types
 
@@ -153,6 +171,18 @@ Purely derived UI
 Never mutates state directly
 
 All state changes via commands
+
+Web (apps/web/)
+
+SPA dashboard (no SSR required)
+
+TanStack Router loaders for route-level data requirements
+
+TanStack Query for all server state and mutations
+
+Uses shared `packages/api-client`; never calls DB directly
+
+No duplicated business rules from `packages/domain`
 
 3. Ticket State Model
 
@@ -335,7 +365,12 @@ teamteamteam/
 │  │  ├─ commands/
 │  │  ├─ tui/
 │  │  └─ index.ts
-│  └─ api/ (optional thin server)
+│  ├─ api/ (Hono app + Edge Function target)
+│  └─ web/
+│     ├─ src/routes/
+│     ├─ src/components/
+│     ├─ src/features/
+│     └─ src/lib/ (queryClient, supabase, api client wiring)
 ├─ packages/
 │  ├─ domain/
 │  │  ├─ entities/
@@ -407,6 +442,14 @@ bun run lint
 Cleanup
 bun run clean
 
+Web Framework Guardrails
+
+Do not add Next.js, Remix, or TanStack Start for this project.
+
+Do not add a custom Node server, GraphQL layer, or tRPC layer.
+
+Reuse existing Edge Function API + shared typed API client.
+
 Important Reminders
 
 Never duplicate domain logic.
@@ -414,6 +457,8 @@ Never duplicate domain logic.
 All mutations must go through commands.
 
 CLI and TUI must use the same API client.
+
+Web must use the same API client as CLI/TUI.
 
 Never hardcode workflow columns.
 

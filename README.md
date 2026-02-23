@@ -1,6 +1,6 @@
 # Teamteamteam
 
-Terminal-first multi-user kanban platform for software teams. Provides a CLI and TUI (terminal UI) experience backed by Supabase authentication and Postgres persistence.
+Terminal-first multi-user kanban platform for software teams. Provides CLI, TUI (terminal UI), and web SPA clients backed by Supabase authentication and Postgres persistence.
 
 Designed to evolve into a full web application without rewriting core logic.
 
@@ -8,6 +8,7 @@ Designed to evolve into a full web application without rewriting core logic.
 
 - **CLI commands** for managing orgs, projects, tickets, tags, and workflows
 - **TUI board** (Ink-based kanban board rendered in the terminal)
+- **Web dashboard SPA** (`apps/web`) with TanStack Router + Query and shadcn/ui components
 - **Built-in backend defaults** in the CLI for zero-config consumer usage
 - **Multi-user / multi-org** with Supabase magic link authentication
 - **Row Level Security** for org-level data isolation
@@ -69,6 +70,9 @@ ttteam --help
    | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (integration tests only) |
    | `TEAMTEAMTEAM_API_URL`   | API URL (Edge Function or local, e.g. `https://<ref>.supabase.co/functions/v1/api`) |
    | `DATABASE_URL`     | Direct Postgres URL (integration tests only, defaults to local Supabase) |
+   | `VITE_SUPABASE_URL` | Supabase URL for web app (`apps/web`) |
+   | `VITE_SUPABASE_ANON_KEY` | Supabase anon key for web app (`apps/web`) |
+   | `VITE_TEAMTEAMTEAM_API_URL` | Edge Function API URL for web app (`apps/web`) |
 
    See [infra/README.md](infra/README.md) for detailed Doppler setup instructions.
 
@@ -213,6 +217,55 @@ ttteam board          # Launch the interactive kanban board
 | `Esc` | Close detail pane / clear filters |
 | `?`   | Show help                   |
 
+### Web App (SPA)
+
+The web client lives in `apps/web` and uses:
+
+- React + Vite
+- TanStack Router
+- TanStack Query
+- Tailwind CSS
+- shadcn/ui
+- Supabase JS auth
+- Shared `@teamteamteam/api-client`
+
+Phase 2 auth/shell is implemented:
+
+- Session hydration on app boot (in-memory auth state + Supabase localStorage persistence)
+- Email OTP passcode verification on `/login` plus callback fallback for magic-link redirects
+- Global app-shell org/project selectors that persist context in localStorage
+
+Phase 3 routing is implemented:
+
+- Route-level error boundaries and not-found pages
+- URL-backed view contracts for org/project filtering, sorting, and pagination
+
+Phase 4 data layer is implemented:
+
+- Canonical query key strategy for org/project/ticket scopes
+- Feature query modules/hooks wrapping shared `@teamteamteam/api-client`
+- Cache policy tuning (feature stale times, retry behavior, reconnect refetch)
+- Dev-only telemetry hooks for query/mutation error events
+
+Phase 5 board experience is implemented:
+
+- Server-ordered workflow columns and richer ticket cards
+- URL-backed ticket detail panel with metadata/actions surface
+- Domain-based filtering/sorting behavior for project board views
+- Standardized loading/empty/error states for board and ticket detail
+
+Run a production build:
+
+```sh
+doppler run -- bun run web:build
+```
+
+Typecheck web only:
+
+```sh
+doppler run -- bun run web:typecheck
+```
+
 ## API
 
 The HTTP API is built with Hono. It exposes all domain operations, auth-gated via Supabase JWT tokens and org-scoped via RLS.
@@ -311,6 +364,8 @@ doppler run -- bun run test:watch     # Run tests in watch mode
 doppler run -- bun run test:coverage  # Run tests with coverage
 doppler run -- bun run knip           # Dead code detection
 doppler run -- bun run clean          # Clean build artifacts
+doppler run -- bun run web:build      # Build web SPA (apps/web)
+doppler run -- bun run web:typecheck  # Typecheck web SPA (apps/web)
 ```
 
 ### Pre-commit Checklist
@@ -408,7 +463,13 @@ apps/cli/            → Client layer. Commander CLI commands + TUI (Ink).
   commands/            Delegates to API client. Outputs formatted text or JSON.
   tui/                 Purely derived UI. All state changes via commands.
 
-packages/api-client/ → Shared typed API client used by both CLI and TUI.
+apps/web/            → Client layer. React SPA dashboard (no SSR).
+  routes/              TanStack Router typed route tree + route loaders.
+  features/            TanStack Query server-state hooks and selectors.
+  components/ui/       shadcn/ui component primitives.
+                       Uses shared API client; no direct DB access.
+
+packages/api-client/ → Shared typed API client used by CLI, TUI, and Web.
                        Auth (magic link, token refresh), queries, mutations.
                        Session stored at ~/.config/teamteamteam/session.json.
 ```
@@ -419,7 +480,8 @@ packages/api-client/ → Shared typed API client used by both CLI and TUI.
 teamteamteam/
 ├─ apps/
 │  ├─ cli/              # CLI commands + TUI
-│  └─ api/              # HTTP API (Hono — runs on Bun or Supabase Edge Functions)
+│  ├─ api/              # HTTP API (Hono — runs on Bun or Supabase Edge Functions)
+│  └─ web/              # React SPA (Vite + TanStack Router/Query + shadcn/ui)
 ├─ packages/
 │  ├─ domain/           # Business rules (source of truth)
 │  │  ├─ entities/      # Ticket, Project, Org, User, etc.
@@ -443,6 +505,7 @@ teamteamteam/
 | HTTP API       | Hono (Supabase Edge Functions / Bun)        |
 | CLI            | Commander + Chalk                           |
 | TUI            | Ink (React for terminal)                    |
+| Web Frontend   | React + Vite + TanStack Router + TanStack Query + Tailwind + shadcn/ui |
 | Backend        | Supabase (Auth via magic link, Postgres, RLS) |
 | Validation     | Zod                                         |
 | Testing        | Vitest                                      |

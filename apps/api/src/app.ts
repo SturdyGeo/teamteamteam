@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { authMiddleware } from "./middleware/auth.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { health } from "./routes/health.js";
@@ -14,6 +15,12 @@ export function createApp(basePath = "/") {
   const app = new Hono().basePath(basePath);
 
   app.onError(errorHandler);
+
+  app.use("/*", cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Authorization", "Content-Type"],
+  }));
 
   // Public routes (no auth)
   app.route("/", health);

@@ -21,7 +21,10 @@
     "db:push": "supabase db push",
     "db:reset": "supabase db reset --linked",
     "db:diff": "supabase db diff",
-    "db:status": "supabase migration list"
+    "db:status": "supabase migration list",
+    "web:dev": "bun run --filter @teamteamteam/web dev",
+    "web:build": "bun run --filter @teamteamteam/web build",
+    "web:typecheck": "bun run --filter @teamteamteam/web typecheck"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
