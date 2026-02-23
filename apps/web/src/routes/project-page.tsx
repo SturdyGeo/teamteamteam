@@ -4,6 +4,8 @@ import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { StateCard } from "@/components/ui/state-card";
 import {
   useAddTagMutation,
@@ -159,30 +161,6 @@ export function ProjectPage({
     setNewTagInput("");
     setIsActivityOpen(false);
   }, [selectedTicketId, createModalColumnId]);
-
-  useEffect(() => {
-    if (!assigneeMenuTicketId) {
-      return;
-    }
-
-    function onPointerDown(event: MouseEvent): void {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
-
-      if (target.closest("[data-assignee-menu]") || target.closest("[data-assignee-trigger]")) {
-        return;
-      }
-
-      setAssigneeMenuTicketId(null);
-    }
-
-    document.addEventListener("mousedown", onPointerDown);
-    return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-    };
-  }, [assigneeMenuTicketId]);
 
   const assigneeById = useMemo(
     () => new Map(members.map((member) => [member.user.id, member.user.email])),
@@ -663,62 +641,65 @@ export function ProjectPage({
                                   {priority}
                                 </Badge>
                               ) : null}
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  data-assignee-trigger
-                                  className="rounded-full border border-border bg-card px-2.5 py-0.5 text-xs text-foreground hover:bg-accent"
-                                  onMouseDown={(event) => event.stopPropagation()}
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    setAssigneeMenuTicketId((current) => {
-                                      const next = current === ticket.id ? null : ticket.id;
-                                      if (next) {
-                                        setAssigneeMenuSearch("");
-                                      }
-                                      return next;
-                                    });
-                                  }}
-                                >
-                                  {assignee}
-                                </button>
+                              <Popover
+                                open={assigneeMenuTicketId === ticket.id}
+                                onOpenChange={(open) => {
+                                  if (open) {
+                                    setAssigneeMenuTicketId(ticket.id);
+                                    setAssigneeMenuSearch("");
+                                    return;
+                                  }
 
-                                {assigneeMenuTicketId === ticket.id ? (
-                                  <div
-                                    data-assignee-menu
-                                    className="absolute left-0 top-7 z-30 w-52 rounded-xl border border-border bg-card p-1.5 shadow-xl"
+                                  if (assigneeMenuTicketId === ticket.id) {
+                                    setAssigneeMenuTicketId(null);
+                                    setAssigneeMenuSearch("");
+                                  }
+                                }}
+                              >
+                                <PopoverTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="rounded-full border border-border bg-card px-2.5 py-0.5 text-xs text-foreground hover:bg-accent"
                                     onMouseDown={(event) => event.stopPropagation()}
                                     onClick={(event) => event.stopPropagation()}
                                   >
-                                    <input
-                                      value={assigneeMenuSearch}
-                                      onChange={(event) => setAssigneeMenuSearch(event.target.value)}
-                                      placeholder="Search assignee..."
-                                      className="mb-1 h-8 w-full rounded-lg border border-border bg-background px-2.5 text-xs text-foreground outline-none focus:border-ring"
-                                    />
+                                    {assignee}
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  align="start"
+                                  className="w-56 p-1.5"
+                                  onPointerDown={(event) => event.stopPropagation()}
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  <Input
+                                    value={assigneeMenuSearch}
+                                    onChange={(event) => setAssigneeMenuSearch(event.target.value)}
+                                    placeholder="Search assignee..."
+                                    className="mb-1 h-8 border-border bg-background px-2.5 text-xs text-foreground"
+                                  />
+                                  <button
+                                    type="button"
+                                    className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
+                                    onClick={() => void handleQuickAssign(ticket.id, null)}
+                                  >
+                                    Nobody
+                                  </button>
+                                  {quickAssignMembers.map((member) => (
                                     <button
+                                      key={member.user.id}
                                       type="button"
                                       className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
-                                      onClick={() => void handleQuickAssign(ticket.id, null)}
+                                      onClick={() => void handleQuickAssign(ticket.id, member.user.id)}
                                     >
-                                      Nobody
+                                      {member.user.email}
                                     </button>
-                                    {quickAssignMembers.map((member) => (
-                                      <button
-                                        key={member.user.id}
-                                        type="button"
-                                        className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
-                                        onClick={() => void handleQuickAssign(ticket.id, member.user.id)}
-                                      >
-                                        {member.user.email}
-                                      </button>
-                                    ))}
-                                    {quickAssignMembers.length === 0 ? (
-                                      <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No matching members</p>
-                                    ) : null}
-                                  </div>
-                                ) : null}
-                              </div>
+                                  ))}
+                                  {quickAssignMembers.length === 0 ? (
+                                    <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No matching members</p>
+                                  ) : null}
+                                </PopoverContent>
+                              </Popover>
                               {ticket.tags.slice(0, 2).map((item) => (
                                 <Badge
                                   key={item}

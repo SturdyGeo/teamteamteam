@@ -267,6 +267,7 @@ Phase 4 data layer is implemented:
 - Ticket activity is collapsed by default behind a small underlined "Review activity" toggle below action buttons
 - Assignee changes are optimistic (immediate UI update with rollback on failure)
 - Ticket modal assignee uses a dropdown selector (quick-card assign remains searchable)
+- Card-level quick-assign now uses shadcn popover primitives for more stable dropdown interaction
 - Ticket detail save requires the latest Edge Function deployment and DB migrations (`build:edge`, `functions deploy api`, `supabase db push`)
 - Ticket edit modal supports Enter-to-save (title input) with color-coded Save vs Close/Reopen actions
 - Escape now closes active web modals (ticket modal and create org/project dialogs)

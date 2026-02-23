@@ -53,6 +53,7 @@ Current implementation includes:
 - Ticket modal activity feed is hidden by default behind a small underlined "Review activity" toggle below action buttons
 - Assignee changes are optimistic (instant UI update with rollback on mutation failure)
 - Ticket modal assignee uses a dropdown selector
+- Card quick-assign assignee picker uses shadcn popover primitives for stable positioning/interaction
 - Card quick-assign popovers remain searchable
 - Ticket detail save expects latest API + migration rollout (`build:edge`, deploy function, `supabase db push`)
 - Click assignee chip on a card to open a quick-assign dropdown with `Nobody`
