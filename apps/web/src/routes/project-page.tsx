@@ -488,26 +488,13 @@ export function ProjectPage({
   return (
     <>
       <div className="space-y-4">
-        <div className="rounded-[2rem] border border-zinc-700 bg-zinc-900/95 p-4 shadow-[0_20px_50px_-35px_rgba(0,0,0,1)] backdrop-blur">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-lg font-semibold tracking-tight text-zinc-100">{projectName}</h1>
-            <Badge className="rounded-full border border-zinc-600 bg-zinc-800 px-3 text-zinc-200 hover:bg-zinc-800">
-              {projectPrefix}
-            </Badge>
-            <Badge className="rounded-full border border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-950">
-              {totalTickets} tickets
-            </Badge>
-            {isMovePending ? (
-              <Badge className="rounded-full border border-emerald-700 bg-emerald-900/70 px-3 text-emerald-200 hover:bg-emerald-900/70">
-                Saving move...
-              </Badge>
-            ) : null}
-            {isCreatePending ? (
-              <Badge className="rounded-full border border-sky-700 bg-sky-900/70 px-3 text-sky-200 hover:bg-sky-900/70">
-                Adding card...
-              </Badge>
-            ) : null}
-          </div>
+        <div className="px-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{projectName}</h1>
+          <p className="font-mono text-sm text-zinc-500">
+            {projectPrefix} · {totalTickets} tickets
+            {isMovePending ? " · saving move..." : ""}
+            {isCreatePending ? " · adding card..." : ""}
+          </p>
         </div>
 
         {boardErrorMessage ? (
