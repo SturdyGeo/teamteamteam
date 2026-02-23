@@ -250,6 +250,7 @@ Phase 2 auth/shell is implemented:
 Phase 3 routing is implemented:
 
 - Route-level error boundaries and not-found pages
+- Route-level error and not-found pages now share the app's dark mono themed styling
 - URL-backed view contracts for project board routing and state
 
 Phase 4 data layer is implemented:
