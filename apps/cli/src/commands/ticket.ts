@@ -33,8 +33,11 @@ Examples:
   $ ttteam ticket create "Fix login bug"
   $ ttteam ticket list --status "In Progress"
   $ ttteam ticket show BACK-1
+  $ ttteam ticket update BACK-1 --title "Fix login flow"
   $ ttteam ticket move BACK-1 "In Progress"
   $ ttteam ticket assign BACK-1 alice@acme.com
+  $ ttteam ticket unassign BACK-1
+  $ ttteam ticket delete BACK-1
   $ ttteam ticket close BACK-1`,
     );
 
@@ -206,6 +209,53 @@ Example:
     );
 
   ticket
+    .command("update")
+    .description("Update ticket title and/or description")
+    .argument("<key>", "Ticket key (e.g. BACK-1)")
+    .option("--title <text>", "New title")
+    .option("--description <text>", "New description")
+    .addHelpText(
+      "after",
+      `
+Examples:
+  $ ttteam ticket update BACK-1 --title "Fix auth edge cases"
+  $ ttteam ticket update BACK-1 --description "Repro: ...\nExpected: ..."
+  $ ttteam ticket update BACK-1 --title "Fix auth" --description "New details"`,
+    )
+    .action(
+      withErrorHandler(
+        async (
+          key: string,
+          opts: Record<string, string | undefined>,
+          cmd: Command,
+        ) => {
+          if (!opts.title && opts.description === undefined) {
+            throw new Error("Provide --title and/or --description");
+          }
+
+          const client = getClient();
+          const { json, project } = cmd.optsWithGlobals();
+          const projectId = await getDefaultProjectId(project);
+          const resolved = await resolveTicket(client, projectId, key);
+          const current = await client.getTicket(resolved.id);
+          const updated = await client.updateTicket(resolved.id, {
+            title: opts.title ?? current.title,
+            description:
+              opts.description === undefined
+                ? current.description
+                : opts.description,
+          });
+
+          if (json) {
+            printJson(updated);
+          } else {
+            printSuccess(`Updated ${key.toUpperCase()}.`);
+          }
+        },
+      ),
+    );
+
+  ticket
     .command("move")
     .description("Move a ticket to a different workflow column")
     .argument("<key>", "Ticket key (e.g. BACK-1)")
@@ -263,6 +313,32 @@ Example:
           printJson(updated);
         } else {
           printSuccess(`Assigned ${key.toUpperCase()} to ${assignee}.`);
+        }
+      }),
+    );
+
+  ticket
+    .command("unassign")
+    .description("Clear assignee from a ticket")
+    .argument("<key>", "Ticket key (e.g. BACK-1)")
+    .addHelpText(
+      "after",
+      `
+Example:
+  $ ttteam ticket unassign BACK-1`,
+    )
+    .action(
+      withErrorHandler(async (key: string, _opts: unknown, cmd: Command) => {
+        const client = getClient();
+        const { json, project } = cmd.optsWithGlobals();
+        const projectId = await getDefaultProjectId(project);
+        const resolved = await resolveTicket(client, projectId, key);
+        const updated = await client.assignTicket(resolved.id, { assignee_id: null });
+
+        if (json) {
+          printJson(updated);
+        } else {
+          printSuccess(`Unassigned ${key.toUpperCase()}.`);
         }
       }),
     );
@@ -328,6 +404,32 @@ Examples:
           printJson(updated);
         } else {
           printSuccess(`Reopened ${key.toUpperCase()}.`);
+        }
+      }),
+    );
+
+  ticket
+    .command("delete")
+    .description("Delete a ticket permanently")
+    .argument("<key>", "Ticket key (e.g. BACK-1)")
+    .addHelpText(
+      "after",
+      `
+Example:
+  $ ttteam ticket delete BACK-1`,
+    )
+    .action(
+      withErrorHandler(async (key: string, _opts: unknown, cmd: Command) => {
+        const client = getClient();
+        const { json, project } = cmd.optsWithGlobals();
+        const projectId = await getDefaultProjectId(project);
+        const resolved = await resolveTicket(client, projectId, key);
+        const deleted = await client.deleteTicket(resolved.id);
+
+        if (json) {
+          printJson(deleted);
+        } else {
+          printSuccess(`Deleted ${key.toUpperCase()}.`);
         }
       }),
     );

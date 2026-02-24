@@ -53,11 +53,12 @@ const sampleTicket = {
 
 describe("ticket commands", () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
+  let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
+    exitSpy = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
   });
 
   afterEach(() => {
@@ -186,6 +187,43 @@ describe("ticket commands", () => {
     });
   });
 
+  describe("ticket update", () => {
+    it("updates only title when description is omitted", async () => {
+      mockResolveTicket.mockResolvedValue(sampleTicket as never);
+      const mockClient = {
+        getTicket: vi.fn().mockResolvedValue(sampleTicket),
+        updateTicket: vi.fn().mockResolvedValue({
+          ...sampleTicket,
+          title: "Updated title",
+        }),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+
+      const program = buildProgram();
+      await program.parseAsync([
+        "node", "ttteam", "ticket", "update", "TEST-1", "--title", "Updated title",
+      ]);
+
+      expect(mockClient.updateTicket).toHaveBeenCalledWith("t-1", {
+        title: "Updated title",
+        description: sampleTicket.description,
+      });
+      expect(logSpy.mock.calls[0][0]).toContain("Updated TEST-1");
+    });
+
+    it("throws when neither title nor description is provided", async () => {
+      const mockClient = {};
+      mockGetClient.mockReturnValue(mockClient as never);
+
+      const program = buildProgram();
+      await program.parseAsync([
+        "node", "ttteam", "ticket", "update", "TEST-1",
+      ]);
+
+      expect(exitSpy).toHaveBeenCalled();
+    });
+  });
+
   describe("ticket assign", () => {
     it("assigns a ticket to a member", async () => {
       mockResolveTicket.mockResolvedValue(sampleTicket as never);
@@ -202,6 +240,22 @@ describe("ticket commands", () => {
 
       expect(mockClient.assignTicket).toHaveBeenCalledWith("t-1", { assignee_id: "u-2" });
       expect(logSpy.mock.calls[0][0]).toContain("bob@x.com");
+    });
+  });
+
+  describe("ticket unassign", () => {
+    it("clears the assignee", async () => {
+      mockResolveTicket.mockResolvedValue(sampleTicket as never);
+      const mockClient = {
+        assignTicket: vi.fn().mockResolvedValue({ ...sampleTicket, assignee_id: null }),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "ttteam", "ticket", "unassign", "TEST-1"]);
+
+      expect(mockClient.assignTicket).toHaveBeenCalledWith("t-1", { assignee_id: null });
+      expect(logSpy.mock.calls[0][0]).toContain("Unassigned TEST-1");
     });
   });
 
@@ -251,6 +305,22 @@ describe("ticket commands", () => {
       await program.parseAsync(["node", "ttteam", "ticket", "reopen", "TEST-1", "--column", "In Progress"]);
 
       expect(mockClient.reopenTicket).toHaveBeenCalledWith("t-1", { to_column_id: "col-2" });
+    });
+  });
+
+  describe("ticket delete", () => {
+    it("deletes a ticket", async () => {
+      mockResolveTicket.mockResolvedValue(sampleTicket as never);
+      const mockClient = {
+        deleteTicket: vi.fn().mockResolvedValue(sampleTicket),
+      };
+      mockGetClient.mockReturnValue(mockClient as never);
+
+      const program = buildProgram();
+      await program.parseAsync(["node", "ttteam", "ticket", "delete", "TEST-1"]);
+
+      expect(mockClient.deleteTicket).toHaveBeenCalledWith("t-1");
+      expect(logSpy.mock.calls[0][0]).toContain("Deleted TEST-1");
     });
   });
 });

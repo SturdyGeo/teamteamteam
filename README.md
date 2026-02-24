@@ -200,10 +200,13 @@ ttteam project delete <prefix>         # Delete a project and all its data (--ye
 ttteam ticket list             # List tickets (supports filter flags)
 ttteam ticket create <title>   # Create a new ticket
 ttteam ticket show <key>       # Show ticket details + activity history
+ttteam ticket update <key>     # Update title and/or description
 ttteam ticket move <key> <column>      # Move ticket to a workflow column
 ttteam ticket assign <key> <assignee>  # Assign by email, display name, or email username
+ttteam ticket unassign <key>           # Remove assignee
 ttteam ticket close <key>              # Close a ticket
 ttteam ticket reopen <key>             # Reopen a closed ticket
+ttteam ticket delete <key>             # Delete ticket permanently
 ```
 
 #### Create Options
