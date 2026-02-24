@@ -224,6 +224,32 @@ describe("POST /projects/:projectId/tickets", () => {
     expect(res.status).toBe(500);
     expect((await res.json()).error.code).toBe("DB_ERROR");
   });
+
+  it("retries number allocation after duplicate project ticket key conflict", async () => {
+    const app = setup([
+      { data: COLUMNS, error: null }, // columns query
+      { data: 1, error: null }, // rpc next_ticket_number (stale under race)
+      {
+        data: null,
+        error: {
+          message: 'duplicate key value violates unique constraint "tickets_project_id_number_key"',
+          code: "23505",
+        },
+      }, // ticket insert duplicate
+      { data: 2, error: null }, // rpc next_ticket_number retry
+      { data: null, error: null }, // ticket insert succeeds
+      { data: null, error: null }, // activity event
+    ]);
+
+    const res = await app.request(
+      `/projects/${PROJECT_ID}/tickets`,
+      post({ title: "Retry me" }),
+    );
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.title).toBe("Retry me");
+    expect(body.number).toBe(2);
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -106,6 +106,14 @@ const CreateTicketBody = z.object({
   tags: z.array(z.string()).optional(),
 });
 
+function isDuplicateTicketNumberError(error: { code?: string; message?: string }): boolean {
+  return (
+    error.code === "23505" &&
+    typeof error.message === "string" &&
+    error.message.includes("tickets_project_id_number_key")
+  );
+}
+
 tickets.post("/projects/:projectId/tickets", async (c) => {
   const { supabase, user } = getAuth(c);
   const projectId = c.req.param("projectId");
@@ -150,66 +158,90 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
     );
   }
 
-  // Get next ticket number atomically
-  const { data: nextNumber, error: numberError } = await supabase.rpc(
-    "next_ticket_number",
-    { p_project_id: projectId },
-  );
-
-  if (numberError) {
-    return c.json(
-      { error: { code: "DB_ERROR", message: numberError.message } },
-      500,
-    );
-  }
-
-  // Call domain command
   const now = new Date().toISOString();
-  const id = crypto.randomUUID();
+  const maxInsertAttempts = 5;
+  let createdResult: ReturnType<typeof createTicket> | null = null;
 
-  const result = createTicket(
-    {
-      id,
-      project_id: projectId,
-      number: nextNumber,
-      title: parsed.data.title,
-      description: parsed.data.description,
-      assignee_id: parsed.data.assignee_id,
-      reporter_id: user.id,
-      tags: parsed.data.tags,
-      now,
-    },
-    columnsData,
-  );
+  for (let attempt = 1; attempt <= maxInsertAttempts; attempt += 1) {
+    // Allocate next ticket number from DB.
+    const { data: nextNumber, error: numberError } = await supabase.rpc(
+      "next_ticket_number",
+      { p_project_id: projectId },
+    );
 
-  // Persist ticket (exclude domain-only `tags` field — tags stored in join table)
-  const { error: insertError } = await supabase.from("tickets").insert({
-    id: result.data.id,
-    project_id: result.data.project_id,
-    number: result.data.number,
-    title: result.data.title,
-    description: result.data.description,
-    status_column_id: result.data.status_column_id,
-    assignee_id: result.data.assignee_id,
-    reporter_id: result.data.reporter_id,
-    created_at: result.data.created_at,
-    updated_at: result.data.updated_at,
-    closed_at: result.data.closed_at,
-  });
+    if (numberError) {
+      return c.json(
+        { error: { code: "DB_ERROR", message: numberError.message } },
+        500,
+      );
+    }
 
-  if (insertError) {
+    const result = createTicket(
+      {
+        id: crypto.randomUUID(),
+        project_id: projectId,
+        number: nextNumber,
+        title: parsed.data.title,
+        description: parsed.data.description,
+        assignee_id: parsed.data.assignee_id,
+        reporter_id: user.id,
+        tags: parsed.data.tags,
+        now,
+      },
+      columnsData,
+    );
+
+    // Persist ticket (exclude domain-only `tags` field — tags stored in join table)
+    const { error: insertError } = await supabase.from("tickets").insert({
+      id: result.data.id,
+      project_id: result.data.project_id,
+      number: result.data.number,
+      title: result.data.title,
+      description: result.data.description,
+      status_column_id: result.data.status_column_id,
+      assignee_id: result.data.assignee_id,
+      reporter_id: result.data.reporter_id,
+      created_at: result.data.created_at,
+      updated_at: result.data.updated_at,
+      closed_at: result.data.closed_at,
+    });
+
+    if (!insertError) {
+      createdResult = result;
+      break;
+    }
+
+    if (
+      isDuplicateTicketNumberError(insertError) &&
+      attempt < maxInsertAttempts
+    ) {
+      continue;
+    }
+
     return c.json(
       { error: { code: "DB_ERROR", message: insertError.message } },
       500,
     );
   }
 
+  if (!createdResult) {
+    return c.json(
+      {
+        error: {
+          code: "DB_ERROR",
+          message: "Failed to allocate a unique ticket number",
+        },
+      },
+      500,
+    );
+  }
+
   // Persist activity events (best-effort)
-  await persistActivityEvents(supabase, result.events);
+  await persistActivityEvents(supabase, createdResult.events);
 
   // Handle tags if provided (best-effort — ticket already created)
   if (parsed.data.tags && parsed.data.tags.length > 0) {
-    for (const tagName of result.data.tags) {
+    for (const tagName of createdResult.data.tags) {
       // Upsert tag
       const { data: tagRow, error: tagError } = await supabase
         .from("tags")
@@ -228,7 +260,7 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
       if (tagRow) {
         const { error: joinError } = await supabase
           .from("ticket_tags")
-          .insert({ ticket_id: id, tag_id: tagRow.id });
+          .insert({ ticket_id: createdResult.data.id, tag_id: tagRow.id });
         if (joinError) {
           console.error(`Failed to link tag "${tagName}" to ticket:`, joinError);
         }
@@ -236,7 +268,7 @@ tickets.post("/projects/:projectId/tickets", async (c) => {
     }
   }
 
-  return c.json(result.data, 201);
+  return c.json(createdResult.data, 201);
 });
 
 const UpdateTicketBody = z.object({

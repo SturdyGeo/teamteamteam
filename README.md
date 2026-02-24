@@ -409,7 +409,7 @@ The Bun server runs on `http://localhost:3001` by default (configurable via `POR
 | `GET` | `/projects/:projectId/columns` | List workflow columns |
 | `GET` | `/projects/:projectId/tickets` | List tickets (with filters) |
 | `GET` | `/projects/:projectId/tags` | List project tags |
-| `POST` | `/projects/:projectId/tickets` | Create ticket |
+| `POST` | `/projects/:projectId/tickets` | Create ticket (server retries ticket-number collisions automatically) |
 | `GET` | `/tickets/:ticketId` | Get ticket details |
 | `PATCH` | `/tickets/:ticketId/move` | Move ticket to column (auto-close in Done, auto-reopen when moved out) |
 | `PATCH` | `/tickets/:ticketId/assign` | Assign/unassign ticket |
@@ -434,6 +434,14 @@ The Bun server runs on `http://localhost:3001` by default (configurable via `POR
 ### Authentication
 
 All endpoints except `/health` require a valid Supabase JWT in the `Authorization: Bearer <token>` header. RLS policies enforce org-level isolation automatically.
+
+If org members see `tickets_project_id_number_key` duplicate-key errors while creating tickets, update both API code and DB migrations:
+
+```sh
+doppler run -- bun run build:edge
+doppler run -- supabase functions deploy api
+doppler run -- bun run db:push
+```
 
 ## Development
 
