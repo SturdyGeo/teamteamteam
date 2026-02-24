@@ -540,6 +540,7 @@ Required GitHub configuration:
 - Repository variable:
   - `HOMEBREW_TAP_REPOSITORY` (optional override, format: `owner/homebrew-teamteamteam`)
 - Repository secret:
+  - `RELEASE_GITHUB_TOKEN` (PAT with write access to create releases in the main repo)
   - `HOMEBREW_TAP_GITHUB_TOKEN` (PAT with push access to the tap repo)
 
 Default tap repository (if variable not set):

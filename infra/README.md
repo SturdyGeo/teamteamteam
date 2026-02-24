@@ -78,5 +78,6 @@ Tagging `vX.Y.Z` triggers `.github/workflows/release-cli.yml` to publish prebuil
 
 | Type | Name | Description |
 |------|------|-------------|
+| Secret | `RELEASE_GITHUB_TOKEN` | Personal access token with release write access to the main app repository. |
 | Variable | `HOMEBREW_TAP_REPOSITORY` | Optional tap repo override (`owner/homebrew-teamteamteam`). Defaults to `<repo-owner>/homebrew-teamteamteam`. |
 | Secret | `HOMEBREW_TAP_GITHUB_TOKEN` | Personal access token with push access to the tap repository. |
