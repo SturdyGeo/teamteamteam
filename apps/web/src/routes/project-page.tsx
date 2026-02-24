@@ -699,7 +699,7 @@ export function ProjectPage({
                                     className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-foreground hover:bg-accent"
                                     onClick={() => void handleQuickAssign(ticket.id, null)}
                                   >
-                                    Nobody
+                                    Unassigned
                                   </Button>
                                   {quickAssignMembers.map((member) => (
                                     <Button
@@ -892,7 +892,7 @@ export function ProjectPage({
                       }}
                       disabled={modalBusy}
                     >
-                      <option value="unassigned">Nobody</option>
+                      <option value="unassigned">Unassigned</option>
                       {members.map((member) => (
                         <option key={member.user.id} value={member.user.id}>
                           {member.user.email}

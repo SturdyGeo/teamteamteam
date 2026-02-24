@@ -62,7 +62,7 @@ Current implementation includes:
 - Card quick-assign assignee picker uses shadcn popover primitives for stable positioning/interaction
 - Card quick-assign popovers remain searchable
 - Ticket detail save expects latest API + migration rollout (`build:edge`, deploy function, `supabase db push`)
-- Click assignee chip on a card to open a quick-assign dropdown with `Nobody`
+- Click assignee chip on a card to open a quick-assign dropdown with `Unassigned`
 - Interactive form controls/buttons in app routes are standardized on shared shadcn primitives (`Button`, `Input`, `Select`, `Textarea`, `Label`)
 
 ## Scripts

@@ -303,7 +303,7 @@ Web board UX refresh is implemented:
 - Active drop target column highlights while dragging tickets
 - Per-column `+` actions now open the shared ticket modal in create mode
 - Single-click ticket modal with full detail view + quick edit actions
-- Clickable assignee badge on cards opens quick-assign dropdown (includes Nobody)
+- Clickable assignee badge on cards opens quick-assign dropdown (includes Unassigned)
 - Updated visual theme to a dark mono "executive terminal" style across auth + app surfaces
 - Signed-in logo click now triggers a fast twirl animation with a sharp snap-stop
 - `/` now redirects authenticated users to the first available project board
