@@ -19,6 +19,13 @@ const columns: WorkflowColumn[] = [
     position: 1,
     created_at: "2024-01-01T00:00:00Z",
   },
+  {
+    id: "c0000000-0000-0000-0000-000000000003",
+    project_id: "b0000000-0000-0000-0000-000000000001",
+    name: "Done",
+    position: 2,
+    created_at: "2024-01-01T00:00:00Z",
+  },
 ];
 
 const ticket: Ticket = {
@@ -28,7 +35,6 @@ const ticket: Ticket = {
   title: "Fix the bug",
   description: "",
   status_column_id: columns[0].id,
-  priority: "P1",
   assignee_id: null,
   reporter_id: "d0000000-0000-0000-0000-000000000001",
   tags: [],
@@ -135,5 +141,47 @@ describe("moveTicket", () => {
       columns,
     );
     expect(result.data).not.toBe(ticket);
+  });
+
+  it("auto-closes when moved into Done", () => {
+    const result = moveTicket(
+      ticket,
+      {
+        to_column_id: columns[2].id,
+        actor_id: "d0000000-0000-0000-0000-000000000001",
+        now: "2024-06-02T12:00:00Z",
+      },
+      columns,
+    );
+
+    expect(result.data.closed_at).toBe("2024-06-02T12:00:00Z");
+    expect(result.events.map((event) => event.event_type)).toEqual([
+      "status_changed",
+      "ticket_closed",
+    ]);
+  });
+
+  it("auto-reopens when moved out of Done", () => {
+    const closedDoneTicket: Ticket = {
+      ...ticket,
+      status_column_id: columns[2].id,
+      closed_at: "2024-06-01T13:00:00Z",
+    };
+
+    const result = moveTicket(
+      closedDoneTicket,
+      {
+        to_column_id: columns[1].id,
+        actor_id: "d0000000-0000-0000-0000-000000000001",
+        now: "2024-06-02T12:00:00Z",
+      },
+      columns,
+    );
+
+    expect(result.data.closed_at).toBeNull();
+    expect(result.events.map((event) => event.event_type)).toEqual([
+      "status_changed",
+      "ticket_reopened",
+    ]);
   });
 });

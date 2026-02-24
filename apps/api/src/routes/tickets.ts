@@ -383,6 +383,7 @@ tickets.patch("/tickets/:ticketId/move", async (c) => {
     .from("tickets")
     .update({
       status_column_id: result.data.status_column_id,
+      closed_at: result.data.closed_at,
       updated_at: result.data.updated_at,
     })
     .eq("id", ticketId);
@@ -605,6 +606,47 @@ tickets.patch("/tickets/:ticketId/reopen", async (c) => {
   await persistActivityEvents(supabase, result.events);
 
   return c.json(result.data);
+});
+
+tickets.delete("/tickets/:ticketId", async (c) => {
+  const { supabase } = getAuth(c);
+  const ticketId = c.req.param("ticketId");
+
+  const { data: ticketData, error: ticketError } = await supabase
+    .from("tickets")
+    .select(TICKET_SELECT)
+    .eq("id", ticketId)
+    .single();
+
+  if (ticketError) {
+    if (ticketError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Ticket not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: ticketError.message } },
+      500,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ticket = enrichTicketWithTags(ticketData as any);
+
+  const { error: deleteError } = await supabase
+    .from("tickets")
+    .delete()
+    .eq("id", ticketId);
+
+  if (deleteError) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: deleteError.message } },
+      500,
+    );
+  }
+
+  return c.json(ticket);
 });
 
 export { tickets };

@@ -81,10 +81,11 @@ Common error codes:
 | `GET` | `/projects/:projectId/tickets` | Yes | List tickets (with filters) |
 | `POST` | `/projects/:projectId/tickets` | Yes | Create ticket |
 | `GET` | `/tickets/:ticketId` | Yes | Get ticket details |
-| `PATCH` | `/tickets/:ticketId/move` | Yes | Move ticket to column |
+| `PATCH` | `/tickets/:ticketId/move` | Yes | Move ticket to column (auto-closes in Done, auto-reopens when moved out) |
 | `PATCH` | `/tickets/:ticketId/assign` | Yes | Assign/unassign ticket |
 | `PATCH` | `/tickets/:ticketId/close` | Yes | Close ticket |
 | `PATCH` | `/tickets/:ticketId/reopen` | Yes | Reopen ticket |
+| `DELETE` | `/tickets/:ticketId` | Yes | Delete ticket |
 
 ### Tags
 

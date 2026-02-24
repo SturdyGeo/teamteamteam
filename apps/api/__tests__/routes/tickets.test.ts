@@ -7,11 +7,13 @@ const PROJECT_ID = "00000000-0000-0000-0000-000000000010";
 const TICKET_ID = "00000000-0000-0000-0000-000000000100";
 const COLUMN_A = "00000000-0000-0000-0000-00000000000a";
 const COLUMN_B = "00000000-0000-0000-0000-00000000000b";
+const COLUMN_DONE = "00000000-0000-0000-0000-00000000000c";
 const ASSIGNEE_ID = "00000000-0000-0000-0000-000000000002";
 
 const COLUMNS = [
   { id: COLUMN_A, project_id: PROJECT_ID, name: "To Do", position: 0, created_at: "2026-01-01T00:00:00.000Z" },
   { id: COLUMN_B, project_id: PROJECT_ID, name: "In Progress", position: 1, created_at: "2026-01-01T00:00:00.000Z" },
+  { id: COLUMN_DONE, project_id: PROJECT_ID, name: "Done", position: 2, created_at: "2026-01-01T00:00:00.000Z" },
 ];
 
 function rawTicket(overrides: Record<string, unknown> = {}) {
@@ -305,6 +307,51 @@ describe("PATCH /tickets/:ticketId/move", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status_column_id).toBe(COLUMN_B);
+    expect(body.closed_at).toBeNull();
+  });
+
+  it("auto-closes ticket when moved into Done column", async () => {
+    const app = setup([
+      { data: rawTicket({ closed_at: null }), error: null }, // ticket fetch
+      { data: COLUMNS, error: null },                        // columns fetch
+      { data: null, error: null },                           // ticket update
+      { data: null, error: null },                           // status_changed event
+      { data: null, error: null },                           // ticket_closed event
+    ]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}/move`,
+      patch({ to_column_id: COLUMN_DONE }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status_column_id).toBe(COLUMN_DONE);
+    expect(body.closed_at).not.toBeNull();
+  });
+
+  it("auto-reopens ticket when moved out of Done column", async () => {
+    const app = setup([
+      {
+        data: rawTicket({
+          status_column_id: COLUMN_DONE,
+          closed_at: "2026-01-01T00:10:00.000Z",
+        }),
+        error: null,
+      },
+      { data: COLUMNS, error: null },             // columns fetch
+      { data: null, error: null },                // ticket update
+      { data: null, error: null },                // status_changed event
+      { data: null, error: null },                // ticket_reopened event
+    ]);
+
+    const res = await app.request(
+      `/tickets/${TICKET_ID}/move`,
+      patch({ to_column_id: COLUMN_B }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status_column_id).toBe(COLUMN_B);
+    expect(body.closed_at).toBeNull();
   });
 
   it("returns 400 when to_column_id is missing", async () => {
@@ -367,6 +414,45 @@ describe("PATCH /tickets/:ticketId/move", () => {
       `/tickets/${TICKET_ID}/move`,
       patch({ to_column_id: COLUMN_B }),
     );
+    expect(res.status).toBe(500);
+    expect((await res.json()).error.code).toBe("DB_ERROR");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// DELETE /tickets/:ticketId
+// ---------------------------------------------------------------------------
+
+describe("DELETE /tickets/:ticketId", () => {
+  it("deletes ticket and returns deleted ticket", async () => {
+    const app = setup([
+      { data: rawTicket(), error: null }, // ticket fetch
+      { data: null, error: null },        // delete
+    ]);
+
+    const res = await app.request(`/tickets/${TICKET_ID}`, { method: "DELETE" });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.id).toBe(TICKET_ID);
+  });
+
+  it("returns 404 when ticket not found", async () => {
+    const app = setup([
+      { data: null, error: { message: "not found", code: "PGRST116" } },
+    ]);
+
+    const res = await app.request(`/tickets/${TICKET_ID}`, { method: "DELETE" });
+    expect(res.status).toBe(404);
+    expect((await res.json()).error.code).toBe("NOT_FOUND");
+  });
+
+  it("returns 500 when delete fails", async () => {
+    const app = setup([
+      { data: rawTicket(), error: null },
+      { data: null, error: { message: "delete failed" } },
+    ]);
+
+    const res = await app.request(`/tickets/${TICKET_ID}`, { method: "DELETE" });
     expect(res.status).toBe(500);
     expect((await res.json()).error.code).toBe("DB_ERROR");
   });

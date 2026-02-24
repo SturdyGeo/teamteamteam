@@ -66,6 +66,7 @@ describe("createTeamteamteamClient", () => {
     expect(typeof client.updateTicket).toBe("function");
     expect(typeof client.moveTicket).toBe("function");
     expect(typeof client.closeTicket).toBe("function");
+    expect(typeof client.deleteTicket).toBe("function");
   });
 
   it("uses custom sessionStore when provided", () => {

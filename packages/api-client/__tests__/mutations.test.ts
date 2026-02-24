@@ -85,6 +85,12 @@ describe("MutationMethods", () => {
     });
   });
 
+  it("deleteTicket calls DELETE /tickets/:id", async () => {
+    const mutations = createMutationMethods(http);
+    await mutations.deleteTicket("t-1");
+    expect(http.delete).toHaveBeenCalledWith("/tickets/t-1");
+  });
+
   it("addTag calls POST /tickets/:id/tags", async () => {
     const mutations = createMutationMethods(http);
     await mutations.addTag("t-1", { tag: "bug" });

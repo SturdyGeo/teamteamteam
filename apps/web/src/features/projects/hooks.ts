@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CreateTicketInput,
-  ReopenTicketInput,
   TicketQueryParams,
   UpdateTicketInput,
 } from "@teamteamteam/api-client/web";
@@ -55,11 +54,6 @@ interface MoveTicketVariables {
 interface AssignTicketVariables {
   ticketId: string;
   assigneeId: string | null;
-}
-
-interface ReopenTicketVariables {
-  ticketId: string;
-  toColumnId: string;
 }
 
 interface AddTagVariables {
@@ -237,27 +231,13 @@ export function useAssignTicketMutation(projectId: string | null) {
   });
 }
 
-export function useCloseTicketMutation(projectId: string | null) {
+export function useDeleteTicketMutation(projectId: string | null) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ticketId: string) => apiClient.closeTicket(ticketId),
+    mutationFn: async (ticketId: string) => apiClient.deleteTicket(ticketId),
     onSuccess: async (_ticket, ticketId) => {
       await invalidateTicketQueries(projectId, queryClient, ticketId);
-    },
-  });
-}
-
-export function useReopenTicketMutation(projectId: string | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ ticketId, toColumnId }: ReopenTicketVariables) => {
-      const input: ReopenTicketInput = { to_column_id: toColumnId };
-      return apiClient.reopenTicket(ticketId, input);
-    },
-    onSuccess: async (_ticket, variables) => {
-      await invalidateTicketQueries(projectId, queryClient, variables.ticketId);
     },
   });
 }

@@ -273,7 +273,7 @@ Phase 4 data layer is implemented:
 - Ticket modal assignee uses a dropdown selector (quick-card assign remains searchable)
 - Card-level quick-assign now uses shadcn popover primitives for more stable dropdown interaction
 - Ticket detail save requires the latest Edge Function deployment and DB migrations (`build:edge`, `functions deploy api`, `supabase db push`)
-- Ticket edit modal supports Enter-to-save (title input) with color-coded Save vs Close/Reopen actions
+- Ticket edit modal supports Enter-to-save (title input) with color-coded Save vs Delete actions
 - Escape now closes active web modals (ticket modal and create org/project dialogs)
 - Primary action buttons use a consistent bright amber style across login/create/save/add web flows
 - Global web theme tokens now use a black-first neutral palette with restrained amber accents inspired by the IT Crowd aesthetic
@@ -303,6 +303,7 @@ Web board UX refresh is implemented:
 - Active drop target column highlights while dragging tickets
 - Per-column `+` actions now open the shared ticket modal in create mode
 - Single-click ticket modal with full detail view + quick edit actions
+- Ticket delete action is available directly from the edit modal
 - Clickable assignee badge on cards opens quick-assign dropdown (includes Unassigned)
 - Updated visual theme to a dark mono "executive terminal" style across auth + app surfaces
 - Signed-in logo click now triggers a fast twirl animation with a sharp snap-stop
@@ -380,10 +381,11 @@ The Bun server runs on `http://localhost:3001` by default (configurable via `POR
 | `GET` | `/projects/:projectId/tags` | List project tags |
 | `POST` | `/projects/:projectId/tickets` | Create ticket |
 | `GET` | `/tickets/:ticketId` | Get ticket details |
-| `PATCH` | `/tickets/:ticketId/move` | Move ticket to column |
+| `PATCH` | `/tickets/:ticketId/move` | Move ticket to column (auto-close in Done, auto-reopen when moved out) |
 | `PATCH` | `/tickets/:ticketId/assign` | Assign/unassign ticket |
 | `PATCH` | `/tickets/:ticketId/close` | Close ticket |
 | `PATCH` | `/tickets/:ticketId/reopen` | Reopen ticket |
+| `DELETE` | `/tickets/:ticketId` | Delete ticket |
 | `POST` | `/tickets/:ticketId/tags` | Add tag to ticket |
 | `DELETE` | `/tickets/:ticketId/tags/:tag` | Remove tag from ticket |
 | `GET` | `/tickets/:ticketId/activity` | Get ticket activity log |
@@ -459,7 +461,7 @@ doppler run -- bun run test:integration
 Integration tests cover:
 - Org/project/ticket CRUD through the real API
 - RLS org isolation (users can only see their own org's data)
-- Ticket lifecycle (create, move, assign, tag, close, reopen)
+- Ticket lifecycle (create, move, assign, tag, close, reopen, delete)
 - Activity event append-only enforcement
 - Member invitation and access control
 - Tag normalization and deduplication

@@ -31,13 +31,17 @@ export function moveTicket(
     );
   }
 
+  const isTargetDone = targetColumn.name.trim().toLowerCase() === "done";
+  const nextClosedAt = isTargetDone ? input.now : null;
+
   const updated: Ticket = {
     ...ticket,
     status_column_id: input.to_column_id,
+    closed_at: nextClosedAt,
     updated_at: input.now,
   };
 
-  const event: NewActivityEvent = {
+  const statusEvent: NewActivityEvent = {
     ticket_id: ticket.id,
     actor_id: input.actor_id,
     event_type: "status_changed",
@@ -47,5 +51,24 @@ export function moveTicket(
     },
   };
 
-  return { data: updated, events: [event] };
+  const events: NewActivityEvent[] = [statusEvent];
+  if (ticket.closed_at === null && nextClosedAt !== null) {
+    events.push({
+      ticket_id: ticket.id,
+      actor_id: input.actor_id,
+      event_type: "ticket_closed",
+      payload: {},
+    });
+  } else if (ticket.closed_at !== null && nextClosedAt === null) {
+    events.push({
+      ticket_id: ticket.id,
+      actor_id: input.actor_id,
+      event_type: "ticket_reopened",
+      payload: {
+        to_column_id: input.to_column_id,
+      },
+    });
+  }
+
+  return { data: updated, events };
 }

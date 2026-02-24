@@ -14,9 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   useAddTagMutation,
   useAssignTicketMutation,
-  useCloseTicketMutation,
+  useDeleteTicketMutation,
   useRemoveTagMutation,
-  useReopenTicketMutation,
   useTicketActivityQuery,
   useTicketDetailQuery,
   useUpdateTicketMutation,
@@ -151,8 +150,7 @@ export function ProjectPage({
   const ticketActivityQuery = useTicketActivityQuery(selectedTicketId, Boolean(selectedTicketId));
   const updateMutation = useUpdateTicketMutation(projectId);
   const assignMutation = useAssignTicketMutation(projectId);
-  const closeMutation = useCloseTicketMutation(projectId);
-  const reopenMutation = useReopenTicketMutation(projectId);
+  const deleteMutation = useDeleteTicketMutation(projectId);
   const addTagMutation = useAddTagMutation(projectId);
   const removeTagMutation = useRemoveTagMutation(projectId);
 
@@ -219,8 +217,7 @@ export function ProjectPage({
   const modalBusy =
     updateMutation.isPending ||
     assignMutation.isPending ||
-    closeMutation.isPending ||
-    reopenMutation.isPending ||
+    deleteMutation.isPending ||
     addTagMutation.isPending ||
     removeTagMutation.isPending ||
     isCreatePending ||
@@ -424,29 +421,23 @@ export function ProjectPage({
     }
   }
 
-  async function handleCloseOrReopen(): Promise<void> {
+  async function handleDeleteTicket(): Promise<void> {
     if (!selectedTicket) {
       return;
     }
 
     setModalError(null);
 
+    const confirmed = window.confirm(
+      `Delete ${projectPrefix}-${selectedTicket.number}? This cannot be undone.`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
     try {
-      if (selectedTicket.closed_at) {
-        const fallbackColumnId = columns[0]?.id;
-        if (!fallbackColumnId) {
-          throw new Error("No workflow columns available.");
-        }
-
-        await reopenMutation.mutateAsync({
-          ticketId: selectedTicket.id,
-          toColumnId: fallbackColumnId,
-        });
-      } else {
-        await closeMutation.mutateAsync(selectedTicket.id);
-      }
-
-      await ticketDetailQuery.refetch();
+      await deleteMutation.mutateAsync(selectedTicket.id);
+      closeModal();
     } catch (error) {
       setModalError(toMessage(error));
     }
@@ -954,15 +945,10 @@ export function ProjectPage({
                   <Button
                     type="button"
                     disabled={modalBusy}
-                    onClick={() => void handleCloseOrReopen()}
-                    className={cn(
-                      "h-9 rounded-md border px-3 text-sm disabled:opacity-50",
-                      selectedTicket.closed_at
-                        ? "border-primary/60 bg-primary/20 text-primary hover:bg-primary/30"
-                        : "border-destructive/60 bg-destructive/20 text-destructive hover:bg-destructive/30",
-                    )}
+                    onClick={() => void handleDeleteTicket()}
+                    className="h-9 rounded-md border border-destructive/70 bg-destructive/20 px-3 text-sm text-destructive hover:bg-destructive/30 disabled:opacity-50"
                   >
-                    {selectedTicket.closed_at ? "Reopen ticket" : "Close ticket"}
+                    {deleteMutation.isPending ? "Deleting..." : "Delete ticket"}
                   </Button>
                 </div>
 

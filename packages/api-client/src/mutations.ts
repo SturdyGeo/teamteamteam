@@ -21,6 +21,7 @@ export interface MutationMethods {
   assignTicket(ticketId: string, input: AssignTicketInput): Promise<Ticket>;
   closeTicket(ticketId: string): Promise<Ticket>;
   reopenTicket(ticketId: string, input: ReopenTicketInput): Promise<Ticket>;
+  deleteTicket(ticketId: string): Promise<Ticket>;
   addTag(ticketId: string, input: AddTagInput): Promise<Ticket>;
   removeTag(ticketId: string, tag: string): Promise<Ticket>;
   inviteMember(orgId: string, input: InviteMemberInput): Promise<Membership>;
@@ -60,6 +61,10 @@ export function createMutationMethods(http: HttpClient): MutationMethods {
 
     reopenTicket(ticketId: string, input: ReopenTicketInput) {
       return http.patch<Ticket>(`/tickets/${ticketId}/reopen`, input);
+    },
+
+    deleteTicket(ticketId: string) {
+      return http.delete<Ticket>(`/tickets/${ticketId}`);
     },
 
     addTag(ticketId: string, input: AddTagInput) {

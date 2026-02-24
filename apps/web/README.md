@@ -43,11 +43,11 @@ Current implementation includes:
 - Drag-and-drop uses optimistic board state without snap-back while awaiting server confirmation
 - Visual drop-target highlight while dragging cards across columns
 - Per-column `+` actions open the shared ticket modal in create mode
-- Single-click ticket modal for full view with assignment, status, tags, and close/reopen actions
+- Single-click ticket modal for full view with assignment, status, tags, and delete action
 - Ticket modal title + description are editable text inputs with persisted save
 - Saving ticket title/description closes the modal; unchanged edits also close without error
 - Pressing Enter in ticket title now submits "Save changes"
-- Save/Close/Reopen actions are color-coded for clearer intent
+- Save/Delete actions are color-coded for clearer intent
 - Primary action buttons now use a consistent bright amber treatment across auth, create, and save/add flows
 - Color styling is tokenized through global CSS variables (`styles.css`) across routes/components
 - Global token palette uses a black-first neutral base with restrained amber accents (bright amber reserved for high-intent actions)
