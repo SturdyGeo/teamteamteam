@@ -4,6 +4,13 @@ Command-line interface and TUI for Teamteamteam. Built with Commander (CLI) and 
 
 ## Installation
 
+Recommended end-user install (no Bun required):
+
+```sh
+brew tap <org>/teamteamteam
+brew install ttteam
+```
+
 The CLI is part of the Teamteamteam monorepo. After building (`bun run build`), run commands via:
 
 ```sh

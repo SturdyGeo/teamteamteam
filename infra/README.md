@@ -69,3 +69,14 @@ Seed data is in `supabase/seed.sql` and runs automatically after `db:reset`.
 ### CI
 
 GitHub Actions CI does not use Doppler yet (no secrets needed in Phase 1). Doppler integration will be added when Supabase secrets are required.
+
+## Homebrew Release Automation
+
+Tagging `vX.Y.Z` triggers `.github/workflows/release-cli.yml` to publish prebuilt macOS binaries and update the Homebrew tap formula.
+
+### Required GitHub Settings
+
+| Type | Name | Description |
+|------|------|-------------|
+| Variable | `HOMEBREW_TAP_REPOSITORY` | Optional tap repo override (`owner/homebrew-teamteamteam`). Defaults to `<repo-owner>/homebrew-teamteamteam`. |
+| Secret | `HOMEBREW_TAP_GITHUB_TOKEN` | Personal access token with push access to the tap repository. |

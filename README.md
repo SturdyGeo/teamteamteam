@@ -18,6 +18,16 @@ Designed to evolve into a full web application without rewriting core logic.
 - **Flexible workflows** — columns are data, not hardcoded enums
 - **Client-side filtering** by status, assignee, tag, and text search
 
+## Homebrew Install (End Users)
+
+Install the standalone macOS CLI binary with no Bun/Doppler dependency:
+
+```sh
+brew tap <org>/teamteamteam
+brew install ttteam
+ttteam --version
+```
+
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (runtime and package manager)
@@ -470,7 +480,7 @@ Integration tests cover:
 
 ## Binary Distribution
 
-Install the CLI in one command:
+For local developer installs, install the CLI in one command:
 
 ```sh
 bun run install:cli
@@ -508,6 +518,42 @@ Or use the `release` script to build everything (TypeScript + binary):
 
 ```sh
 doppler run -- bun run release
+```
+
+## Automated CLI Releases (GitHub + Homebrew Tap)
+
+Tag-driven release automation is implemented in `.github/workflows/release-cli.yml`.
+
+When a tag like `v1.2.3` is pushed, CI will:
+
+1. Build standalone binaries on macOS runners:
+   1. `ttteam-darwin-arm64.tar.gz`
+   2. `ttteam-darwin-amd64.tar.gz`
+2. Verify binary startup (`./dist/ttteam --version`)
+3. Compute SHA256 checksums
+4. Create/update the GitHub release and upload both binaries + checksum files
+5. Generate `Formula/ttteam.rb` with architecture-specific URLs + SHA256
+6. Commit and push formula updates to the Homebrew tap repository
+
+Required GitHub configuration:
+
+- Repository variable:
+  - `HOMEBREW_TAP_REPOSITORY` (optional override, format: `owner/homebrew-teamteamteam`)
+- Repository secret:
+  - `HOMEBREW_TAP_GITHUB_TOKEN` (PAT with push access to the tap repo)
+
+Default tap repository (if variable not set):
+
+```sh
+<current-repo-owner>/homebrew-teamteamteam
+```
+
+Tap repository layout:
+
+```text
+homebrew-teamteamteam/
+└─ Formula/
+   └─ ttteam.rb
 ```
 
 ## Architecture

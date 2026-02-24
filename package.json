@@ -18,6 +18,7 @@
     "release": "bun run build && bun run build:cli",
     "clean": "rm -rf dist packages/*/dist apps/*/dist *.tsbuildinfo packages/*/*.tsbuildinfo apps/*/*.tsbuildinfo",
     "build:edge": "bun build apps/api/src/app.ts --bundle --outfile supabase/functions/api/app.bundle.js --format esm --target browser --external @supabase/supabase-js",
+    "generate:homebrew-formula": "node ./scripts/generate-homebrew-formula.mjs",
     "db:push": "supabase db push",
     "db:reset": "supabase db reset --linked",
     "db:diff": "supabase db diff",
