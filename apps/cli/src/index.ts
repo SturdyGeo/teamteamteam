@@ -8,8 +8,14 @@ import { registerTagCommands } from "./commands/tag.js";
 import { registerBoardCommand } from "./commands/board.js";
 import { configureClient } from "./client.js";
 
+declare const __TTTEAM_VERSION__: string | undefined;
+
+const embeddedVersion =
+  typeof __TTTEAM_VERSION__ !== "undefined" ? __TTTEAM_VERSION__ : undefined;
+const cliVersion = (embeddedVersion ?? process.env.TTTEAM_VERSION ?? "0.1.0").replace(/^v/, "");
+
 const program = new Command("ttteam")
-  .version("0.1.0")
+  .version(cliVersion)
   .description("Terminal-first multi-user kanban")
   .showHelpAfterError()
   .option("--json", "Output as JSON")

@@ -506,10 +506,16 @@ You can also build the standalone macOS binary without installing it:
 doppler run -- bun run build:cli
 ```
 
+To embed a custom version string in the compiled binary:
+
+```sh
+TTTEAM_VERSION=v0.1.6 doppler run -- bun run build:cli
+```
+
 This produces `dist/ttteam`. Run it directly:
 
 ```sh
-./dist/ttteam --version   # 0.1.0
+./dist/ttteam --version   # local default: 0.1.0, release builds: tag version
 ./dist/ttteam --help
 ./dist/ttteam login alice@acme.com
 ```
@@ -530,6 +536,7 @@ When a tag like `v1.2.3` is pushed, CI will:
    1. `ttteam-darwin-arm64.tar.gz`
    2. `ttteam-darwin-amd64.tar.gz`
 2. Verify binary startup (`./dist/ttteam --version`)
+   - release builds inject `TTTEAM_VERSION` from the git tag (for example `v0.1.6` -> `0.1.6`)
 3. Compute SHA256 checksums
 4. Create/update the GitHub release and upload both binaries + checksum files
 5. Generate `Formula/ttteam.rb` with architecture-specific URLs + SHA256

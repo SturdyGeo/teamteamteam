@@ -73,6 +73,7 @@ GitHub Actions CI does not use Doppler yet (no secrets needed in Phase 1). Doppl
 ## Homebrew Release Automation
 
 Tagging `vX.Y.Z` triggers `.github/workflows/release-cli.yml` to publish prebuilt macOS binaries and update the Homebrew tap formula.
+The release workflow sets `TTTEAM_VERSION` from the tag so `ttteam --version` matches the brewed formula version.
 
 Current macOS build matrix:
 - `macos-14` for `arm64`
