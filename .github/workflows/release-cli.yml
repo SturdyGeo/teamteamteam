@@ -56,7 +56,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.asset_arch }}
-          path: release/*
+          if-no-files-found: error
+          path: |
+            release/ttteam-darwin-${{ matrix.asset_arch }}.tar.gz
+            release/ttteam-darwin-${{ matrix.asset_arch }}.tar.gz.sha256
 
   publish-release:
     name: Publish release + update Homebrew tap
@@ -73,6 +76,11 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: release
+
+      - name: List downloaded artifacts
+        run: |
+          set -euo pipefail
+          find release -maxdepth 3 -type f | sort
 
       - name: Compute release metadata
         run: |
