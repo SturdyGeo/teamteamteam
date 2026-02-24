@@ -18,7 +18,7 @@ jobs:
         include:
           - runner: macos-14
             asset_arch: arm64
-          - runner: macos-13
+          - runner: macos-15-intel
             asset_arch: amd64
 
     steps:
