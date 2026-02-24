@@ -7,8 +7,16 @@ Command-line interface and TUI for Teamteamteam. Built with Commander (CLI) and 
 Recommended end-user install (no Bun required):
 
 ```sh
-brew tap <org>/teamteamteam
-brew install ttteam
+brew tap sturdygeo/teamteamteam
+brew install sturdygeo/teamteamteam/ttteam
+ttteam --version
+```
+
+Upgrade an existing install:
+
+```sh
+brew update
+brew upgrade ttteam
 ```
 
 The CLI is part of the Teamteamteam monorepo. After building (`bun run build`), run commands via:

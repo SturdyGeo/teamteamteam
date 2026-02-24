@@ -23,10 +23,28 @@ Designed to evolve into a full web application without rewriting core logic.
 Install the standalone macOS CLI binary with no Bun/Doppler dependency:
 
 ```sh
-brew tap <org>/teamteamteam
-brew install ttteam
+brew tap sturdygeo/teamteamteam
+brew install sturdygeo/teamteamteam/ttteam
 ttteam --version
 ```
+
+Upgrade to the latest released version:
+
+```sh
+brew update
+brew upgrade ttteam
+ttteam --version
+```
+
+If `ttteam` is not found after install, refresh your shell path and retry:
+
+```sh
+eval "$(brew shellenv)"
+hash -r
+ttteam --version
+```
+
+Release maintainer runbook: [`RELEASES.md`](RELEASES.md)
 
 ## Prerequisites
 
