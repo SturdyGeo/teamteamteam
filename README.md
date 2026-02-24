@@ -488,6 +488,7 @@ Unit tests are located at `**/__tests__/**/*.test.ts` within each workspace pack
 ### Integration Tests
 
 Integration tests live in `tests/integration/` and run against a real Supabase local dev instance. They verify the full stack: HTTP request -> auth middleware -> Supabase client -> Postgres (with RLS) -> response.
+Vitest integration test discovery pattern: `tests/integration/__tests__/**/*.test.ts`.
 
 **Prerequisites:**
 - Docker running
