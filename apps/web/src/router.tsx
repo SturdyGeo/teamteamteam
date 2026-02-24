@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
@@ -6,7 +6,8 @@ import {
   createRouter,
   redirect,
 } from "@tanstack/react-router";
-import { sortColumns, sortTickets } from "@teamteamteam/domain";
+import { sortColumns, sortTickets, type Project, type Ticket, type WorkflowColumn } from "@teamteamteam/domain";
+import { Button } from "@/components/ui/button";
 import { useOrgMembersQuery, useOrgProjectsQuery } from "@/features/orgs/hooks";
 import { orgMembersQueryOptions, orgProjectsQueryOptions, orgsQueryOptions } from "@/features/orgs/queries";
 import {
@@ -27,7 +28,9 @@ import { OrgsPage } from "@/routes/orgs-page";
 import { OrgPage } from "@/routes/org-page";
 import { ProjectPage } from "@/routes/project-page";
 import { NotFoundPage, RouteErrorBoundary } from "@/routes/error-boundary";
+import { useVisibleProjectBoards } from "@/routes/root-layout";
 import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -231,6 +234,7 @@ const projectRoute = createRoute({
 
     return {
       project,
+      projects,
       columns,
       tickets,
       members,
@@ -240,24 +244,37 @@ const projectRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
-function ProjectRouteComponent(): React.JSX.Element {
-  const { project, columns, tickets, members } = projectRoute.useLoaderData();
+interface ProjectBoardSectionProps {
+  project: Project;
+  members: ReturnType<typeof projectRoute.useLoaderData>["members"];
+  seedColumns?: WorkflowColumn[];
+  seedTickets?: Ticket[];
+}
+
+function ProjectBoardSection({
+  project,
+  members,
+  seedColumns,
+  seedTickets,
+}: ProjectBoardSectionProps): React.JSX.Element {
   const liveColumnsQuery = useProjectColumnsQuery(project.id);
   const liveTicketsQuery = useProjectTicketsQuery(project.id);
   const createTicketMutation = useCreateTicketMutation(project.id);
   const moveTicketMutation = useMoveTicketMutation(project.id);
 
   const currentColumns = useMemo(
-    () => sortColumns(liveColumnsQuery.data ?? columns),
-    [columns, liveColumnsQuery.data],
+    () => sortColumns(liveColumnsQuery.data ?? seedColumns ?? []),
+    [liveColumnsQuery.data, seedColumns],
   );
   const currentTickets = useMemo(
-    () => sortTickets(liveTicketsQuery.data ?? tickets),
-    [liveTicketsQuery.data, tickets],
+    () => sortTickets(liveTicketsQuery.data ?? seedTickets ?? []),
+    [liveTicketsQuery.data, seedTickets],
   );
   const boardError = liveColumnsQuery.error ?? liveTicketsQuery.error;
   const boardErrorMessage = boardError ? toErrorMessage(boardError) : null;
-  const isBoardLoading = liveColumnsQuery.isPending || liveTicketsQuery.isPending;
+  const isBoardLoading =
+    (liveColumnsQuery.isPending && !seedColumns) ||
+    (liveTicketsQuery.isPending && !seedTickets);
 
   async function handleTicketMove(ticketId: string, toColumnId: string): Promise<void> {
     await moveTicketMutation.mutateAsync({ ticketId, toColumnId });
@@ -300,6 +317,120 @@ function ProjectRouteComponent(): React.JSX.Element {
       onTicketMove={handleTicketMove}
       onTicketCreate={handleTicketCreate}
     />
+  );
+}
+
+function ProjectRouteComponent(): React.JSX.Element {
+  const { project, projects, columns, tickets, members } = projectRoute.useLoaderData();
+  const { visibleProjectIds, setVisibleProjectIds } = useVisibleProjectBoards();
+  const [draggingProjectId, setDraggingProjectId] = useState<string | null>(null);
+  const [dropTargetProjectId, setDropTargetProjectId] = useState<string | null>(null);
+
+  const projectsById = useMemo(
+    () => new Map(projects.map((item) => [item.id, item])),
+    [projects],
+  );
+  const orderedProjectIds = useMemo(() => {
+    const chosen = visibleProjectIds.filter((projectId) => projectsById.has(projectId));
+    return [project.id, ...chosen.filter((projectId) => projectId !== project.id)];
+  }, [project.id, projectsById, visibleProjectIds]);
+  const secondaryProjects = orderedProjectIds
+    .filter((projectId) => projectId !== project.id)
+    .map((projectId) => projectsById.get(projectId))
+    .filter((item): item is Project => Boolean(item));
+
+  function reorderSecondaryProjects(draggedProjectId: string, targetProjectId: string): void {
+    if (draggedProjectId === targetProjectId) {
+      return;
+    }
+
+    setVisibleProjectIds((current) => {
+      const currentSecondary = current.filter(
+        (projectId) => projectId !== project.id && projectsById.has(projectId),
+      );
+      const fromIndex = currentSecondary.indexOf(draggedProjectId);
+      const toIndex = currentSecondary.indexOf(targetProjectId);
+      if (fromIndex === -1 || toIndex === -1) {
+        return current;
+      }
+
+      const reordered = [...currentSecondary];
+      reordered.splice(fromIndex, 1);
+      reordered.splice(toIndex, 0, draggedProjectId);
+      return [project.id, ...reordered];
+    });
+  }
+
+  return (
+    <div className="space-y-5">
+      <ProjectBoardSection
+        project={project}
+        members={members}
+        seedColumns={columns}
+        seedTickets={tickets}
+      />
+
+      {secondaryProjects.map((secondaryProject) => (
+        <section key={secondaryProject.id} className="flex items-start gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            draggable
+            aria-label={`Reorder ${secondaryProject.name}`}
+            onDragStart={(event) => {
+              setDraggingProjectId(secondaryProject.id);
+              event.dataTransfer.effectAllowed = "move";
+              event.dataTransfer.setData("text/plain", secondaryProject.id);
+            }}
+            onDragEnd={() => {
+              setDraggingProjectId(null);
+              setDropTargetProjectId(null);
+            }}
+            className="mt-12 h-8 w-8 cursor-grab rounded-full border border-border/70 text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+          >
+            ≡
+          </Button>
+
+          <div
+            className={cn(
+              "flex-1 rounded-[1.8rem] transition",
+              dropTargetProjectId === secondaryProject.id ? "ring-2 ring-primary/70 ring-offset-2 ring-offset-background" : "",
+            )}
+            onDragOver={(event) => {
+              if (!draggingProjectId) {
+                return;
+              }
+
+              event.preventDefault();
+              if (dropTargetProjectId !== secondaryProject.id) {
+                setDropTargetProjectId(secondaryProject.id);
+              }
+            }}
+            onDragLeave={() => {
+              if (dropTargetProjectId === secondaryProject.id) {
+                setDropTargetProjectId(null);
+              }
+            }}
+            onDrop={(event) => {
+              if (!draggingProjectId) {
+                return;
+              }
+
+              event.preventDefault();
+              reorderSecondaryProjects(draggingProjectId, secondaryProject.id);
+              setDraggingProjectId(null);
+              setDropTargetProjectId(null);
+            }}
+          >
+            <ProjectBoardSection
+              project={secondaryProject}
+              members={members}
+            />
+          </div>
+        </section>
+      ))}
+    </div>
   );
 }
 

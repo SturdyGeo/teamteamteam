@@ -1,4 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type SetStateAction,
+} from "react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -16,8 +25,10 @@ import { useAuth } from "@/lib/auth";
 import {
   getStoredOrgId,
   getStoredProjectId,
+  getStoredVisibleProjectIds,
   setStoredOrgId,
   setStoredProjectId,
+  setStoredVisibleProjectIds,
 } from "@/lib/context-storage";
 
 interface RouteContext {
@@ -79,6 +90,59 @@ function toMessage(error: unknown): string {
 type OpenMenu = "org" | "project" | "profile" | null;
 const PRIMARY_BUTTON_CLASS =
   "border border-primary bg-primary text-primary-foreground hover:bg-primary/90";
+
+interface VisibleProjectBoardsContextValue {
+  orgId: string | null;
+  activeProjectId: string | null;
+  visibleProjectIds: string[];
+  setVisibleProjectIds: (next: SetStateAction<string[]>) => void;
+}
+
+const VisibleProjectBoardsContext = createContext<VisibleProjectBoardsContextValue | null>(null);
+
+function arraysEqual(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function normalizeVisibleProjectIds(
+  projectIds: string[],
+  allowedProjectIds: Set<string>,
+  activeProjectId: string | null,
+): string[] {
+  const deduped: string[] = [];
+  for (const projectId of projectIds) {
+    if (!allowedProjectIds.has(projectId) || deduped.includes(projectId)) {
+      continue;
+    }
+
+    deduped.push(projectId);
+  }
+
+  if (activeProjectId && allowedProjectIds.has(activeProjectId)) {
+    return [activeProjectId, ...deduped.filter((projectId) => projectId !== activeProjectId)];
+  }
+
+  return deduped;
+}
+
+export function useVisibleProjectBoards(): VisibleProjectBoardsContextValue {
+  const context = useContext(VisibleProjectBoardsContext);
+  if (!context) {
+    throw new Error("useVisibleProjectBoards must be used within RootLayout.");
+  }
+
+  return context;
+}
 
 export function RootLayout(): React.JSX.Element {
   const navigate = useNavigate();
@@ -222,6 +286,43 @@ export function RootLayout(): React.JSX.Element {
     setStoredProjectId(activeProjectId);
   }, [activeProjectId, preferredProjectId, projects.length]);
 
+  const allowedProjectIds = useMemo(
+    () => new Set(projects.map((project) => project.id)),
+    [projects],
+  );
+  const [visibleProjectIds, setVisibleProjectIdsState] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!activeOrgId) {
+      setVisibleProjectIdsState([]);
+      return;
+    }
+
+    const stored = getStoredVisibleProjectIds(activeOrgId);
+    const normalized = normalizeVisibleProjectIds(stored, allowedProjectIds, activeProjectId);
+    setVisibleProjectIdsState((previous) =>
+      arraysEqual(previous, normalized) ? previous : normalized,
+    );
+  }, [activeOrgId, activeProjectId, allowedProjectIds]);
+
+  useEffect(() => {
+    if (!activeOrgId) {
+      return;
+    }
+
+    setStoredVisibleProjectIds(activeOrgId, visibleProjectIds);
+  }, [activeOrgId, visibleProjectIds]);
+
+  const setVisibleProjectIds = useCallback(
+    (next: SetStateAction<string[]>) => {
+      setVisibleProjectIdsState((previous) => {
+        const proposed = typeof next === "function" ? next(previous) : next;
+        return normalizeVisibleProjectIds(proposed, allowedProjectIds, activeProjectId);
+      });
+    },
+    [activeProjectId, allowedProjectIds],
+  );
+
   const createOrgMutation = useCreateOrgMutation();
   const createProjectMutation = useCreateProjectMutation(activeOrgId);
 
@@ -233,6 +334,7 @@ export function RootLayout(): React.JSX.Element {
     queryClient.clear();
     setPreferredOrgId(null);
     setPreferredProjectId(null);
+    setVisibleProjectIdsState([]);
     setStoredOrgId(null);
     setStoredProjectId(null);
     await navigate({ to: "/login" });
@@ -261,6 +363,16 @@ export function RootLayout(): React.JSX.Element {
         orgId: activeOrgId,
         projectId,
       },
+    });
+  }
+
+  function toggleProjectVisibility(projectId: string): void {
+    setVisibleProjectIds((current) => {
+      if (current.includes(projectId)) {
+        return current.filter((id) => id !== projectId);
+      }
+
+      return [...current, projectId];
     });
   }
 
@@ -359,22 +471,34 @@ export function RootLayout(): React.JSX.Element {
   }
 
   const userEmail = session?.user.email ?? "";
+  const visibleBoardsContextValue = useMemo<VisibleProjectBoardsContextValue>(
+    () => ({
+      orgId: activeOrgId,
+      activeProjectId,
+      visibleProjectIds,
+      setVisibleProjectIds,
+    }),
+    [activeOrgId, activeProjectId, setVisibleProjectIds, visibleProjectIds],
+  );
   const isAuthSurfaceRoute =
     status !== "authenticated" &&
     (pathname === "/" || pathname === "/login" || pathname === "/auth/callback");
 
   if (isAuthSurfaceRoute) {
     return (
-      <div className="min-h-screen bg-app-auth-surface">
-        <main className="grid min-h-screen place-items-center px-4 py-10">
-          <Outlet />
-        </main>
-      </div>
+      <VisibleProjectBoardsContext.Provider value={visibleBoardsContextValue}>
+        <div className="min-h-screen bg-app-auth-surface">
+          <main className="grid min-h-screen place-items-center px-4 py-10">
+            <Outlet />
+          </main>
+        </div>
+      </VisibleProjectBoardsContext.Provider>
     );
   }
 
   return (
-    <div className="min-h-screen bg-app-shell">
+    <VisibleProjectBoardsContext.Provider value={visibleBoardsContextValue}>
+      <div className="min-h-screen bg-app-shell">
       <header className="sticky top-2 z-30 flex justify-center px-3 pt-1">
         <div
           ref={menuContainerRef}
@@ -483,19 +607,42 @@ export function RootLayout(): React.JSX.Element {
                       <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-muted-foreground">
                         Projects
                       </p>
+                      <p className="px-2 pb-1 text-[11px] text-muted-foreground">
+                        Check boards to show below the main board.
+                      </p>
                       <div className="max-h-56 overflow-auto">
-                        {projects.map((project) => (
-                          <Button
-                            key={project.id}
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => void selectProject(project.id)}
-                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
-                          >
-                            {project.name}
-                          </Button>
-                        ))}
+                        {projects.map((project) => {
+                          const isVisible = visibleProjectIds.includes(project.id);
+                          const isMainProject = project.id === activeProjectId;
+                          return (
+                            <div
+                              key={project.id}
+                              className="mb-1 flex items-center gap-1 rounded-xl px-1 py-1 hover:bg-accent/50"
+                            >
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => void selectProject(project.id)}
+                                className="h-8 flex-1 rounded-lg px-2.5 text-left text-sm hover:bg-accent"
+                              >
+                                {project.name}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleProjectVisibility(project.id)}
+                                disabled={isMainProject}
+                                className="h-8 min-w-9 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-pressed={isVisible}
+                                aria-label={`${isVisible ? "Hide" : "Show"} board ${project.name}`}
+                              >
+                                {isVisible ? "☑" : "☐"}
+                              </Button>
+                            </div>
+                          );
+                        })}
                       </div>
                       <Button
                         type="button"
@@ -661,6 +808,7 @@ export function RootLayout(): React.JSX.Element {
           </form>
         </div>
       ) : null}
-    </div>
+      </div>
+    </VisibleProjectBoardsContext.Provider>
   );
 }

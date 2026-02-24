@@ -32,6 +32,8 @@ Current implementation includes:
 - Shared loading/empty/error state cards across the board surface
 - Rounded compact top navigation is center-aligned and content-width (middle-top only) with text/caret org-project selectors and profile actions
 - Project selector labels in nav use project names only (no prefix code)
+- Project dropdown supports multi-board check toggles; selected boards stack below the main board
+- Secondary boards include left drag handles for reorder-by-drag in the stacked view
 - Boss logo in nav is non-draggable and stays click-only for spin/home action
 - Dark mono executive-terminal visual language across org/project board surfaces
 - Boss logo fast twirl + snap-stop animation on click for authenticated sessions
