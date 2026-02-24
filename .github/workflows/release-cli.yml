@@ -150,11 +150,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- Formula/ttteam.rb; then
+          git add Formula/ttteam.rb
+
+          if git diff --cached --quiet -- Formula/ttteam.rb; then
             echo "Formula already up to date."
             exit 0
           fi
 
-          git add Formula/ttteam.rb
           git commit -m "ttteam v${VERSION}"
           git push origin HEAD
