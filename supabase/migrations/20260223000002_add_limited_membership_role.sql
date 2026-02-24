@@ -13,8 +13,8 @@ CREATE POLICY "Users can view tickets in their org projects"
       WHERE p.id = tickets.project_id
         AND m.user_id = auth.uid()
         AND (
-          m.role IN ('owner', 'admin', 'member')
-          OR (m.role = 'limited' AND tickets.assignee_id = auth.uid())
+          m.role::text IN ('owner', 'admin', 'member')
+          OR (m.role::text = 'limited' AND tickets.assignee_id = auth.uid())
         )
     )
   );
@@ -32,8 +32,8 @@ CREATE POLICY "Users can view activity events in their org projects"
       WHERE t.id = activity_events.ticket_id
         AND m.user_id = auth.uid()
         AND (
-          m.role IN ('owner', 'admin', 'member')
-          OR (m.role = 'limited' AND t.assignee_id = auth.uid())
+          m.role::text IN ('owner', 'admin', 'member')
+          OR (m.role::text = 'limited' AND t.assignee_id = auth.uid())
         )
     )
   );
