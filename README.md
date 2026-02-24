@@ -426,8 +426,8 @@ All development commands require the Doppler prefix:
 ```sh
 doppler run -- bun run build          # Build all packages
 doppler run -- bun run build:edge     # Build Edge Function bundle
-doppler run -- bun run build:cli      # Build standalone macOS binary (dist/ttteam)
-doppler run -- bun run release        # Build all + binary
+doppler run -- bun run build:cli      # Build all packages + standalone macOS binary (dist/ttteam)
+doppler run -- bun run release        # Alias for build:cli
 doppler run -- bun run typecheck      # Type check
 doppler run -- bun run lint           # Lint
 doppler run -- bun run test           # Run unit tests
