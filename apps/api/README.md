@@ -12,7 +12,7 @@ Authorization: Bearer <access_token>
 
 RLS policies enforce org-level data isolation automatically.
 
-For reliable member invites by email (including users not yet in the org), set `SUPABASE_SERVICE_ROLE_KEY` for the API runtime so server-side user lookup can bypass org-scoped user visibility.
+Member invite email lookup now uses a security-definer DB function (`public.user_id_by_email`) so existing users can be resolved without org-scoped visibility issues. `SUPABASE_SERVICE_ROLE_KEY` remains optional fallback for server-side lookup paths.
 
 ## Error Response Format
 

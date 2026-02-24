@@ -7,16 +7,34 @@ const members = new Hono();
 
 async function lookupUserIdByEmail(
   supabase: ReturnType<typeof getAuth>["supabase"] | null,
+  fallbackSupabase: ReturnType<typeof getAuth>["supabase"] | null,
   email: string,
 ): Promise<{ userId: string | null; errorMessage: string | null }> {
   if (!supabase) {
     return { userId: null, errorMessage: null };
   }
 
-  const { data, error } = await supabase
+  const normalizedEmail = email.trim().toLowerCase();
+  const { data: rpcData, error: rpcError } = await supabase.rpc(
+    "user_id_by_email",
+    { p_email: normalizedEmail },
+  );
+
+  if (!rpcError) {
+    const userId =
+      typeof rpcData === "string"
+        ? rpcData
+        : (rpcData && typeof rpcData === "object" && "id" in rpcData && typeof rpcData.id === "string"
+            ? rpcData.id
+            : null);
+    return { userId, errorMessage: null };
+  }
+
+  const lookupClient = fallbackSupabase ?? supabase;
+  const { data, error } = await lookupClient
     .from("users")
     .select("id")
-    .ilike("email", email)
+    .ilike("email", normalizedEmail)
     .maybeSingle();
 
   if (error) {
@@ -74,7 +92,7 @@ members.post("/orgs/:orgId/members", async (c) => {
 
   const email = parsed.data.email.trim().toLowerCase();
 
-  let userLookup = await lookupUserIdByEmail(lookupSupabase, email);
+  let userLookup = await lookupUserIdByEmail(supabase, lookupSupabase, email);
   if (userLookup.errorMessage) {
     return c.json(
       { error: { code: "DB_ERROR", message: userLookup.errorMessage } },
@@ -103,7 +121,7 @@ members.post("/orgs/:orgId/members", async (c) => {
     }
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      userLookup = await lookupUserIdByEmail(lookupSupabase, email);
+      userLookup = await lookupUserIdByEmail(supabase, lookupSupabase, email);
       if (userLookup.errorMessage) {
         return c.json(
           { error: { code: "DB_ERROR", message: userLookup.errorMessage } },

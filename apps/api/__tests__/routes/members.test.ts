@@ -79,6 +79,21 @@ describe("POST /orgs/:orgId/members", () => {
     expect(await res.json()).toEqual(membership);
   });
 
+  it("falls back to users table lookup when RPC helper is unavailable", async () => {
+    const app = setup([
+      { data: null, error: { message: "function not found", code: "PGRST202" } }, // rpc lookup
+      { data: { id: "user-2" }, error: null },                                     // users table lookup
+      { data: membership, error: null },                                            // membership insert
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members`,
+      post({ email: "new@example.com" }),
+    );
+    expect(res.status).toBe(201);
+    expect(await res.json()).toEqual(membership);
+  });
+
   it("matches invite email case-insensitively", async () => {
     let otpTriggered = false;
     const app = setup(

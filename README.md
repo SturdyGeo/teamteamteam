@@ -154,7 +154,7 @@ ttteam org invite <email>      # Invite a user by email (--role admin|member|lim
 
 If you have only one org, it is auto-selected without needing `org use`.
 
-`org invite` now supports brand-new email addresses by triggering OTP auto-provisioning; if the account does not finalize immediately, retry after the user signs in once.
+`org invite` now resolves existing users by email through a DB helper function and also supports brand-new email addresses by triggering OTP auto-provisioning; if the account does not finalize immediately, retry after the user signs in once.
 The `limited` role can only view tickets assigned to them.
 
 ### Projects
