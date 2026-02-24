@@ -3,6 +3,7 @@ import type {
   CreateOrgInput,
   CreateProjectInput,
   InviteMemberInput,
+  UpdateMemberRoleInput,
 } from "@teamteamteam/api-client/web";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
@@ -75,6 +76,27 @@ export function useInviteMemberMutation(orgId: string | null) {
       }
 
       return apiClient.inviteMember(orgId, input);
+    },
+    onSuccess: async () => {
+      if (!orgId) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.orgs.members(orgId) });
+    },
+  });
+}
+
+export function useUpdateMemberRoleMutation(orgId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ memberId, input }: { memberId: string; input: UpdateMemberRoleInput }) => {
+      if (!orgId) {
+        throw new Error("Select an organization first.");
+      }
+
+      return apiClient.updateMemberRole(orgId, memberId, input);
     },
     onSuccess: async () => {
       if (!orgId) {

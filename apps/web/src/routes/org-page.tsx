@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { MemberWithUser } from "@teamteamteam/api-client";
-import type { Project } from "@teamteamteam/domain";
+import type { MembershipRole, Project } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { useInviteMemberMutation } from "@/features/orgs/hooks";
+import {
+  useInviteMemberMutation,
+  useUpdateMemberRoleMutation,
+} from "@/features/orgs/hooks";
 import {
   Card,
   CardContent,
@@ -19,11 +22,20 @@ import {
 interface OrgPageProps {
   orgId: string;
   orgName: string;
+  viewerRole: MembershipRole;
   projects: Project[];
   members: MemberWithUser[];
 }
 
 type InviteRole = "member" | "admin" | "limited";
+type EditableRole = "member" | "admin" | "limited";
+
+function toEditableRole(role: MembershipRole): EditableRole | null {
+  if (role === "member" || role === "admin" || role === "limited") {
+    return role;
+  }
+  return null;
+}
 
 function toMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -33,12 +45,45 @@ function toMessage(error: unknown): string {
   return "Request failed.";
 }
 
-export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): React.JSX.Element {
+export function OrgPage({
+  orgId,
+  orgName,
+  viewerRole,
+  projects,
+  members,
+}: OrgPageProps): React.JSX.Element {
   const inviteMutation = useInviteMemberMutation(orgId);
+  const updateRoleMutation = useUpdateMemberRoleMutation(orgId);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<InviteRole>("member");
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [roleError, setRoleError] = useState<string | null>(null);
+  const [roleMessage, setRoleMessage] = useState<string | null>(null);
+  const [roleDraftByMemberId, setRoleDraftByMemberId] = useState<Record<string, EditableRole>>(
+    {},
+  );
+
+  const canManageRoles = viewerRole === "owner" || viewerRole === "admin";
+
+  useEffect(() => {
+    setRoleDraftByMemberId((previous) => {
+      const next: Record<string, EditableRole> = {};
+      for (const member of members) {
+        const editableRole = toEditableRole(member.role);
+        if (!editableRole) {
+          continue;
+        }
+        next[member.id] = previous[member.id] ?? editableRole;
+      }
+      return next;
+    });
+  }, [members]);
+
+  const sortedMembers = useMemo(
+    () => [...members].sort((a, b) => a.user.email.localeCompare(b.user.email)),
+    [members],
+  );
 
   async function handleInvite(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -61,6 +106,26 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
       setInviteRole("member");
     } catch (error) {
       setInviteError(toMessage(error));
+    }
+  }
+
+  async function handleRoleUpdate(member: MemberWithUser): Promise<void> {
+    const targetRole = roleDraftByMemberId[member.id];
+    if (!targetRole || targetRole === member.role) {
+      return;
+    }
+
+    setRoleError(null);
+    setRoleMessage(null);
+
+    try {
+      await updateRoleMutation.mutateAsync({
+        memberId: member.id,
+        input: { role: targetRole },
+      });
+      setRoleMessage(`Updated ${member.user.email} to ${targetRole}.`);
+    } catch (error) {
+      setRoleError(toMessage(error));
     }
   }
 
@@ -156,20 +221,72 @@ export function OrgPage({ orgId, orgName, projects, members }: OrgPageProps): Re
         <h2 className="text-xl font-semibold text-foreground">Members</h2>
         <Card className="border-border bg-card text-card-foreground">
           <CardContent className="pt-6">
-            <div className="flex flex-wrap gap-2">
-              {members.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No visible members.</p>
-              ) : (
-                members.map((member) => (
-                  <Badge
+            <div className="space-y-2">
+              {sortedMembers.length === 0 ? <p className="text-sm text-muted-foreground">No visible members.</p> : null}
+              {!canManageRoles && sortedMembers.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Role changes require owner or admin permissions.
+                </p>
+              ) : null}
+              {sortedMembers.map((member) => {
+                const editableRole = toEditableRole(member.role);
+                const selectedRole = roleDraftByMemberId[member.id] ?? editableRole ?? "member";
+                const isOwnerRole = member.role === "owner";
+                const canEditThisMember = canManageRoles && !isOwnerRole;
+                return (
+                  <article
                     key={member.id}
-                    className="border-border bg-muted text-muted-foreground hover:bg-muted"
+                    className="grid gap-2 rounded-md border border-border px-3 py-2 md:grid-cols-[1fr_auto_auto]"
                   >
-                    {member.user.email} ({member.role})
-                  </Badge>
-                ))
-              )}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-foreground">{member.user.email}</p>
+                      <p className="text-xs text-muted-foreground">{member.user.display_name}</p>
+                    </div>
+                    <div className="flex items-center">
+                      {canEditThisMember ? (
+                        <Select
+                          value={selectedRole}
+                          onChange={(event) => {
+                            const role = event.target.value as EditableRole;
+                            setRoleDraftByMemberId((previous) => ({
+                              ...previous,
+                              [member.id]: role,
+                            }));
+                          }}
+                          className="min-w-36"
+                          disabled={updateRoleMutation.isPending}
+                        >
+                          <option value="member">Member</option>
+                          <option value="admin">Admin</option>
+                          <option value="limited">Limited (assigned only)</option>
+                        </Select>
+                      ) : (
+                        <Badge className="border-border bg-muted text-muted-foreground hover:bg-muted">
+                          {member.role}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-end">
+                      {canEditThisMember ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-8 rounded-md border border-primary bg-primary px-3 text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                          disabled={updateRoleMutation.isPending || selectedRole === member.role}
+                          onClick={() => void handleRoleUpdate(member)}
+                        >
+                          {updateRoleMutation.isPending ? "Saving..." : "Save"}
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">{isOwnerRole ? "Owner locked" : "Read only"}</span>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
+            {roleMessage ? <p className="mt-2 text-sm text-muted-foreground">{roleMessage}</p> : null}
+            {roleError ? <p className="mt-2 text-sm text-destructive">{roleError}</p> : null}
           </CardContent>
         </Card>
       </section>

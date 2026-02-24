@@ -25,6 +25,7 @@ export type {
   ReopenTicketInput,
   AddTagInput,
   InviteMemberInput,
+  UpdateMemberRoleInput,
   TicketQueryParams,
   StoredSession,
   SessionStore,

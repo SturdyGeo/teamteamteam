@@ -69,6 +69,10 @@ export interface InviteMemberInput {
   role: MembershipRole;
 }
 
+export interface UpdateMemberRoleInput {
+  role: "admin" | "member" | "limited";
+}
+
 export interface TicketQueryParams {
   status_column_id?: string;
   assignee_id?: string;

@@ -264,6 +264,7 @@ Phase 4 data layer is implemented:
 - Cache policy tuning (feature stale times, retry behavior, reconnect refetch)
 - Web visual theming uses global CSS design tokens (no hardcoded route/component color literals)
 - `/orgs/$orgId` now supports inviting members by email with `member`/`admin` role selection
+- `/orgs/$orgId` now supports owner/admin role updates for existing members (`admin`/`member`/`limited`)
 - Org/project list cards are click-to-open across web org views (buttonless card navigation)
 - Dev-only telemetry hooks for query/mutation error events
 - Ticket detail modal now supports persisted inline editing for title + description
@@ -376,6 +377,7 @@ The Bun server runs on `http://localhost:3001` by default (configurable via `POR
 | `DELETE` | `/orgs/:orgId/projects/:projectId` | Delete project (owner/admin) |
 | `GET` | `/orgs/:orgId/members` | List org members |
 | `POST` | `/orgs/:orgId/members` | Invite member by email (auto-provisions via OTP if new) |
+| `PATCH` | `/orgs/:orgId/members/:memberId` | Update existing member role (admin/member/limited; owner memberships are locked) |
 | `GET` | `/projects/:projectId/columns` | List workflow columns |
 | `GET` | `/projects/:projectId/tickets` | List tickets (with filters) |
 | `GET` | `/projects/:projectId/tags` | List project tags |

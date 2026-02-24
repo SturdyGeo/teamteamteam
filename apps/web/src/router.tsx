@@ -195,6 +195,7 @@ function OrgRouteComponent(): React.JSX.Element {
     <OrgPage
       orgId={org.id}
       orgName={org.name}
+      viewerRole={org.membership_role}
       projects={currentProjects}
       members={currentMembers}
     />

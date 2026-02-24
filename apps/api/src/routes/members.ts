@@ -70,6 +70,10 @@ const InviteMemberBody = z.object({
   role: z.enum(["admin", "member", "limited"]).optional().default("member"),
 });
 
+const UpdateMemberRoleBody = z.object({
+  role: z.enum(["admin", "member", "limited"]),
+});
+
 members.post("/orgs/:orgId/members", async (c) => {
   const { supabase } = getAuth(c);
   const serviceSupabase = createSupabaseServiceClient();
@@ -180,6 +184,85 @@ members.post("/orgs/:orgId/members", async (c) => {
   }
 
   return c.json(membership, 201);
+});
+
+members.patch("/orgs/:orgId/members/:memberId", async (c) => {
+  const { supabase } = getAuth(c);
+  const orgId = c.req.param("orgId");
+  const memberId = c.req.param("memberId");
+
+  const body = await c.req.json();
+  const parsed = UpdateMemberRoleBody.safeParse(body);
+  if (!parsed.success) {
+    return c.json(
+      {
+        error: {
+          code: "INVALID_INPUT",
+          message: parsed.error.issues[0].message,
+        },
+      },
+      400,
+    );
+  }
+
+  const { data: existingMember, error: existingError } = await supabase
+    .from("memberships")
+    .select("id, org_id, user_id, role, created_at")
+    .eq("id", memberId)
+    .eq("org_id", orgId)
+    .single();
+
+  if (existingError) {
+    if (existingError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Member not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: existingError.message } },
+      500,
+    );
+  }
+
+  if (existingMember.role === "owner") {
+    return c.json(
+      {
+        error: {
+          code: "DOMAIN_ERROR",
+          message: "Owner role cannot be changed from this endpoint",
+        },
+      },
+      409,
+    );
+  }
+
+  if (existingMember.role === parsed.data.role) {
+    return c.json(existingMember);
+  }
+
+  const { data: updatedMember, error: updateError } = await supabase
+    .from("memberships")
+    .update({ role: parsed.data.role })
+    .eq("id", memberId)
+    .eq("org_id", orgId)
+    .select()
+    .single();
+
+  if (updateError) {
+    if (updateError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Member not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: updateError.message } },
+      500,
+    );
+  }
+
+  return c.json(updatedMember);
 });
 
 export { members };

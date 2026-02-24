@@ -212,3 +212,100 @@ describe("POST /orgs/:orgId/members", () => {
     expect((await res.json()).error.code).toBe("DB_ERROR");
   });
 });
+
+describe("PATCH /orgs/:orgId/members/:memberId", () => {
+  const MEMBER_ID = "00000000-0000-0000-0000-000000000111";
+  const baseMember = {
+    id: MEMBER_ID,
+    org_id: ORG_ID,
+    user_id: "00000000-0000-0000-0000-000000000222",
+    role: "member",
+    created_at: "2026-01-01T00:00:00.000Z",
+  };
+
+  function patch(body: unknown) {
+    return {
+      method: "PATCH" as const,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    };
+  }
+
+  it("updates a member role", async () => {
+    const app = setup([
+      { data: baseMember, error: null },                    // existing membership lookup
+      { data: { ...baseMember, role: "admin" }, error: null }, // membership update
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "admin" }),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).role).toBe("admin");
+  });
+
+  it("returns existing membership when role is unchanged", async () => {
+    const app = setup([
+      { data: baseMember, error: null }, // existing membership lookup
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "member" }),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).role).toBe("member");
+  });
+
+  it("returns 400 for invalid role payload", async () => {
+    const app = setup([]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "owner" }),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.code).toBe("INVALID_INPUT");
+  });
+
+  it("returns 404 when membership is missing", async () => {
+    const app = setup([
+      { data: null, error: { message: "missing", code: "PGRST116" } },
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "admin" }),
+    );
+    expect(res.status).toBe(404);
+    expect((await res.json()).error.code).toBe("NOT_FOUND");
+  });
+
+  it("returns 409 when attempting to change owner role", async () => {
+    const app = setup([
+      { data: { ...baseMember, role: "owner" }, error: null },
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "admin" }),
+    );
+    expect(res.status).toBe(409);
+    expect((await res.json()).error.code).toBe("DOMAIN_ERROR");
+  });
+
+  it("returns 500 when update fails", async () => {
+    const app = setup([
+      { data: baseMember, error: null },
+      { data: null, error: { message: "update failed" } },
+    ]);
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members/${MEMBER_ID}`,
+      patch({ role: "admin" }),
+    );
+    expect(res.status).toBe(500);
+    expect((await res.json()).error.code).toBe("DB_ERROR");
+  });
+});

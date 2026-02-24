@@ -20,5 +20,6 @@ export type {
   ReopenTicketInput,
   AddTagInput,
   InviteMemberInput,
+  UpdateMemberRoleInput,
   TicketQueryParams,
 } from "./types.js";

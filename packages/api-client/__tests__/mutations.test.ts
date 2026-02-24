@@ -126,4 +126,14 @@ describe("MutationMethods", () => {
       role: "member",
     });
   });
+
+  it("updateMemberRole calls PATCH /orgs/:orgId/members/:memberId", async () => {
+    const mutations = createMutationMethods(http);
+    await mutations.updateMemberRole("org-1", "mem-1", {
+      role: "admin",
+    });
+    expect(http.patch).toHaveBeenCalledWith("/orgs/org-1/members/mem-1", {
+      role: "admin",
+    });
+  });
 });

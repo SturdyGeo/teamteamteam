@@ -59,6 +59,7 @@ Common error codes:
 |--------|------|------|-------------|
 | `GET` | `/orgs/:orgId/members` | Yes | List org members |
 | `POST` | `/orgs/:orgId/members` | Yes | Invite member by email (roles: admin/member/limited; auto-provisions via OTP if new) |
+| `PATCH` | `/orgs/:orgId/members/:memberId` | Yes | Update existing member role (admin/member/limited; owner memberships are locked) |
 
 ### Projects
 

@@ -10,6 +10,7 @@ import type {
   ReopenTicketInput,
   AddTagInput,
   InviteMemberInput,
+  UpdateMemberRoleInput,
 } from "./types.js";
 
 export interface MutationMethods {
@@ -25,6 +26,11 @@ export interface MutationMethods {
   addTag(ticketId: string, input: AddTagInput): Promise<Ticket>;
   removeTag(ticketId: string, tag: string): Promise<Ticket>;
   inviteMember(orgId: string, input: InviteMemberInput): Promise<Membership>;
+  updateMemberRole(
+    orgId: string,
+    memberId: string,
+    input: UpdateMemberRoleInput,
+  ): Promise<Membership>;
   deleteOrg(orgId: string): Promise<Org>;
   deleteProject(orgId: string, projectId: string): Promise<Project>;
 }
@@ -78,6 +84,10 @@ export function createMutationMethods(http: HttpClient): MutationMethods {
 
     inviteMember(orgId: string, input: InviteMemberInput) {
       return http.post<Membership>(`/orgs/${orgId}/members`, input);
+    },
+
+    updateMemberRole(orgId: string, memberId: string, input: UpdateMemberRoleInput) {
+      return http.patch<Membership>(`/orgs/${orgId}/members/${memberId}`, input);
     },
 
     deleteOrg(orgId: string) {
