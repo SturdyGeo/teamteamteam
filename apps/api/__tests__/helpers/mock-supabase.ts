@@ -26,6 +26,7 @@ export function createMockSupabase(
     for (const method of [
       "select",
       "eq",
+      "ilike",
       "is",
       "order",
       "insert",

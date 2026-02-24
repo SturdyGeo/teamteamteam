@@ -78,7 +78,7 @@ This is the correct local dev invocation. `bun run ttteam` will fail unless you 
    |--------------------|------------------------------|
    | `SUPABASE_URL`     | Your Supabase project URL    |
    | `SUPABASE_ANON_KEY`| Your Supabase anonymous key  |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (integration tests only) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (integration tests + API invite email lookup fallback) |
    | `TEAMTEAMTEAM_API_URL`   | API URL (Edge Function or local, e.g. `https://<ref>.supabase.co/functions/v1/api`) |
    | `DATABASE_URL`     | Direct Postgres URL (integration tests only, defaults to local Supabase) |
    | `VITE_SUPABASE_URL` | Supabase URL for web app (`apps/web`) |

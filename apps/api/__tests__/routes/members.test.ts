@@ -79,6 +79,29 @@ describe("POST /orgs/:orgId/members", () => {
     expect(await res.json()).toEqual(membership);
   });
 
+  it("matches invite email case-insensitively", async () => {
+    let otpTriggered = false;
+    const app = setup(
+      [
+        { data: { id: "user-2" }, error: null },
+        { data: membership, error: null },
+      ],
+      {
+        onSignInWithOtp: () => {
+          otpTriggered = true;
+        },
+      },
+    );
+
+    const res = await app.request(
+      `/orgs/${ORG_ID}/members`,
+      post({ email: "New@Example.com" }),
+    );
+    expect(res.status).toBe(201);
+    expect(await res.json()).toEqual(membership);
+    expect(otpTriggered).toBe(false);
+  });
+
   it("returns 400 when email is invalid", async () => {
     const app = setup([]);
 

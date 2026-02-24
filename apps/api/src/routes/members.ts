@@ -1,17 +1,22 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { getAuth } from "../middleware/auth.js";
+import { createSupabaseServiceClient } from "../lib/supabase.js";
 
 const members = new Hono();
 
 async function lookupUserIdByEmail(
-  supabase: ReturnType<typeof getAuth>["supabase"],
+  supabase: ReturnType<typeof getAuth>["supabase"] | null,
   email: string,
 ): Promise<{ userId: string | null; errorMessage: string | null }> {
+  if (!supabase) {
+    return { userId: null, errorMessage: null };
+  }
+
   const { data, error } = await supabase
     .from("users")
     .select("id")
-    .eq("email", email)
+    .ilike("email", email)
     .maybeSingle();
 
   if (error) {
@@ -49,6 +54,8 @@ const InviteMemberBody = z.object({
 
 members.post("/orgs/:orgId/members", async (c) => {
   const { supabase } = getAuth(c);
+  const serviceSupabase = createSupabaseServiceClient();
+  const lookupSupabase = serviceSupabase ?? supabase;
   const orgId = c.req.param("orgId");
 
   const body = await c.req.json();
@@ -67,7 +74,7 @@ members.post("/orgs/:orgId/members", async (c) => {
 
   const email = parsed.data.email.trim().toLowerCase();
 
-  let userLookup = await lookupUserIdByEmail(supabase, email);
+  let userLookup = await lookupUserIdByEmail(lookupSupabase, email);
   if (userLookup.errorMessage) {
     return c.json(
       { error: { code: "DB_ERROR", message: userLookup.errorMessage } },
@@ -96,7 +103,7 @@ members.post("/orgs/:orgId/members", async (c) => {
     }
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      userLookup = await lookupUserIdByEmail(supabase, email);
+      userLookup = await lookupUserIdByEmail(lookupSupabase, email);
       if (userLookup.errorMessage) {
         return c.json(
           { error: { code: "DB_ERROR", message: userLookup.errorMessage } },
@@ -118,7 +125,7 @@ members.post("/orgs/:orgId/members", async (c) => {
         error: {
           code: "NOT_FOUND",
           message:
-            "No user found with that email address yet. A sign-in code was sent; ask them to sign in once, then retry the invite.",
+            "No user found with that email address yet. A sign-in code was sent; ask them to sign in once, then retry the invite. If this persists, configure SUPABASE_SERVICE_ROLE_KEY for API invite lookup.",
         },
       },
       404,
