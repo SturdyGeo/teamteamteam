@@ -21,7 +21,32 @@ import {
   useUpdateTicketMutation,
 } from "@/features/projects/hooks";
 import { ticketsForColumn } from "@/features/projects/selectors";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+
+type AssigneeFilter = "all" | "mine" | "unassigned" | "others";
+
+const FILTER_STORAGE_KEY = "ttt-board-assignee-filter";
+
+function getStoredFilter(): AssigneeFilter {
+  try {
+    const stored = localStorage.getItem(FILTER_STORAGE_KEY);
+    if (stored === "all" || stored === "mine" || stored === "unassigned" || stored === "others") {
+      return stored;
+    }
+  } catch {
+    // localStorage not available
+  }
+  return "all";
+}
+
+function setStoredFilter(filter: AssigneeFilter): void {
+  try {
+    localStorage.setItem(FILTER_STORAGE_KEY, filter);
+  } catch {
+    // localStorage not available
+  }
+}
 
 interface ProjectPageProps {
   projectId: string;
