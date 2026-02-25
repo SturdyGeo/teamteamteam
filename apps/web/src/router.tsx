@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
@@ -7,7 +7,6 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { sortColumns, sortTickets, type Project, type Ticket, type WorkflowColumn } from "@teamteamteam/domain";
-import { Button } from "@/components/ui/button";
 import { useOrgMembersQuery, useOrgProjectsQuery } from "@/features/orgs/hooks";
 import { orgMembersQueryOptions, orgProjectsQueryOptions, orgsQueryOptions } from "@/features/orgs/queries";
 import {
@@ -28,9 +27,7 @@ import { OrgsPage } from "@/routes/orgs-page";
 import { OrgPage } from "@/routes/org-page";
 import { ProjectPage } from "@/routes/project-page";
 import { NotFoundPage, RouteErrorBoundary } from "@/routes/error-boundary";
-import { useVisibleProjectBoards } from "@/routes/root-layout";
 import { supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -322,116 +319,15 @@ function ProjectBoardSection({
 }
 
 function ProjectRouteComponent(): React.JSX.Element {
-  const { project, projects, columns, tickets, members } = projectRoute.useLoaderData();
-  const { visibleProjectIds, setVisibleProjectIds } = useVisibleProjectBoards();
-  const [draggingProjectId, setDraggingProjectId] = useState<string | null>(null);
-  const [dropTargetProjectId, setDropTargetProjectId] = useState<string | null>(null);
-
-  const projectsById = useMemo(
-    () => new Map(projects.map((item) => [item.id, item])),
-    [projects],
-  );
-  const orderedProjectIds = useMemo(() => {
-    const chosen = visibleProjectIds.filter((projectId) => projectsById.has(projectId));
-    return [project.id, ...chosen.filter((projectId) => projectId !== project.id)];
-  }, [project.id, projectsById, visibleProjectIds]);
-  const secondaryProjects = orderedProjectIds
-    .filter((projectId) => projectId !== project.id)
-    .map((projectId) => projectsById.get(projectId))
-    .filter((item): item is Project => Boolean(item));
-
-  function reorderSecondaryProjects(draggedProjectId: string, targetProjectId: string): void {
-    if (draggedProjectId === targetProjectId) {
-      return;
-    }
-
-    setVisibleProjectIds((current) => {
-      const currentSecondary = current.filter(
-        (projectId) => projectId !== project.id && projectsById.has(projectId),
-      );
-      const fromIndex = currentSecondary.indexOf(draggedProjectId);
-      const toIndex = currentSecondary.indexOf(targetProjectId);
-      if (fromIndex === -1 || toIndex === -1) {
-        return current;
-      }
-
-      const reordered = [...currentSecondary];
-      reordered.splice(fromIndex, 1);
-      reordered.splice(toIndex, 0, draggedProjectId);
-      return [project.id, ...reordered];
-    });
-  }
+  const { project, columns, tickets, members } = projectRoute.useLoaderData();
 
   return (
-    <div className="space-y-5">
-      <ProjectBoardSection
-        project={project}
-        members={members}
-        seedColumns={columns}
-        seedTickets={tickets}
-      />
-
-      {secondaryProjects.map((secondaryProject) => (
-        <section key={secondaryProject.id} className="flex items-start gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            draggable
-            aria-label={`Reorder ${secondaryProject.name}`}
-            onDragStart={(event) => {
-              setDraggingProjectId(secondaryProject.id);
-              event.dataTransfer.effectAllowed = "move";
-              event.dataTransfer.setData("text/plain", secondaryProject.id);
-            }}
-            onDragEnd={() => {
-              setDraggingProjectId(null);
-              setDropTargetProjectId(null);
-            }}
-            className="mt-12 h-8 w-8 cursor-grab rounded-full border border-border/70 text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
-          >
-            ≡
-          </Button>
-
-          <div
-            className={cn(
-              "flex-1 rounded-[1.8rem] transition",
-              dropTargetProjectId === secondaryProject.id ? "ring-2 ring-primary/70 ring-offset-2 ring-offset-background" : "",
-            )}
-            onDragOver={(event) => {
-              if (!draggingProjectId) {
-                return;
-              }
-
-              event.preventDefault();
-              if (dropTargetProjectId !== secondaryProject.id) {
-                setDropTargetProjectId(secondaryProject.id);
-              }
-            }}
-            onDragLeave={() => {
-              if (dropTargetProjectId === secondaryProject.id) {
-                setDropTargetProjectId(null);
-              }
-            }}
-            onDrop={(event) => {
-              if (!draggingProjectId) {
-                return;
-              }
-
-              event.preventDefault();
-              reorderSecondaryProjects(draggingProjectId, secondaryProject.id);
-              setDraggingProjectId(null);
-              setDropTargetProjectId(null);
-            }}
-          >
-            <ProjectBoardSection
-              project={secondaryProject}
-              members={members}
-            />
-          </div>
-        </section>
-      ))}
-    </div>
+    <ProjectBoardSection
+      project={project}
+      members={members}
+      seedColumns={columns}
+      seedTickets={tickets}
+    />
   );
 }
 
