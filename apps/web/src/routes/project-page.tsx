@@ -958,7 +958,7 @@ export function ProjectPage({
                         onKeyDown={(event) => {
                           if (event.key === "Enter") {
                             event.preventDefault();
-                            void handleAddTag();
+                            void handleAddTag(event as unknown as React.FormEvent<HTMLFormElement>);
                           }
                         }}
                         placeholder="add tag"
@@ -968,7 +968,7 @@ export function ProjectPage({
                         type="button"
                         size="sm"
                         disabled={modalBusy}
-                        onClick={() => void handleAddTag()}
+                        onClick={() => void handleAddTag({ preventDefault: () => {} } as React.FormEvent<HTMLFormElement>)}
                         className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         Add
