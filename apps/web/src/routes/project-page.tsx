@@ -135,7 +135,8 @@ export function ProjectPage({
   const [createModalColumnId, setCreateModalColumnId] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState("");
   const [newCardDescription, setNewCardDescription] = useState("");
-  const [newCardTags, setNewCardTags] = useState("");
+  const [newCardTagInput, setNewCardTagInput] = useState("");
+  const [newCardTagsList, setNewCardTagsList] = useState<string[]>([]);
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
@@ -161,6 +162,7 @@ export function ProjectPage({
   useEffect(() => {
     setModalError(null);
     setNewTagInput("");
+    setNewCardTagInput("");
     setIsActivityOpen(false);
   }, [selectedTicketId, createModalColumnId]);
 
@@ -223,11 +225,15 @@ export function ProjectPage({
     isCreatePending ||
     isMovePending;
 
-  function parseTags(value: string): string[] {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
+  function handleAddNewCardTag(): void {
+    const tag = newCardTagInput.trim();
+    if (!tag || newCardTagsList.includes(tag)) return;
+    setNewCardTagsList((prev) => [...prev, tag]);
+    setNewCardTagInput("");
+  }
+
+  function handleRemoveNewCardTag(tag: string): void {
+    setNewCardTagsList((prev) => prev.filter((t) => t !== tag));
   }
 
   function openCreateModal(columnId: string): void {
@@ -236,7 +242,8 @@ export function ProjectPage({
     setModalError(null);
     setNewCardTitle("");
     setNewCardDescription("");
-    setNewCardTags("");
+    setNewCardTagInput("");
+    setNewCardTagsList([]);
   }
 
   function closeModal(): void {
@@ -246,7 +253,8 @@ export function ProjectPage({
     setNewTagInput("");
     setNewCardTitle("");
     setNewCardDescription("");
-    setNewCardTags("");
+    setNewCardTagInput("");
+    setNewCardTagsList([]);
     setIsActivityOpen(false);
   }
 
@@ -301,8 +309,7 @@ export function ProjectPage({
     }
   }
 
-  async function handleCreateCard(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
+  async function handleCreateCard(): Promise<void> {
     setModalError(null);
 
     if (!createModalColumnId) {
@@ -320,7 +327,7 @@ export function ProjectPage({
         createModalColumnId,
         title,
         newCardDescription,
-        parseTags(newCardTags),
+        newCardTagsList,
       );
       closeModal();
     } catch (error) {
@@ -760,7 +767,7 @@ export function ProjectPage({
             </header>
 
             {isCreateModal ? (
-              <form onSubmit={(event) => void handleCreateCard(event)} className="space-y-4">
+              <div className="space-y-4">
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
                   <Input
@@ -784,12 +791,48 @@ export function ProjectPage({
 
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Tags</h3>
-                  <Input
-                    value={newCardTags}
-                    onChange={(event) => setNewCardTags(event.target.value)}
-                    placeholder="bug, urgent, backend"
-                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring"
-                  />
+                  <div className="rounded-lg border border-border bg-background p-3">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {newCardTagsList.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">No tags</p>
+                      ) : (
+                        newCardTagsList.map((tag) => (
+                          <Button
+                            key={tag}
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="rounded-full border border-secondary bg-secondary/70 px-2.5 py-0.5 text-xs text-secondary-foreground hover:bg-secondary/80"
+                            onClick={() => handleRemoveNewCardTag(tag)}
+                          >
+                            {tag} x
+                          </Button>
+                        ))
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newCardTagInput}
+                        onChange={(event) => setNewCardTagInput(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            handleAddNewCardTag();
+                          }
+                        }}
+                        placeholder="add tag"
+                        className="h-8 flex-1 rounded-md border border-border bg-card px-2 text-xs text-foreground outline-none focus:border-ring"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => handleAddNewCardTag()}
+                        className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                  </div>
                 </section>
 
                 <div className="block space-y-1 text-xs text-muted-foreground">
@@ -812,21 +855,16 @@ export function ProjectPage({
                 </div>
 
                 <Button
-                  type="submit"
+                  type="button"
                   disabled={modalBusy}
+                  onClick={() => void handleCreateCard()}
                   className="h-9 w-full rounded-md border border-primary bg-primary text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
                   {isCreatePending ? "Adding..." : "Add card"}
                 </Button>
-              </form>
+              </div>
             ) : selectedTicket ? (
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void handleSaveDetails();
-                }}
-              >
+              <div className="space-y-4">
                 <section>
                   <h3 className="mb-1 text-sm font-semibold text-foreground">Title</h3>
                   <Input
@@ -941,8 +979,9 @@ export function ProjectPage({
 
                 <div className="flex flex-wrap gap-2">
                   <Button
-                    type="submit"
+                    type="button"
                     disabled={modalBusy}
+                    onClick={() => void handleSaveDetails()}
                     className="h-9 rounded-md border border-primary bg-primary px-3 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     {updateMutation.isPending ? "Saving..." : "Save changes"}
@@ -996,7 +1035,7 @@ export function ProjectPage({
                   <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
                   {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
                 </div>
-              </form>
+              </div>
             ) : null}
 
             {modalError ? <p className="mt-3 text-sm text-destructive">{modalError}</p> : null}
