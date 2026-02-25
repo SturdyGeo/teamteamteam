@@ -6,7 +6,9 @@ import type { SessionStore, StoredSession } from "./types.js";
 const REFRESH_BUFFER_MS = 60_000;
 
 export interface AuthClient {
-  sendMagicLink(email: string, redirectTo?: string): Promise<void>;
+  sendOtp(email: string): Promise<void>;
+  /** @deprecated Use sendOtp instead */
+  sendMagicLink(email: string): Promise<void>;
   verifyOtp(email: string, token: string): Promise<void>;
   exchangeCodeForSession(code: string): Promise<void>;
   logout(): Promise<void>;
@@ -43,14 +45,20 @@ export function createAuthClient(config: AuthClientConfig): AuthClient {
   }
 
   return {
-    async sendMagicLink(email: string, redirectTo?: string): Promise<void> {
+    async sendOtp(email: string): Promise<void> {
+      // Do NOT pass emailRedirectTo - that triggers magic link behavior.
+      // Without it, Supabase sends only an OTP code.
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: redirectTo ? { emailRedirectTo: redirectTo } : undefined,
       });
       if (error) {
         throw new ApiError("AUTH_ERROR", error.message, error.status ?? 500);
       }
+    },
+
+    /** @deprecated Use sendOtp instead */
+    async sendMagicLink(email: string): Promise<void> {
+      return this.sendOtp(email);
     },
 
     async verifyOtp(email: string, token: string): Promise<void> {

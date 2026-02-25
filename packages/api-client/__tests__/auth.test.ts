@@ -62,24 +62,14 @@ describe("AuthClient", () => {
     });
   }
 
-  describe("sendMagicLink", () => {
-    it("calls signInWithOtp with email", async () => {
+  describe("sendOtp", () => {
+    it("calls signInWithOtp with email only (no emailRedirectTo to avoid magic links)", async () => {
       mockSignInWithOtp.mockResolvedValue({ error: null });
       const client = makeClient();
-      await client.sendMagicLink("user@example.com");
+      await client.sendOtp("user@example.com");
+      // Should NOT include emailRedirectTo - that triggers magic link behavior
       expect(mockSignInWithOtp).toHaveBeenCalledWith({
         email: "user@example.com",
-        options: undefined,
-      });
-    });
-
-    it("passes redirectTo when provided", async () => {
-      mockSignInWithOtp.mockResolvedValue({ error: null });
-      const client = makeClient();
-      await client.sendMagicLink("user@example.com", "http://localhost/cb");
-      expect(mockSignInWithOtp).toHaveBeenCalledWith({
-        email: "user@example.com",
-        options: { emailRedirectTo: "http://localhost/cb" },
       });
     });
 
@@ -89,10 +79,21 @@ describe("AuthClient", () => {
       });
       const client = makeClient();
       await expect(
-        client.sendMagicLink("user@example.com"),
+        client.sendOtp("user@example.com"),
       ).rejects.toMatchObject({
         code: "AUTH_ERROR",
         statusCode: 429,
+      });
+    });
+  });
+
+  describe("sendMagicLink (deprecated)", () => {
+    it("delegates to sendOtp", async () => {
+      mockSignInWithOtp.mockResolvedValue({ error: null });
+      const client = makeClient();
+      await client.sendMagicLink("user@example.com");
+      expect(mockSignInWithOtp).toHaveBeenCalledWith({
+        email: "user@example.com",
       });
     });
   });
