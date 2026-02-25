@@ -443,9 +443,7 @@ export function ProjectPage({
     }
   }
 
-  async function handleAddTag(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-
+  async function handleAddTag(): Promise<void> {
     if (!selectedTicket) {
       return;
     }
@@ -915,22 +913,29 @@ export function ProjectPage({
                         ))
                       )}
                     </div>
-                    <form onSubmit={(event) => void handleAddTag(event)} className="flex gap-2">
+                    <div className="flex gap-2">
                       <Input
                         value={newTagInput}
                         onChange={(event) => setNewTagInput(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            void handleAddTag();
+                          }
+                        }}
                         placeholder="add tag"
                         className="h-8 flex-1 rounded-md border border-border bg-card px-2 text-xs text-foreground outline-none focus:border-ring"
                       />
                       <Button
-                        type="submit"
+                        type="button"
                         size="sm"
                         disabled={modalBusy}
+                        onClick={() => void handleAddTag()}
                         className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         Add
                       </Button>
-                    </form>
+                    </div>
                   </div>
                 </section>
 
