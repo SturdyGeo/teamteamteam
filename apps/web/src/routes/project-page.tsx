@@ -3,6 +3,7 @@ import { useHotkey } from "@tanstack/react-hotkeys";
 import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
+import Markdown from "react-markdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
