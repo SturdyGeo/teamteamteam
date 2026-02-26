@@ -4,7 +4,6 @@ import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
 import { filterTickets } from "@teamteamteam/domain";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
-import Markdown from "react-markdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -312,11 +311,6 @@ export function ProjectPage({
     setMemberFilterSearch("");
   }
 
-  function parseTags(value: string): string[] {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
   function handleAddNewCardTag(): void {
     const tag = newCardTagInput.trim();
     if (!tag || newCardTagsList.includes(tag)) return;
@@ -1134,7 +1128,7 @@ export function ProjectPage({
                         onKeyDown={(event) => {
                           if (event.key === "Enter") {
                             event.preventDefault();
-                            void handleAddTag(event as unknown as React.FormEvent<HTMLFormElement>);
+                            void handleAddTag();
                           }
                         }}
                         placeholder="add tag"
@@ -1144,7 +1138,7 @@ export function ProjectPage({
                         type="button"
                         size="sm"
                         disabled={modalBusy}
-                        onClick={() => void handleAddTag({ preventDefault: () => {} } as React.FormEvent<HTMLFormElement>)}
+                        onClick={() => void handleAddTag()}
                         className="rounded-md border border-primary bg-primary px-2.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         Add
