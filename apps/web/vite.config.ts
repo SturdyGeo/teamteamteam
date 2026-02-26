@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    dedupe: ['zod'],
     alias: [
       { find: "@", replacement: path.resolve(__dirname, "./src") },
       // Workspace packages — resolve to TS source (no pre-build required)
