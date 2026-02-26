@@ -17,7 +17,7 @@ function readOtp(): Promise<string> {
 export function registerAuthCommands(program: Command): void {
   program
     .command("login")
-    .description("Log in with a magic link sent to your email")
+    .description("Log in with an OTP code sent to your email")
     .argument("<email>", "Your email address (e.g. alice@acme.com)")
     .addHelpText(
       "after",

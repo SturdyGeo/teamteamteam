@@ -25,10 +25,10 @@ export function LoginPage(): React.JSX.Element {
     setMessage(null);
     setSendingOtp(true);
 
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    // Do NOT pass emailRedirectTo - that triggers magic link behavior.
+    // Without it, Supabase sends only an OTP code.
     const { error: authError } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo },
     });
 
     setSendingOtp(false);
