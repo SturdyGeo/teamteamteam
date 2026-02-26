@@ -74,7 +74,6 @@ export function LoginPage(): React.JSX.Element {
           className="mx-auto mb-4 h-24 w-24 rounded-lg object-contain"
         />
         <h1 className="text-[22px] font-semibold text-foreground">Teamteamteam</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Terminal-first Kanban</p>
       </div>
 
       <form onSubmit={handleVerifyOtp} className="space-y-6 font-mono">
