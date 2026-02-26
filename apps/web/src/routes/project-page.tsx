@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { ApiError } from "@teamteamteam/api-client/web";
 import type { ActivityEventWithActor, MemberWithUser } from "@teamteamteam/api-client";
+import { filterTickets } from "@teamteamteam/domain";
 import type { Ticket, WorkflowColumn } from "@teamteamteam/domain";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,28 @@ function getStoredFilter(): AssigneeFilter {
 function setStoredFilter(filter: AssigneeFilter): void {
   try {
     localStorage.setItem(FILTER_STORAGE_KEY, filter);
+  } catch {
+    // localStorage not available
+  }
+}
+
+const MEMBER_FILTER_KEY = "ttt-board-member-filter";
+
+function getStoredMemberFilter(): string | null {
+  try {
+    return localStorage.getItem(MEMBER_FILTER_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setStoredMemberFilter(userId: string | null): void {
+  try {
+    if (userId === null) {
+      localStorage.removeItem(MEMBER_FILTER_KEY);
+    } else {
+      localStorage.setItem(MEMBER_FILTER_KEY, userId);
+    }
   } catch {
     // localStorage not available
   }
@@ -168,6 +191,13 @@ export function ProjectPage({
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [isActivityOpen, setIsActivityOpen] = useState(false);
+  const [assigneeFilter, setAssigneeFilter] = useState<AssigneeFilter>(getStoredFilter);
+  const [memberFilter, setMemberFilter] = useState<string | null>(getStoredMemberFilter);
+  const [memberFilterSearch, setMemberFilterSearch] = useState("");
+  const [memberFilterOpen, setMemberFilterOpen] = useState(false);
+  const { session } = useAuth();
+  const currentUserId = session?.user.id ?? null;
+
   const lastDragAtRef = useRef<number>(0);
   const initializedTicketIdRef = useRef<string | null>(null);
 
@@ -205,6 +235,23 @@ export function ProjectPage({
   }, [assigneeMenuSearch, members]);
 
   const totalTickets = boardTickets.length;
+
+  const filteredTickets = useMemo(() => {
+    if (memberFilter) return filterTickets(boardTickets, { assignee_id: memberFilter });
+    if (assigneeFilter === "all") return boardTickets;
+    if (assigneeFilter === "mine") return currentUserId ? filterTickets(boardTickets, { assignee_id: currentUserId }) : boardTickets;
+    if (assigneeFilter === "unassigned") return filterTickets(boardTickets, { assignee_id: null });
+    // "others"
+    return boardTickets.filter(
+      (t) => t.assignee_id !== null && t.assignee_id !== currentUserId,
+    );
+  }, [assigneeFilter, boardTickets, currentUserId, memberFilter]);
+
+  const memberFilterMembers = useMemo(() => {
+    const query = memberFilterSearch.trim().toLowerCase();
+    if (!query) return members;
+    return members.filter((m) => m.user.email.toLowerCase().includes(query));
+  }, [memberFilterSearch, members]);
 
   const selectedTicket = useMemo(() => {
     if (!selectedTicketId) {
@@ -247,6 +294,20 @@ export function ProjectPage({
     removeTagMutation.isPending ||
     isCreatePending ||
     isMovePending;
+
+  function handleFilterChange(filter: AssigneeFilter): void {
+    setAssigneeFilter(filter);
+    setStoredFilter(filter);
+    setMemberFilter(null);
+    setStoredMemberFilter(null);
+  }
+
+  function handleMemberSelect(userId: string | null): void {
+    setMemberFilter(userId);
+    setStoredMemberFilter(userId);
+    setMemberFilterOpen(false);
+    setMemberFilterSearch("");
+  }
 
   function parseTags(value: string): string[] {
     return value
@@ -518,10 +579,94 @@ export function ProjectPage({
         <div className="px-1">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">{projectName}</h1>
           <p className="font-mono text-sm text-muted-foreground">
-            {projectPrefix} · {totalTickets} tickets
+            {projectPrefix} · {filteredTickets.length === totalTickets
+              ? `${totalTickets} tickets`
+              : `${filteredTickets.length} of ${totalTickets} tickets`}
             {isMovePending ? " · saving move..." : ""}
             {isCreatePending ? " · adding card..." : ""}
           </p>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 px-1">
+          {(["all", "mine", "unassigned", "others"] as const).map((mode) => (
+            <Button
+              key={mode}
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => handleFilterChange(mode)}
+              className={cn(
+                "rounded-full border px-3 py-1 text-xs capitalize",
+                assigneeFilter === mode && memberFilter === null
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              {mode === "mine" ? "Mine" : mode.charAt(0).toUpperCase() + mode.slice(1)}
+            </Button>
+          ))}
+          <Popover
+            open={memberFilterOpen}
+            onOpenChange={(open) => {
+              setMemberFilterOpen(open);
+              if (!open) setMemberFilterSearch("");
+            }}
+          >
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs",
+                  memberFilter !== null
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+              >
+                {memberFilter !== null
+                  ? (assigneeById.get(memberFilter) ?? "Person")
+                  : "Person ▾"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-56 p-1.5">
+              <Input
+                value={memberFilterSearch}
+                onChange={(event) => setMemberFilterSearch(event.target.value)}
+                placeholder="Search member..."
+                className="mb-1 h-8 border-border bg-background px-2.5 text-xs text-foreground"
+              />
+              {memberFilter !== null ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  onClick={() => handleMemberSelect(null)}
+                >
+                  Clear person filter
+                </Button>
+              ) : null}
+              {memberFilterMembers.map((member) => (
+                <Button
+                  key={member.user.id}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "mb-1 w-full rounded-lg px-2.5 py-1.5 text-left text-xs hover:bg-accent hover:text-foreground",
+                    memberFilter === member.user.id ? "bg-primary/10 text-primary" : "text-foreground",
+                  )}
+                  onClick={() => handleMemberSelect(member.user.id)}
+                >
+                  {member.user.email}
+                </Button>
+              ))}
+              {memberFilterMembers.length === 0 ? (
+                <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No matching members</p>
+              ) : null}
+            </PopoverContent>
+          </Popover>
         </div>
 
         {boardErrorMessage ? (
@@ -570,7 +715,7 @@ export function ProjectPage({
         {!boardErrorMessage && columns.length > 0 ? (
           <section className="flex snap-x gap-4 overflow-x-auto pb-3">
             {columns.map((column) => {
-              const columnTickets = ticketsForColumn(boardTickets, column);
+              const columnTickets = ticketsForColumn(filteredTickets, column);
               return (
                 <section
                   key={column.id}
