@@ -26,7 +26,6 @@
     "clsx": "^2.1.1",
     "react": "^18",
     "react-dom": "^18",
-    "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7"
   },
