@@ -83,3 +83,13 @@ VITE_TEAMTEAMTEAM_API_URL=
 ```
 
 Use Doppler for local development in this repository.
+
+## SPA Routing (Production Deployment)
+
+This is a single-page application with client-side routing. When deployed, the server must serve `index.html` for all routes (except static assets) so the client-side router can handle navigation.
+
+**Vercel:** The `vercel.json` file configures rewrites to serve `index.html` for all non-asset routes.
+
+**Netlify:** The `public/_redirects` file configures the same fallback behavior.
+
+Without this configuration, refreshing or directly accessing routes like `/orgs/{id}/projects/{id}` will return a 404.
