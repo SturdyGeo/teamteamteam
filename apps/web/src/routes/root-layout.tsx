@@ -366,16 +366,6 @@ export function RootLayout(): React.JSX.Element {
     });
   }
 
-  function toggleProjectVisibility(projectId: string): void {
-    setVisibleProjectIds((current) => {
-      if (current.includes(projectId)) {
-        return current.filter((id) => id !== projectId);
-      }
-
-      return [...current, projectId];
-    });
-  }
-
   async function handleCreateOrg(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setCreateOrgError(null);
@@ -603,46 +593,23 @@ export function RootLayout(): React.JSX.Element {
                   </Button>
 
                   {openMenu === "project" ? (
-                    <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-border bg-card p-2 font-mono text-foreground shadow-xl">
+                    <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-border bg-card p-2 font-mono text-foreground shadow-xl">
                       <p className="px-2 py-1 text-[11px] uppercase tracking-wide text-muted-foreground">
                         Projects
                       </p>
-                      <p className="px-2 pb-1 text-[11px] text-muted-foreground">
-                        Check boards to show below the main board.
-                      </p>
                       <div className="max-h-56 overflow-auto">
-                        {projects.map((project) => {
-                          const isVisible = visibleProjectIds.includes(project.id);
-                          const isMainProject = project.id === activeProjectId;
-                          return (
-                            <div
-                              key={project.id}
-                              className="mb-1 flex items-center gap-1 rounded-xl px-1 py-1 hover:bg-accent/50"
-                            >
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => void selectProject(project.id)}
-                                className="h-8 flex-1 rounded-lg px-2.5 text-left text-sm hover:bg-accent"
-                              >
-                                {project.name}
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleProjectVisibility(project.id)}
-                                disabled={isMainProject}
-                                className="h-8 min-w-9 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                                aria-pressed={isVisible}
-                                aria-label={`${isVisible ? "Hide" : "Show"} board ${project.name}`}
-                              >
-                                {isVisible ? "☑" : "☐"}
-                              </Button>
-                            </div>
-                          );
-                        })}
+                        {projects.map((project) => (
+                          <Button
+                            key={project.id}
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => void selectProject(project.id)}
+                            className="mb-1 w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-accent"
+                          >
+                            {project.name}
+                          </Button>
+                        ))}
                       </div>
                       <Button
                         type="button"
