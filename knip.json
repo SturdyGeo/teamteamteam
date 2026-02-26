@@ -20,7 +20,8 @@
       "project": ["src/**/*.{ts,tsx}"]
     },
     "apps/web": {
-      "project": ["src/**/*.{ts,tsx}"]
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignoreDependencies": ["zod"]
     }
   }
 }
