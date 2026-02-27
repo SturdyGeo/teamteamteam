@@ -479,7 +479,7 @@ export function RootLayout(): React.JSX.Element {
       <VisibleProjectBoardsContext.Provider value={visibleBoardsContextValue}>
         <div className="min-h-screen bg-app-auth-surface">
           <main className="grid min-h-screen place-items-center px-4 py-10">
-            <Outlet />
+            {status === "loading" ? null : <Outlet />}
           </main>
         </div>
       </VisibleProjectBoardsContext.Provider>
