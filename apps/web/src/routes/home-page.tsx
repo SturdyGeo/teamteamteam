@@ -15,13 +15,9 @@ export function HomePage(): React.JSX.Element {
           className="mx-auto mb-5 h-44 w-44 rounded-lg object-contain md:h-52 md:w-52"
         />
         <h1 className="text-[22px] font-semibold tracking-tight text-foreground">Teamteamteam</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Terminal-first Kanban</p>
       </div>
 
       <div className="mt-8 border-t border-border pt-6 text-center">
-        <p className="mb-5 text-sm text-muted-foreground">
-          Corporate composure. Basement IT energy.
-        </p>
         <Button
           asChild
           className={`rounded-md px-8 font-mono ${PRIMARY_BUTTON_CLASS}`}
