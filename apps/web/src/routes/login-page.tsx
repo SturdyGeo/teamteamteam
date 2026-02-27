@@ -42,8 +42,13 @@ export function LoginPage(): React.JSX.Element {
     setMessage("Passcode sent. Enter the code from your email.");
   }
 
-  async function handleVerifyOtp(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
+    // If OTP hasn't been requested yet, send it. Otherwise verify.
+    if (!otpRequested) {
+      await handleSendOtp();
+      return;
+    }
     setError(null);
     setMessage(null);
     setVerifyingOtp(true);
@@ -77,7 +82,7 @@ export function LoginPage(): React.JSX.Element {
         <p className="mt-1 text-sm text-muted-foreground">Terminal-first Kanban</p>
       </div>
 
-      <form onSubmit={handleVerifyOtp} className="space-y-6 font-mono">
+      <form onSubmit={handleFormSubmit} className="space-y-6 font-mono">
         {!otpRequested ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">Login requested for:</p>
