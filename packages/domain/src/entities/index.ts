@@ -10,6 +10,7 @@ export { ProjectSchema, type Project } from "./project.js";
 export { WorkflowColumnSchema, type WorkflowColumn } from "./workflow-column.js";
 export { TicketSchema, type Ticket } from "./ticket.js";
 export { TagSchema, type Tag } from "./tag.js";
+export { TicketCommentSchema, type TicketComment } from "./ticket-comment.js";
 export {
   TicketCreatedEventSchema,
   StatusChangedEventSchema,
