@@ -37,3 +37,11 @@ export function ticketActivityQueryOptions(ticketId: string) {
     staleTime: 10_000,
   });
 }
+
+export function archivedTicketsQueryOptions(projectId: string) {
+  return queryOptions({
+    queryKey: ["projects", projectId, "tickets", "archived"],
+    queryFn: () => apiClient.getArchivedTickets(projectId),
+    staleTime: 15_000,
+  });
+}

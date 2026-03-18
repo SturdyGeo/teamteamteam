@@ -12,6 +12,7 @@ export interface QueryMethods {
   getProjects(orgId: string): Promise<Project[]>;
   getColumns(projectId: string): Promise<WorkflowColumn[]>;
   getTickets(projectId: string, params?: TicketQueryParams): Promise<Ticket[]>;
+  getArchivedTickets(projectId: string): Promise<Ticket[]>;
   getTicket(ticketId: string): Promise<Ticket>;
   getTags(projectId: string): Promise<Tag[]>;
   getActivity(ticketId: string): Promise<ActivityEventWithActor[]>;
@@ -49,6 +50,10 @@ export function createQueryMethods(http: HttpClient): QueryMethods {
     getTickets(projectId: string, params?: TicketQueryParams) {
       const qs = buildQueryString(params);
       return http.get<Ticket[]>(`/projects/${projectId}/tickets${qs}`);
+    },
+
+    getArchivedTickets(projectId: string) {
+      return http.get<Ticket[]>(`/projects/${projectId}/tickets/archived`);
     },
 
     getTicket(ticketId: string) {

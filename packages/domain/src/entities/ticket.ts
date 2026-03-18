@@ -13,6 +13,7 @@ export const TicketSchema = z.object({
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
   closed_at: z.string().datetime().nullable(),
+  archived_at: z.string().datetime().nullable().default(null),
 });
 
 export type Ticket = z.infer<typeof TicketSchema>;

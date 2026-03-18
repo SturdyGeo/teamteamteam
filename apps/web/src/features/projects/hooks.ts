@@ -8,6 +8,7 @@ import type { Ticket } from "@teamteamteam/domain";
 import { apiClient } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import {
+  archivedTicketsQueryOptions,
   projectColumnsQueryOptions,
   projectTicketQueryOptions,
   projectTicketsQueryOptions,
@@ -43,6 +44,13 @@ export function useTicketActivityQuery(ticketId: string | null, enabled = true) 
   return useQuery({
     ...ticketActivityQueryOptions(ticketId ?? ""),
     enabled: enabled && Boolean(ticketId),
+  });
+}
+
+export function useArchivedTicketsQuery(projectId: string | null, enabled = true) {
+  return useQuery({
+    ...archivedTicketsQueryOptions(projectId ?? ""),
+    enabled: enabled && Boolean(projectId),
   });
 }
 
@@ -262,6 +270,40 @@ export function useRemoveTagMutation(projectId: string | null) {
       apiClient.removeTag(ticketId, tag),
     onSuccess: async (_ticket, variables) => {
       await invalidateTicketQueries(projectId, queryClient, variables.ticketId);
+    },
+  });
+}
+
+export function useArchiveTicketMutation(projectId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ticketId: string) => apiClient.archiveTicket(ticketId),
+    onSuccess: async (_ticket, ticketId) => {
+      await invalidateTicketQueries(projectId, queryClient, ticketId);
+      // Also invalidate archived tickets query
+      if (projectId) {
+        await queryClient.invalidateQueries({
+          queryKey: ["projects", projectId, "tickets", "archived"],
+        });
+      }
+    },
+  });
+}
+
+export function useUnarchiveTicketMutation(projectId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ticketId: string) => apiClient.unarchiveTicket(ticketId),
+    onSuccess: async (_ticket, ticketId) => {
+      await invalidateTicketQueries(projectId, queryClient, ticketId);
+      // Also invalidate archived tickets query
+      if (projectId) {
+        await queryClient.invalidateQueries({
+          queryKey: ["projects", projectId, "tickets", "archived"],
+        });
+      }
     },
   });
 }

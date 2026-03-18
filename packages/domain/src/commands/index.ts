@@ -6,3 +6,5 @@ export { reopenTicket, type ReopenTicketInput } from "./reopen-ticket.js";
 export { assignTicket, type AssignTicketInput } from "./assign-ticket.js";
 export { addTag, type AddTagInput } from "./add-tag.js";
 export { removeTag, type RemoveTagInput } from "./remove-tag.js";
+export { archiveTicket, type ArchiveTicketInput } from "./archive-ticket.js";
+export { unarchiveTicket, type UnarchiveTicketInput } from "./unarchive-ticket.js";

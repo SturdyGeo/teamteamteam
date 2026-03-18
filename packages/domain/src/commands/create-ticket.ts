@@ -51,6 +51,7 @@ export function createTicket(
     created_at: input.now,
     updated_at: input.now,
     closed_at: null,
+    archived_at: null,
   };
 
   const event: NewActivityEvent = {

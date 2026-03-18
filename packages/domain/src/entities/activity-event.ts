@@ -63,6 +63,16 @@ export const TicketReopenedEventSchema = BaseEventSchema.extend({
   }),
 });
 
+export const TicketArchivedEventSchema = BaseEventSchema.extend({
+  event_type: z.literal("ticket_archived"),
+  payload: z.object({}),
+});
+
+export const TicketUnarchivedEventSchema = BaseEventSchema.extend({
+  event_type: z.literal("ticket_unarchived"),
+  payload: z.object({}),
+});
+
 export const ActivityEventSchema = z.discriminatedUnion("event_type", [
   TicketCreatedEventSchema,
   StatusChangedEventSchema,
@@ -72,6 +82,8 @@ export const ActivityEventSchema = z.discriminatedUnion("event_type", [
   TagRemovedEventSchema,
   TicketClosedEventSchema,
   TicketReopenedEventSchema,
+  TicketArchivedEventSchema,
+  TicketUnarchivedEventSchema,
 ]);
 
 export type ActivityEvent = z.infer<typeof ActivityEventSchema>;

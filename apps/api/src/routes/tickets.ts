@@ -7,6 +7,8 @@ import {
   assignTicket,
   closeTicket,
   reopenTicket,
+  archiveTicket,
+  unarchiveTicket,
   filterTickets,
   sortTickets,
 } from "@teamteamteam/domain";
@@ -42,6 +44,12 @@ tickets.get("/projects/:projectId/tickets", async (c) => {
     }
   }
 
+  // Filter archived tickets - include_archived=true to show all
+  const includeArchived = c.req.query("include_archived");
+  if (includeArchived !== "true") {
+    query = query.is("archived_at", null);
+  }
+
   const { data, error } = await query;
 
   if (error) {
@@ -65,6 +73,30 @@ tickets.get("/projects/:projectId/tickets", async (c) => {
   }
 
   // Sort by updated_at
+  const sorted = sortTickets(enriched);
+
+  return c.json(sorted);
+});
+
+tickets.get("/projects/:projectId/tickets/archived", async (c) => {
+  const { supabase } = getAuth(c);
+  const projectId = c.req.param("projectId");
+
+  const { data, error } = await supabase
+    .from("tickets")
+    .select(TICKET_SELECT)
+    .eq("project_id", projectId)
+    .not("archived_at", "is", null);
+
+  if (error) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: error.message } },
+      500,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const enriched = (data ?? []).map((row: any) => enrichTicketWithTags(row));
   const sorted = sortTickets(enriched);
 
   return c.json(sorted);
@@ -624,6 +656,110 @@ tickets.patch("/tickets/:ticketId/reopen", async (c) => {
     .update({
       status_column_id: result.data.status_column_id,
       closed_at: result.data.closed_at,
+      updated_at: result.data.updated_at,
+    })
+    .eq("id", ticketId);
+
+  if (updateError) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: updateError.message } },
+      500,
+    );
+  }
+
+  await persistActivityEvents(supabase, result.events);
+
+  return c.json(result.data);
+});
+
+tickets.patch("/tickets/:ticketId/archive", async (c) => {
+  const { supabase, user } = getAuth(c);
+  const ticketId = c.req.param("ticketId");
+
+  const { data: ticketData, error: ticketError } = await supabase
+    .from("tickets")
+    .select(TICKET_SELECT)
+    .eq("id", ticketId)
+    .single();
+
+  if (ticketError) {
+    if (ticketError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Ticket not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: ticketError.message } },
+      500,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ticket = enrichTicketWithTags(ticketData as any);
+
+  const now = new Date().toISOString();
+  const result = archiveTicket(ticket, {
+    actor_id: user.id,
+    now,
+  });
+
+  const { error: updateError } = await supabase
+    .from("tickets")
+    .update({
+      archived_at: result.data.archived_at,
+      updated_at: result.data.updated_at,
+    })
+    .eq("id", ticketId);
+
+  if (updateError) {
+    return c.json(
+      { error: { code: "DB_ERROR", message: updateError.message } },
+      500,
+    );
+  }
+
+  await persistActivityEvents(supabase, result.events);
+
+  return c.json(result.data);
+});
+
+tickets.patch("/tickets/:ticketId/unarchive", async (c) => {
+  const { supabase, user } = getAuth(c);
+  const ticketId = c.req.param("ticketId");
+
+  const { data: ticketData, error: ticketError } = await supabase
+    .from("tickets")
+    .select(TICKET_SELECT)
+    .eq("id", ticketId)
+    .single();
+
+  if (ticketError) {
+    if (ticketError.code === "PGRST116") {
+      return c.json(
+        { error: { code: "NOT_FOUND", message: "Ticket not found" } },
+        404,
+      );
+    }
+    return c.json(
+      { error: { code: "DB_ERROR", message: ticketError.message } },
+      500,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ticket = enrichTicketWithTags(ticketData as any);
+
+  const now = new Date().toISOString();
+  const result = unarchiveTicket(ticket, {
+    actor_id: user.id,
+    now,
+  });
+
+  const { error: updateError } = await supabase
+    .from("tickets")
+    .update({
+      archived_at: result.data.archived_at,
       updated_at: result.data.updated_at,
     })
     .eq("id", ticketId);
