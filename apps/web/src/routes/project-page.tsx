@@ -14,11 +14,14 @@ import { StateCard } from "@/components/ui/state-card";
 import { Textarea } from "@/components/ui/textarea";
 import {
   useAddTagMutation,
+  useArchiveTicketMutation,
+  useArchivedTicketsQuery,
   useAssignTicketMutation,
   useDeleteTicketMutation,
   useRemoveTagMutation,
   useTicketActivityQuery,
   useTicketDetailQuery,
+  useUnarchiveTicketMutation,
   useUpdateTicketMutation,
 } from "@/features/projects/hooks";
 import { ticketsForColumn } from "@/features/projects/selectors";
@@ -154,6 +157,10 @@ function formatActivityText(
       return "closed this ticket";
     case "ticket_reopened":
       return "reopened this ticket";
+    case "ticket_archived":
+      return "archived this ticket";
+    case "ticket_unarchived":
+      return "unarchived this ticket";
     default:
       return "updated this ticket";
   }
@@ -196,6 +203,7 @@ export function ProjectPage({
   const [memberFilter, setMemberFilter] = useState<string | null>(getStoredMemberFilter);
   const [memberFilterSearch, setMemberFilterSearch] = useState("");
   const [memberFilterOpen, setMemberFilterOpen] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const { session } = useAuth();
   const currentUserId = session?.user.id ?? null;
 
@@ -204,11 +212,14 @@ export function ProjectPage({
 
   const ticketDetailQuery = useTicketDetailQuery(selectedTicketId, Boolean(selectedTicketId));
   const ticketActivityQuery = useTicketActivityQuery(selectedTicketId, Boolean(selectedTicketId));
+  const archivedTicketsQuery = useArchivedTicketsQuery(projectId, showArchived);
   const updateMutation = useUpdateTicketMutation(projectId);
   const assignMutation = useAssignTicketMutation(projectId);
   const deleteMutation = useDeleteTicketMutation(projectId);
   const addTagMutation = useAddTagMutation(projectId);
   const removeTagMutation = useRemoveTagMutation(projectId);
+  const archiveMutation = useArchiveTicketMutation(projectId);
+  const unarchiveMutation = useUnarchiveTicketMutation(projectId);
 
   useEffect(() => {
     setBoardTickets(tickets);
@@ -294,6 +305,8 @@ export function ProjectPage({
     deleteMutation.isPending ||
     addTagMutation.isPending ||
     removeTagMutation.isPending ||
+    archiveMutation.isPending ||
+    unarchiveMutation.isPending ||
     isCreatePending ||
     isMovePending;
 
@@ -578,6 +591,36 @@ export function ProjectPage({
     }
   }
 
+  async function handleArchiveTicket(): Promise<void> {
+    if (!selectedTicket) {
+      return;
+    }
+
+    setModalError(null);
+
+    try {
+      await archiveMutation.mutateAsync(selectedTicket.id);
+      closeModal();
+    } catch (error) {
+      setModalError(toMessage(error));
+    }
+  }
+
+  async function handleUnarchiveTicket(): Promise<void> {
+    if (!selectedTicket) {
+      return;
+    }
+
+    setModalError(null);
+
+    try {
+      await unarchiveMutation.mutateAsync(selectedTicket.id);
+      closeModal();
+    } catch (error) {
+      setModalError(toMessage(error));
+    }
+  }
+
   return (
     <>
       <div className="space-y-4">
@@ -672,6 +715,20 @@ export function ProjectPage({
               ) : null}
             </PopoverContent>
           </Popover>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowArchived((prev) => !prev)}
+            className={cn(
+              "rounded-full border px-3 py-1 text-xs",
+              showArchived
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground",
+            )}
+          >
+            {showArchived ? "Hide Archived" : "View Archived"}
+          </Button>
         </div>
 
         {boardErrorMessage ? (
@@ -901,6 +958,48 @@ export function ProjectPage({
                 </section>
               );
             })}
+          </section>
+        ) : null}
+
+        {showArchived ? (
+          <section className="mt-6 space-y-3">
+            <h2 className="px-1 text-lg font-semibold text-foreground">Archived Tickets</h2>
+            {archivedTicketsQuery.isLoading ? (
+              <StateCard
+                title="Loading archived tickets"
+                description="Fetching archived tickets..."
+                className="rounded-[1.75rem] border-border bg-card/95 text-foreground"
+              />
+            ) : archivedTicketsQuery.data && archivedTicketsQuery.data.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {archivedTicketsQuery.data.map((ticket) => {
+                  const assignee =
+                    ticket.assignee_id === null
+                      ? "Unassigned"
+                      : (assigneeById.get(ticket.assignee_id) ?? "Unknown assignee");
+                  return (
+                    <article
+                      key={ticket.id}
+                      onClick={() => handleCardClick(ticket.id)}
+                      className="cursor-pointer rounded-2xl border border-border/60 bg-background/60 p-3 text-foreground opacity-70 transition hover:bg-card hover:opacity-100"
+                    >
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="font-mono text-[11px] text-muted-foreground">
+                          {projectPrefix}-{ticket.number}
+                        </span>
+                        <Badge className="rounded-full border border-muted bg-muted/50 px-2 text-muted-foreground text-[10px]">
+                          Archived
+                        </Badge>
+                      </div>
+                      <p className="mb-2 text-sm font-medium leading-snug">{ticket.title}</p>
+                      <p className="text-xs text-muted-foreground">{assignee}</p>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="px-1 text-sm text-muted-foreground">No archived tickets.</p>
+            )}
           </section>
         ) : null}
       </div>
@@ -1156,6 +1255,25 @@ export function ProjectPage({
                   >
                     {updateMutation.isPending ? "Saving..." : "Save changes"}
                   </Button>
+                  {selectedTicket.archived_at === null ? (
+                    <Button
+                      type="button"
+                      disabled={modalBusy}
+                      onClick={() => void handleArchiveTicket()}
+                      className="h-9 rounded-md border border-muted bg-muted/50 px-3 text-sm text-muted-foreground hover:bg-muted disabled:opacity-50"
+                    >
+                      {archiveMutation.isPending ? "Archiving..." : "Archive"}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      disabled={modalBusy}
+                      onClick={() => void handleUnarchiveTicket()}
+                      className="h-9 rounded-md border border-primary/70 bg-primary/20 px-3 text-sm text-primary hover:bg-primary/30 disabled:opacity-50"
+                    >
+                      {unarchiveMutation.isPending ? "Unarchiving..." : "Unarchive"}
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     disabled={modalBusy}
@@ -1204,6 +1322,7 @@ export function ProjectPage({
                 <div className="text-xs text-muted-foreground">
                   <p>Updated: {formatUpdatedAt(selectedTicket.updated_at)}</p>
                   {selectedTicket.closed_at ? <p>Closed: {formatUpdatedAt(selectedTicket.closed_at)}</p> : null}
+                  {selectedTicket.archived_at ? <p>Archived: {formatUpdatedAt(selectedTicket.archived_at)}</p> : null}
                 </div>
               </div>
             ) : null}
