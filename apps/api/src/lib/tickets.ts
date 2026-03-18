@@ -29,4 +29,4 @@ export function enrichTicketWithTags(raw: RawTicketRow): Ticket {
 }
 
 export const TICKET_SELECT =
-  "id, project_id, number, title, description, status_column_id, assignee_id, reporter_id, created_at, updated_at, closed_at, ticket_tags(tags(name))";
+  "id, project_id, number, title, description, status_column_id, assignee_id, reporter_id, created_at, updated_at, closed_at, archived_at, ticket_tags(tags(name))";
